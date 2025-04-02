@@ -27,7 +27,7 @@ title = "Vari-sh's Blog"
     weight = 1
 
   [[menu.main]]
-    name = "Blog"
+    name = "Archive"
     url = "/posts/"
     weight = 2
 

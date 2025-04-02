@@ -1,10 +1,6 @@
----
-title: "Welcome to Vari-sh's Dark Blog"
-date: 2025-04-02
-draft: false
----
-
 # 🧙‍♂️ The Mystical Lair of vari.sh
+
+---
 
 ![Doppelganger](/images/redteamgrimoire.png)
 
