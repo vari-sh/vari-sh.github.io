@@ -1,16 +1,16 @@
 ---
-title = 'Doppelganger'
-date = 2025-04-02T15:28:21+02:00
-draft = false
+title: "Doppelganger"
+date: 2025-04-02T15:28:21+02:00
+draft: false
 ---
 
 ### Doppelganger Program: An Advanced LSASS Dumper with Process Cloning
 
 #### Author: vari.sh
 
-![Doppelganger](images/doppelganger.png)
-
 ---
+
+![Doppelganger](/images/doppelganger.png)
 
 ## Overview
 

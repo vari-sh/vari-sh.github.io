@@ -6,6 +6,8 @@ draft: false
 
 # 🧙‍♂️ The Mystical Lair of vari.sh
 
+![Doppelganger](/images/redteamgrimoire.png)
+
 ## 🔮 Whoami?
 
 Greetings, wanderer! 👋 I am **vari.sh**, an ethical hacker and digital sorcerer 🧙‍♂️ hailing from the arcane lands of cybersecurity. I earned my Master’s Degree in **ICT for Internet and Multimedia (Telecommunications Engineering)** from the ancient halls of **Università degli Studi di Padova**.
