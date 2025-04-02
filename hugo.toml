@@ -1,39 +1,48 @@
 baseURL = "https://vari-sh.github.io/"
 languageCode = "en-us"
-theme = "anubis2"
-title = "Vari-sh's Blog"
+theme = "not-much"
+title = "vari-sh's Blog"
 
+[params]
+theme = "dark"
+palette = "catpuccin"
+showThemeNotice = false
+showPostsSummary = true 
 [params.author]
   name = "vari-sh"
 
-[params]
-  rssIcon = false
+[markup]
+  [markup.highlight]
+    style = 'dracula'
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
 
-[[params.Social]]
-  id = "github"
-  url = "https://github.com/vari-sh"
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
 
-[markup.goldmark.renderer]
-  unsafe = true # true | false; Enable unsafe mode to have a better experience
-
-[markup.highlight]
-  style = 'base16-snazzy' # Chroma style, find more at here: https://swapoff.org/chroma/playground/
-
-
+# Navigation
 [menu]
   [[menu.main]]
-    name = "Home"
+    identifier = "home"
+    name = "home"
+    title = "Home"
     url = "/"
     weight = 1
-
+  
   [[menu.main]]
-    name = "Archive"
+    identifier = "posts"
+    name = "posts"
+    title = "posts"
     url = "/posts/"
     weight = 2
-
+  
   [[menu.main]]
-    name = "About"
-    url = "/about/"
+    identifier = "github"
+    name = "github"
+    title = "GitHub"
+    url = "https://github.com/vari-sh"
     weight = 3
 
 
