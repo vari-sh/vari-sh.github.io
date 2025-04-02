@@ -4,13 +4,20 @@ theme = "anubis2"
 title = "Vari-sh's Blog"
 
 [params.author]
-name = "Vari-sh"
+  name = "vari-sh"
+
+[params]
+  rssIcon = false
+
+[[params.Social]]
+  id = "github"
+  url = "https://github.com/vari-sh"
 
 [markup.goldmark.renderer]
-unsafe = true # true | false; Enable unsafe mode to have a better experience
+  unsafe = true # true | false; Enable unsafe mode to have a better experience
 
 [markup.highlight]
-style = 'base16-snazzy' # Chroma style, find more at here: https://swapoff.org/chroma/playground/
+  style = 'base16-snazzy' # Chroma style, find more at here: https://swapoff.org/chroma/playground/
 
 
 [menu]
@@ -28,3 +35,5 @@ style = 'base16-snazzy' # Chroma style, find more at here: https://swapoff.org/c
     name = "About"
     url = "/about/"
     weight = 3
+
+
