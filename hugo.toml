@@ -1,7 +1,7 @@
 baseURL = "https://vari-sh.github.io/"
 languageCode = "en-us"
 theme = "not-much"
-title = "vari-sh's Blog"
+title = "vari.sh's Blog"
 
 [params]
 theme = "dark"
@@ -9,7 +9,7 @@ palette = "catpuccin"
 showThemeNotice = false
 showPostsSummary = true 
 [params.author]
-  name = "vari-sh"
+  name = "vari.sh"
 
 [markup]
   [markup.highlight]

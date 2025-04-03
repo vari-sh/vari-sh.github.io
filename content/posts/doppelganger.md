@@ -9,7 +9,7 @@ tags: ["red teaming", "windows security", "Detection bypass", "RTCore64", "LSASS
 summary: Overview of the Doppelganger technique for dumping LSASS via cloning, featuring obfuscation and security solutions detection bypass.
 ---
 
-# Doppelganger Program: An Advanced LSASS Dumper with Process Cloning
+# Doppelganger: An Advanced LSASS Dumper with Process Cloning
 
 ## Author: vari.sh
 
@@ -37,7 +37,7 @@ The program achieves this by:
 - **Token Manipulation:** Elevates to SYSTEM privileges to access LSASS, ensuring compatibility even with domain accounts.
 - **Driver Interaction:** Leverages `RTCore64.sys` for direct memory access to disable PPL, utilizing kernel privileges to modify process protection.
 - **Process Cloning:** Uses `NtCreateProcessEx` to clone `lsass.exe` and evade detection by EDR/XDR solutions.
-- **XOR Encryption:** Dumps are encrypted with a predefined XOR key before being written to a file. The dump is temporarily written to a temp file to avoid detection, then XORed and saved to disk.
+- **XOR Encryption:** Encrypts dumps with a predefined XOR key before write them to a file. The dump is temporarily written to a temp file to avoid detection, then XORed and saved to disk.
 - **DLL Obfuscation:** Loads DLLs and APIs using encrypted strings to bypass signature-based detections, preventing static analysis.
 
 ---
@@ -65,7 +65,7 @@ Ensure the `RTCore64.sys` driver is present and accessible by the program (in `C
 
 ## Code Breakdown
 
-### 1. Resolving APIs
+### 1. APIs Resolution
 
 The tool resolves critical Windows APIs by decrypting their names from encrypted strings and dynamically loading them with custom API resolution methods. This allows bypassing API monitoring mechanisms from security solutions.
 
@@ -131,7 +131,7 @@ NTSTATUS status = pNTCPX(
 );
 ```
 
-### 4. Disabling PPL
+### 4. PPL Disabling
 
 Protected Process Light (PPL) protection is disabled by directly modifying memory using the `RTCore64.sys` driver.
 
@@ -142,7 +142,7 @@ WriteMemoryPrimitive(Device, 1, eproc + offs.Protection, 0x00); // Protection
 log_success("PPL disabled (0x00 written)");
 ```
 
-### 5. Creating the Dump
+### 5. Dump Creation
 
 A memory dump of the cloned `lsass.exe` process is created in a temp file, then encrypted and written to `C:\Users\Public\`.
 
@@ -158,7 +158,7 @@ BOOL dumped = pMDWD(
 );
 ```
 
-### 5. Restoring PPL
+### 5. PPL Restoring
 
 Protection fields are then restored to their original values.
 
