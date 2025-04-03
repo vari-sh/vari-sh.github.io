@@ -13,7 +13,7 @@ showPostsSummary = true
 
 [markup]
   [markup.highlight]
-    style = 'dracula'
+    style = 'catppuccin-macchiato'
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
