@@ -7,7 +7,7 @@ title = "vari-sh's Blog"
 theme = "dark"
 palette = "catpuccin"
 showThemeNotice = false
-showPostsSummary = false 
+showPostsSummary = true 
 [params.author]
   name = "vari-sh"
 
