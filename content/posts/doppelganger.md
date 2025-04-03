@@ -1,7 +1,12 @@
 ---
-title: "Doppelganger"
-date: 2025-04-02T15:28:21+02:00
+title: "Doppelganger: Cloning and Dumping LSASS to Evade Detection"
+date: 2025-04-03
+slug: "Doppelganger"
+description: "Technique for cloning and dumping LSASS to evade detection using RTCore64.sys, NtCreateProcessEx and MiniDumpWriteDump."
+keywords: ["Doppelganger", "LSASS", "RTCore64", "Red Teaming", "Detection Bypass", "Windows Security"]
 draft: false
+tags: ["red teaming", "windows security", "EDR bypass", "RTCore64", "LSASS"]
+summary: Overview of the Doppelganger technique for dumping LSASS via cloning, featuring obfuscation and security solutions detection bypass.
 ---
 
 # Doppelganger Program: An Advanced LSASS Dumper with Process Cloning
