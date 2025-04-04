@@ -38,7 +38,7 @@ The program achieves this by:
 - **Token Manipulation:** Elevates to SYSTEM privileges to access LSASS, ensuring compatibility even with domain accounts.
 - **Driver Interaction:** Leverages `RTCore64.sys` for direct memory access to disable PPL, utilizing kernel privileges to modify process protection.
 - **Process Cloning:** Uses `NtCreateProcessEx` to clone `lsass.exe` and evade detection by EDR/XDR solutions.
-- **XOR Encryption:** Encrypts dumps with a predefined XOR key before write them to a file. The dump is temporarily written to a temp file to avoid detection, then XORed and saved to disk.
+- **XOR Encryption:** Encrypts dumps with a predefined XOR key before write them to a file. The dump is saved to memory through MDWD callback, then XORed and saved to disk.
 - **DLL Obfuscation:** Loads DLLs and APIs using encrypted strings to bypass signature-based detections, preventing static analysis.
 
 ---
