@@ -978,8 +978,8 @@ Use responsibly. Learn deeply. Red team ethically.
 
 ## References
 
-https://github.com/Offensive-Panda/NT-AUTHORITY-SYSTEM-CONTEXT-RTCORE/
-https://www.vergiliusproject.com
-https://ntdoc.m417z.com/ntcreateprocessex
-https://billdemirkapi.me/abusing-windows-implementation-of-fork-for-stealthy-memory-operations/
-https://shorsec.io/blog/its-all-in-the-details-the-curious-case-of-an-lsass-dumper-gone-undetected/
+- https://github.com/Offensive-Panda/NT-AUTHORITY-SYSTEM-CONTEXT-RTCORE/
+- https://www.vergiliusproject.com
+- https://ntdoc.m417z.com/ntcreateprocessex
+- https://billdemirkapi.me/abusing-windows-implementation-of-fork-for-stealthy-memory-operations/
+- https://shorsec.io/blog/its-all-in-the-details-the-curious-case-of-an-lsass-dumper-gone-undetected/
