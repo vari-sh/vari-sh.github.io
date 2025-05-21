@@ -129,7 +129,7 @@ These mechanisms raise the bar for credential theft, but as history shows, **def
 By leveraging native Windows internals and carefully crafted obfuscation, Doppelganger:
 
 - **Clones the LSASS process** using `NtCreateProcessEx`, creating a nearly identical copy of the target.
-- **Avoids accessing the original LSASS** directly, which would trigger protections like PPL or Credential Guard.
+- **Avoids accessing the original LSASS** directly, which would trigger alerts.
 - **Uses kernel-level access** via the vulnerable driver `RTCore64.sys` to temporarily remove process protections without crashing the system or triggering alarms.
 - **Encrypts the resulting memory dump** with XOR encryption to minimize detection and simplify exfiltration.
 - **Loads API functions dynamically and obfuscated**, preventing static detection by EDRs and sandbox analysis tools.
