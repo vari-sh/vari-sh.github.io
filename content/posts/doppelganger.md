@@ -9,11 +9,9 @@ tags: ["red teaming", "windows security", "Detection bypass", "RTCore64", "LSASS
 summary: Overview of the Doppelganger technique for dumping LSASS via cloning, featuring obfuscation and security solutions detection bypass.
 toc: true
 ---
-
 # Doppelganger: An Advanced LSASS Dumper with Process Cloning
 
 ## Author: vari.sh
-
 ---
 
 ![Doppelganger](/images/doppelganger.png)
