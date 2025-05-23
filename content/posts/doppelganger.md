@@ -141,7 +141,7 @@ Most security solutions focus on **monitoring and protecting the LSASS process i
 - Kernel callbacks to detect memory access to protected processes.
 - Logging and alerting when LSASS memory is dumped.
 
-But Doppelganger **never touches the original LSASS**.
+But Doppelganger **never touches the memory of the original LSASS**.
 
 Instead, it:
 
@@ -228,7 +228,7 @@ One of the key stealth mechanisms in **Doppelganger** is its **dynamic and obfus
 This technique serves multiple purposes:
 
 - **Evades static detection** (no plaintext API names in the binary)
-- **Avoids hooking** by loading clean DLLs manually
+- **Avoids hooking** by loading clean DLLs at runtime
 - **Reduces behavioral visibility** by delaying resolution until the function is actually needed
 
 #### XOR-Obfuscated API Strings
