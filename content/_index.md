@@ -31,3 +31,6 @@ May your shellcodes be undetected and your breakpoints ever precise.
 
 — vari.sh
 
+## Support
+[BuyMeACoffee](https://buymeacoffee.com/vari.sh)
+
