@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Tags on vari-sh&#39;s Blog</title>
+    <title>Tags on vari.sh&#39;s Blog</title>
     <link>http://localhost:1313/tags/</link>
-    <description>Recent content in Tags on vari-sh&#39;s Blog</description>
+    <description>Recent content in Tags on vari.sh&#39;s Blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
+    <lastBuildDate>Thu, 03 Apr 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Detection Bypass</title>
+      <link>http://localhost:1313/tags/detection-bypass/</link>
+      <pubDate>Thu, 03 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/detection-bypass/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>LSASS</title>
+      <link>http://localhost:1313/tags/lsass/</link>
+      <pubDate>Thu, 03 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/lsass/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Red Teaming</title>
+      <link>http://localhost:1313/tags/red-teaming/</link>
+      <pubDate>Thu, 03 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/red-teaming/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RTCore64</title>
+      <link>http://localhost:1313/tags/rtcore64/</link>
+      <pubDate>Thu, 03 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/rtcore64/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Windows Security</title>
+      <link>http://localhost:1313/tags/windows-security/</link>
+      <pubDate>Thu, 03 Apr 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/windows-security/</guid>
+      <description></description>
+    </item>
   </channel>
 </rss>
