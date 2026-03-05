@@ -1,8 +1,18 @@
+---
+title: "Obolos: Building a Polymorphic Syscall Engine with Full Stack Spoofing"
+date: 2026-03-05
+slug: "obolos"
+description: "Deep dive into the architecture of a custom syscall engine combining indirect syscalls, extended stack spoofing, dynamic SSN resolution via Halo's Gate, and polymorphic stub generation to evade EDR detection on Windows x64."
+keywords: ["Indirect Syscalls", "Stack Spoofing", "Halo's Gate", "Polymorphic Stubs", "EDR Evasion", "Windows Internals", "Red Teaming", "Syscall Engine", "MASM", "Windows Security"]
+draft: false
+tags: ["red teaming", "windows security", "edr evasion", "syscalls", "windows internals", "offensive security"]
+summary: "Architecture and implementation of Obolos, a syscall engine that combines Halo's Gate SSN resolution, indirect syscall dispatch, synthetic stack construction, dynamic spoofing masks anchored to real call-sites, and polymorphic 16-byte MASM stubs to produce a stealthy, robust kernel call dispatcher."
+toc: true
+---
+
 # 🪙 Obolos: Building a Polymorphic Syscall Engine with Full Stack Spoofing
 
 > **Disclaimer.** This material is published for educational and research purposes only. Understanding offensive techniques is essential for building better defenses. The author assumes no responsibility for misuse.
-
-**Tags:** Indirect Syscalls · Stack Spoofing · Halo's Gate · Polymorphic Stubs · x64 Windows
 
 ---
 
