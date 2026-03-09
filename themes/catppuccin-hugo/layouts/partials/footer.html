@@ -1,0 +1,58 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="container--wide">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <a href="{{ "/" | relURL }}" class="site-logo">
+          <span class="logo-icon" aria-hidden="true">🧙‍♂️</span>
+          <span>{{ .Site.Title }}</span>
+        </a>
+        <p class="footer-tagline">
+          {{ .Site.Params.description | default "A modern blog with the Catppuccin palette." }}
+        </p>
+      </div>
+
+      <div>
+        <p class="footer-heading">Navigation</p>
+        <ul class="footer-links">
+          <li><a href="{{ "/" | relURL }}">Home</a></li>
+          <li><a href="{{ "/posts/" | relURL }}">Posts</a></li>
+          <li><a href="{{ "/tags/" | relURL }}">Tags</a></li>
+          <li><a href="{{ "/" | relURL }}#about">About</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="footer-heading">Link</p>
+        <ul class="footer-links">
+          {{ with .Site.Params.github }}<li><a href="{{ . }}" target="_blank" rel="noopener">GitHub</a></li>{{ end }}
+          {{ with .Site.Params.twitter }}<li><a href="https://twitter.com/{{ . }}" target="_blank" rel="noopener">Twitter</a></li>{{ end }}
+          {{ with .Site.Params.mastodon }}<li><a href="{{ . }}" target="_blank" rel="noopener">Mastodon</a></li>{{ end }}
+          <li><a href="{{ "/index.xml" | relURL }}">RSS Feed</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>
+        © {{ now.Year }} {{ if reflect.IsMap .Site.Params.author }}{{ .Site.Params.author.name | default .Site.Title }}{{ else }}{{ .Site.Params.author | default .Site.Title }}{{ end }} ·
+        Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" style="color:var(--accent)">Hugo</a> ·
+        Theme <a href="https://catppuccin.com" target="_blank" rel="noopener" style="color:var(--accent)">Catppuccin</a>
+      </span>
+      <div class="footer-palette" aria-hidden="true" title="Catppuccin palette">
+        <span class="palette-dot" style="background:var(--rosewater)"></span>
+        <span class="palette-dot" style="background:var(--flamingo)"></span>
+        <span class="palette-dot" style="background:var(--pink)"></span>
+        <span class="palette-dot" style="background:var(--mauve)"></span>
+        <span class="palette-dot" style="background:var(--red)"></span>
+        <span class="palette-dot" style="background:var(--peach)"></span>
+        <span class="palette-dot" style="background:var(--yellow)"></span>
+        <span class="palette-dot" style="background:var(--green)"></span>
+        <span class="palette-dot" style="background:var(--teal)"></span>
+        <span class="palette-dot" style="background:var(--blue)"></span>
+        <span class="palette-dot" style="background:var(--lavender)"></span>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,11 @@
+name = "Catppuccin Hugo"
+license = "MIT"
+licenselink = "https://github.com/catppuccin/catppuccin/blob/main/LICENSE"
+description = "A beautiful, modern Hugo theme inspired by the Catppuccin color palette"
+homepage = "https://github.com/catppuccin/hugo"
+tags = ["catppuccin", "blog", "dark", "minimal", "modern"]
+features = ["blog", "responsive", "syntax-highlighting", "dark-mode"]
+min_version = "0.112.0"
+
+[author]
+  name = "Catppuccin Hugo Theme"

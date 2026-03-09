@@ -1,0 +1,21 @@
+{{ define "main" }}
+<div class="container">
+
+  <header class="page-header">
+    <h1 class="page-title">🏷️ Tags</h1>
+    <p class="page-subtitle">Browse posts by topic</p>
+  </header>
+
+  <div class="tags-cloud">
+    {{ $colors := slice "mauve" "blue" "green" "peach" "teal" "pink" "lavender" "yellow" "sapphire" "flamingo" }}
+    {{ range $i, $term := .Data.Terms.Alphabetical }}
+    <a href="{{ .Page.Permalink }}" class="tag-item"
+       style="--tag-color: var(--{{ index $colors (mod $i (len $colors)) }})">
+      {{ .Page.Title }}
+      <span class="tag-count">{{ .Count }}</span>
+    </a>
+    {{ end }}
+  </div>
+
+</div>
+{{ end }}

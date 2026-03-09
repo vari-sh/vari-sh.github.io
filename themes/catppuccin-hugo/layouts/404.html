@@ -1,0 +1,16 @@
+{{ define "main" }}
+<div class="container">
+  <div class="error-page">
+    <div class="error-code"><span>4</span>0<span>4</span></div>
+    <h1 style="font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:0.75rem">
+      Page not found
+    </h1>
+    <p style="color:var(--subtext0); margin-bottom:2rem; font-size:1rem">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+    <a href="{{ "/" | relURL }}" class="btn btn-primary">
+      ← Back to Home
+    </a>
+  </div>
+</div>
+{{ end }}

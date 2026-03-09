@@ -1,48 +1,62 @@
-baseURL = "https://vari-sh.github.io/"
-languageCode = "en-us"
-theme = "not-much"
-title = "vari.sh's Blog"
-
-[params]
-theme = "dark"
-palette = "catpuccin"
-showThemeNotice = false
-showPostsSummary = true
-[params.author]
-  name = "vari.sh"
+baseURL = "https://vari.sh/"
+languageCode = "en"
+title = "vari.sh"
+theme = "catppuccin-hugo"
 
 [markup]
   [markup.highlight]
-    style = 'catppuccin-macchiato'
-  [markup.goldmark]
-    [markup.goldmark.renderer]
-      unsafe = true
+    style = "catppuccin-mocha"
+    lineNos = false
+    noClasses = false
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
 
-[caches]
-  [caches.images]
-    dir = ':cacheDir/images'
+[params]
+  description = "Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire."
 
-# Navigation
+  [params.author]
+    name = "vari.sh"
+
+  authorRole = "Ethical Hacker & Security Researcher"
+
+  heroEyebrow  = "Welcome to my lair"
+  heroTitle    = "Hacking, Research<br><em>&amp; Dark Arts</em>"
+  heroSubtitle = "Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire."
+
+  github = "https://github.com/vari-sh"
+
+  toc    = true
+  search = false
+
 [menu]
   [[menu.main]]
-    identifier = "home"
-    name = "home"
-    title = "Home"
-    url = "/"
+    name   = "Home"
+    url    = "/"
     weight = 1
-  
   [[menu.main]]
-    identifier = "posts"
-    name = "posts"
-    title = "posts"
-    url = "/posts/"
+    name   = "Posts"
+    url    = "/posts/"
     weight = 2
-  
   [[menu.main]]
-    identifier = "github"
-    name = "github"
-    title = "GitHub"
-    url = "https://github.com/vari-sh"
+    name   = "Tags"
+    url    = "/tags/"
     weight = 3
+  [[menu.main]]
+    name   = "About"
+    url    = "/#about"
+    weight = 4
+  [[menu.main]]
+    name   = "GitHub"
+    url    = "https://github.com/vari-sh"
+    weight = 5
 
+[taxonomies]
+  tag      = "tags"
+  category = "categories"
 
+[outputs]
+  home    = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]

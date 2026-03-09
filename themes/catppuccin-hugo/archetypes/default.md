@@ -1,0 +1,10 @@
++++
+title = "{{ replace .File.ContentBaseName "-" " " | title }}"
+date = {{ .Date }}
+draft = true
+description = ""
+tags = []
+emoji = "📝"
++++
+
+Scrivi qui il tuo contenuto...

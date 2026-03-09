@@ -1,0 +1,86 @@
+{{ define "main" }}
+<article class="post-single">
+  <div class="container">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">
+          {{ .Date.Format "02 January 2006" }}
+        </time>
+        {{ if .Params.readingTime }}
+        <span class="post-date">· {{ .ReadingTime }} min read</span>
+        {{ end }}
+        {{ range .Params.tags }}
+        <a href="{{ "/tags/" | relURL }}{{ . | urlize }}" class="post-tag">{{ . }}</a>
+        {{ end }}
+      </div>
+
+      <h1 class="post-title">{{ .Title }}</h1>
+
+      {{ with .Description }}
+      <p class="post-description">{{ . }}</p>
+      {{ end }}
+
+      {{ $authorName := "" }}
+      {{ with .Site.Params.author }}
+        {{ if reflect.IsMap . }}
+          {{ $authorName = .name | default "" }}
+        {{ else }}
+          {{ $authorName = . | string }}
+        {{ end }}
+      {{ end }}
+      {{ with $authorName }}
+      <div class="post-author">
+        <div class="author-avatar" aria-hidden="true">
+          {{ substr . 0 1 | upper }}
+        </div>
+        <div class="author-info">
+          <span class="author-name">{{ . }}</span>
+          <span class="author-role">{{ $.Site.Params.authorRole | default "Author" }}</span>
+        </div>
+      </div>
+      {{ end }}
+    </header>
+
+    {{/* Table of Contents */}}
+    {{ if and .Site.Params.toc (gt (len .TableOfContents) 100) }}
+    <div class="toc">
+      <p class="toc-title">📖 Contents</p>
+      {{ .TableOfContents }}
+    </div>
+    {{ end }}
+
+    {{/* Content */}}
+    <div class="post-content">
+      {{ .Content }}
+    </div>
+
+    {{/* Tags footer */}}
+    {{ with .Params.tags }}
+    <hr class="section-divider">
+    <div class="post-meta" style="flex-wrap:wrap; gap:0.5rem">
+      <span style="color:var(--subtext0); font-size:0.85rem">Tag:</span>
+      {{ range . }}
+      <a href="{{ "/tags/" | relURL }}{{ . | urlize }}" class="post-tag">{{ . }}</a>
+      {{ end }}
+    </div>
+    {{ end }}
+
+    {{/* Navigation */}}
+    <hr class="section-divider">
+    <nav style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap">
+      {{ with .PrevInSection }}
+      <a href="{{ .Permalink }}" class="btn btn-outline" style="max-width:45%">
+        ← {{ .Title | truncate 40 }}
+      </a>
+      {{ end }}
+      {{ with .NextInSection }}
+      <a href="{{ .Permalink }}" class="btn btn-outline" style="margin-left:auto; max-width:45%; text-align:right">
+        {{ .Title | truncate 40 }} →
+      </a>
+      {{ end }}
+    </nav>
+
+  </div>
+</article>
+{{ end }}

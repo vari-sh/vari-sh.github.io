@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang | default "en" }}" data-theme="mocha">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+
+  {{/* Open Graph */}}
+  <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+  <meta property="og:title" content="{{ .Title }}">
+  <meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+  <meta property="og:url" content="{{ .Permalink }}">
+  {{ with .Site.Params.ogImage }}<meta property="og:image" content="{{ . }}">{{ end }}
+
+  {{/* Twitter Card */}}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ .Title }}">
+
+  {{/* Canonical */}}
+  <link rel="canonical" href="{{ .Permalink }}">
+
+  {{/* RSS */}}
+  {{ range .AlternativeOutputFormats -}}
+    <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $.Site.Title }}">
+  {{ end }}
+
+  {{/* Favicon */}}
+  {{ if .Site.Params.favicon }}
+  <link rel="icon" href="{{ .Site.Params.favicon | relURL }}">
+  {{ else }}
+  <link rel="icon" href="{{ "favicon.ico" | relURL }}" type="image/x-icon">
+  {{ end }}
+
+  {{/* Fonts preconnect */}}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  {{/* Styles */}}
+  <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
+  {{ range .Site.Params.customCSS -}}
+    <link rel="stylesheet" href="{{ . | relURL }}">
+  {{ end }}
+
+  {{/* Syntax Highlighting */}}
+  {{ if .Site.Params.syntaxHighlight }}
+  <link rel="stylesheet" href="{{ "css/syntax.css" | relURL }}">
+  {{ end }}
+
+  {{ partial "head-extra.html" . }}
+</head>
+<body>
+
+  {{ partial "header.html" . }}
+
+  <main id="main-content">
+    {{ block "main" . }}{{ end }}
+  </main>
+
+  {{ partial "footer.html" . }}
+
+  <button class="back-to-top" id="back-to-top" aria-label="Torna su">↑</button>
+
+  <script src="{{ "js/main.js" | relURL }}" defer></script>
+  {{ range .Site.Params.customJS -}}
+    <script src="{{ . | relURL }}" defer></script>
+  {{ end }}
+
+  {{ if .Site.Params.search }}
+  {{ partial "search-data.html" . }}
+  {{ end }}
+</body>
+</html>

@@ -1,0 +1,110 @@
+{{ define "main" }}
+
+{{/* ── HERO — pulls title/description from _index.md front matter ── */}}
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow animate-fade-up">
+      <span>✦</span>
+      {{ .Site.Params.heroEyebrow | default "Welcome to my lair" }}
+    </div>
+    <h1 class="hero-title animate-fade-up animate-delay-1">
+      {{ with .Site.Params.heroTitle }}{{ . | safeHTML }}{{ else }}Hacking, Research<br><em>&amp; Dark Arts</em>{{ end }}
+    </h1>
+    <p class="hero-subtitle animate-fade-up animate-delay-2">
+      {{ .Site.Params.heroSubtitle | default "Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire." }}
+    </p>
+    <div class="hero-cta animate-fade-up animate-delay-3">
+      <a href="{{ "/posts/" | relURL }}" class="btn btn-primary">
+        Read the scrolls
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+      <a href="#about" class="btn btn-outline">About me</a>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+{{/* ── ABOUT — rendered from content/_index.md body ── */}}
+{{ with .Content }}
+<section id="about" class="about-section">
+  <div class="container">
+    <div class="about-card">
+      <div class="post-content">
+        {{ . }}
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="section-divider">
+{{ end }}
+
+{{/* ── LATEST POSTS ── */}}
+<section class="posts-section">
+  <div class="container">
+
+    {{ $posts := where .Site.RegularPages "Type" "posts" }}
+    {{ $featured := first 1 $posts }}
+    {{ $rest := after 1 (first 7 $posts) }}
+
+    {{/* Featured */}}
+    {{ range $featured }}
+    <div class="section-header">
+      <h2 class="section-title">✦ Featured</h2>
+    </div>
+    <a href="{{ .Permalink }}" class="post-featured">
+      <div class="post-featured-image">
+        {{ with .Params.emoji }}{{ . }}{{ else }}📜{{ end }}
+      </div>
+      <div class="post-featured-body">
+        <div class="post-meta">
+          <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">
+            {{ .Date.Format "02 Jan 2006" }}
+          </time>
+          {{ range first 2 .Params.tags }}
+          <span class="post-tag">{{ . }}</span>
+          {{ end }}
+        </div>
+        <h3 class="post-title" style="font-size:1.4rem">{{ .Title }}</h3>
+        <p class="post-excerpt">{{ .Description | default (.Summary | truncate 140) }}</p>
+        <span class="post-readmore">Read more →</span>
+      </div>
+    </a>
+    {{ end }}
+
+    {{/* Grid */}}
+    {{ if $rest }}
+    <div class="section-header" style="margin-top:2.5rem">
+      <h2 class="section-title">Latest Posts</h2>
+      <a href="{{ "/posts/" | relURL }}" class="section-link">All posts →</a>
+    </div>
+    <div class="posts-grid">
+      {{ range $rest }}
+      <a href="{{ .Permalink }}" class="post-card">
+        <div class="post-meta">
+          <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan 2006" }}</time>
+          {{ range first 1 .Params.tags }}
+          <span class="post-tag">{{ . }}</span>
+          {{ end }}
+        </div>
+        <h3 class="post-title">{{ .Title }}</h3>
+        <p class="post-excerpt">{{ .Description | default (.Summary | truncate 100) }}</p>
+        <span class="post-readmore">Read →</span>
+      </a>
+      {{ end }}
+    </div>
+    {{ end }}
+
+    {{ if not $posts }}
+    <div style="text-align:center; padding:4rem 0; color:var(--subtext0)">
+      <p style="font-size:2rem; margin-bottom:1rem">📜</p>
+      <p>No scrolls inscribed yet. Check back soon.</p>
+    </div>
+    {{ end }}
+
+  </div>
+</section>
+
+{{ end }}

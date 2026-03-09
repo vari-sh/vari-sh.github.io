@@ -1,0 +1,6 @@
+{{ $type := .Get "type" | default "note" }}
+{{ $icons := dict "note" "💡" "tip" "✅" "warn" "⚠️" "danger" "🚨" }}
+<div class="callout callout-{{ $type }}" role="note">
+  <span class="callout-icon" aria-hidden="true">{{ index $icons $type }}</span>
+  <div>{{ .Inner | markdownify }}</div>
+</div>

