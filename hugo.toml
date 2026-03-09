@@ -16,12 +16,7 @@ theme = "catppuccin-hugo"
 
 [params]
   description = "Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire."
-
-  [params.author]
-    name = "vari.sh"
-
   authorRole = "Ethical Hacker & Security Researcher"
-
   heroEyebrow  = "Welcome to my lair"
   heroTitle    = "Hacking, Research<br><em>&amp; Dark Arts</em>"
   heroSubtitle = "Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire."
@@ -30,6 +25,9 @@ theme = "catppuccin-hugo"
 
   toc    = true
   search = false
+
+  [params.author]
+    name = "vari.sh"
 
 [menu]
   [[menu.main]]
