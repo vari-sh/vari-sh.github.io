@@ -46,10 +46,6 @@ theme = "catppuccin-hugo"
     name   = "About"
     url    = "/#about"
     weight = 4
-  [[menu.main]]
-    name   = "GitHub"
-    url    = "https://github.com/vari-sh"
-    weight = 5
 
 [taxonomies]
   tag      = "tags"
