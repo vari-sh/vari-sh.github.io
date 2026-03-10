@@ -1208,5 +1208,5 @@ pre:hover .copy-btn { opacity: 1; }
   .post-list-date { display: none; }
   .posts-grid { grid-template-columns: 1fr; }
 
-  .hero { padding: 3rem 0 2.5rem; }
+  /* .hero { padding: 3rem 0 2.5rem; } */
 }
