@@ -1034,6 +1034,10 @@ pre code {
 }
 
 /* ══ COPY BUTTON ══ */
+.code-wrapper {
+  position: relative;
+}
+
 .copy-btn {
   position: absolute;
   top: 0.65rem;
@@ -1051,9 +1055,10 @@ pre code {
   transition: all 0.2s ease;
   opacity: 0;
   padding: 0;
+  z-index: 1;
 }
 
-pre:hover .copy-btn { opacity: 1; }
+.code-wrapper:hover .copy-btn { opacity: 1; }
 
 .copy-btn:hover {
   background: var(--surface1);
@@ -1067,6 +1072,7 @@ pre:hover .copy-btn { opacity: 1; }
   color: var(--green);
   background: rgba(166, 227, 161, 0.1);
 }
+
 .back-to-top {
   position: fixed;
   bottom: 1.5rem;

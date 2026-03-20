@@ -103,6 +103,11 @@
 
     /* ── Copy Code Buttons ── */
     document.querySelectorAll('pre').forEach(pre => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-wrapper';
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
       const btn = document.createElement('button');
       btn.className = 'copy-btn';
       btn.setAttribute('aria-label', 'Copy code');
@@ -125,8 +130,7 @@
           }, 2000);
         });
       });
-      pre.style.position = 'relative';
-      pre.appendChild(btn);
+      wrapper.appendChild(btn);
     });
   });
 })();
