@@ -52,8 +52,8 @@
 
   {{/* Reading Progress Bar */}}
   {{ if .IsPage }}
-  <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--border-subtle);">
-    <div id="reading-progress" style="height:100%;background:linear-gradient(90deg,var(--mauve),var(--blue));width:0;transition:width 0.1s;"></div>
+  <div class="reading-progress-track">
+    <div class="reading-progress-bar" id="reading-progress"></div>
   </div>
   {{ end }}
 </header>

@@ -1,0 +1,120 @@
+{{ define "main" }}
+
+{{/* ── HERO ── */}}
+<section class="hero">
+  <div class="container">
+    <div class="hero-sigil animate-fade-up">
+      {{ partial "sigil.html" . }}
+    </div>
+    <p class="hero-eyebrow animate-fade-up animate-delay-1">
+      {{ .Site.Params.heroEyebrow | default "Enter the Grimoire" }}
+    </p>
+    <h1 class="hero-title animate-fade-up animate-delay-1">
+      {{ with .Site.Params.heroTitle }}{{ . | safeHTML }}{{ else }}Exploits, Rituals<br><em>&amp; Red Team Craft</em>{{ end }}
+    </h1>
+    <p class="hero-subtitle animate-fade-up animate-delay-2">
+      {{ .Site.Params.heroSubtitle | default .Site.Params.description }}
+    </p>
+    <div class="hero-cta animate-fade-up animate-delay-3">
+      <a href="{{ "/posts/" | relURL }}" class="btn btn-primary">
+        Read the scrolls
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+      <a href="#about" class="btn btn-outline">About me</a>
+    </div>
+    <div class="rule-double hero-rule" aria-hidden="true"></div>
+  </div>
+</section>
+
+{{/* ── ABOUT — rendered from content/_index.md body ── */}}
+{{ with .Content }}
+<section id="about" class="about-section">
+  <div class="container">
+    <p class="about-label label" data-reveal>The Keeper of this Grimoire</p>
+    <div class="about-card" data-reveal>
+      <div class="post-content">
+        {{ . }}
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+<hr class="section-divider">
+
+{{/* ── ENTRIES ── */}}
+<section class="posts-section">
+  <div class="container">
+
+    {{ $posts := where .Site.RegularPages "Type" "posts" }}
+    {{ $featured := first 1 $posts }}
+    {{ $rest := after 1 (first 7 $posts) }}
+
+    {{/* Featured */}}
+    {{ range $featured }}
+    <div class="section-header" data-reveal>
+      <h2 class="section-title">Featured</h2>
+      <span class="section-rule"></span>
+    </div>
+    <a href="{{ .Permalink }}" class="post-featured" data-reveal>
+      <span class="post-featured-mark" aria-hidden="true">{{ with .Params.emoji }}{{ . }}{{ else }}📜{{ end }}</span>
+      <div class="post-featured-body">
+        <div class="post-meta">
+          <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">
+            {{ .Date.Format "02 Jan 2006" }}
+          </time>
+          <span class="post-date">· {{ .ReadingTime }} min</span>
+          {{ range first 2 .Params.tags }}
+          <span class="post-tag">{{ . }}</span>
+          {{ end }}
+        </div>
+        <h3 class="post-title">{{ .Title }}</h3>
+        <p class="post-excerpt">{{ .Description | default (.Summary | truncate 150) }}</p>
+        <span class="post-readmore">Read more
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </div>
+    </a>
+    {{ end }}
+
+    {{/* Index */}}
+    {{ if $rest }}
+    <div class="section-header" style="margin-top:3.5rem" data-reveal>
+      <h2 class="section-title">Latest Entries</h2>
+      <span class="section-rule"></span>
+      <a href="{{ "/posts/" | relURL }}" class="section-link">All posts →</a>
+    </div>
+    <div class="posts-list" data-reveal>
+      {{ range $rest }}
+      <a href="{{ .Permalink }}" class="post-list-item">
+        <time class="post-list-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2006" }}</time>
+        <div>
+          <h3 class="post-list-title">{{ .Title }}</h3>
+          <p class="post-list-excerpt">{{ .Description | default (.Summary | truncate 120) }}</p>
+          <div class="post-meta" style="margin-top:0.7rem">
+            {{ range first 3 .Params.tags }}
+            <span class="post-tag">{{ . }}</span>
+            {{ end }}
+          </div>
+        </div>
+        <span class="post-list-arrow" aria-hidden="true">→</span>
+      </a>
+      {{ end }}
+    </div>
+    {{ end }}
+
+    {{ if not $posts }}
+    <div class="posts-empty">
+      <p class="mark">📜</p>
+      <p>No scrolls inscribed yet. Check back soon.</p>
+    </div>
+    {{ end }}
+
+  </div>
+</section>
+
+{{ end }}

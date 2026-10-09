@@ -1,0 +1,5 @@
+{{/* Posts carrying a single tag. Declared explicitly so it wins over
+     tags/taxonomy.html in Hugo's older template lookup rules too. */}}
+{{ define "main" }}
+{{ partial "post-index.html" . }}
+{{ end }}

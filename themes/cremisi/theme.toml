@@ -1,0 +1,9 @@
+name = "Cremisi"
+license = "MIT"
+description = "A gothic-modern Hugo theme for research notebooks and grimoires — obsidian and parchment, crimson and bone."
+tags = ["blog", "dark", "gothic", "editorial", "minimal", "modern"]
+features = ["blog", "responsive", "syntax-highlighting", "dark-mode", "reading-progress"]
+min_version = "0.112.0"
+
+[author]
+  name = "vari.sh"

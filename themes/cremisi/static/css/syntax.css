@@ -1,0 +1,72 @@
+/* ═══════════════════════════════════════════
+   CREMISI — syntax highlighting (Chroma classes)
+   Crimson keywords · sage strings · ember numbers
+═══════════════════════════════════════════ */
+
+.chroma { color: var(--subtext1); background: transparent; }
+
+/* comments */
+.chroma .c, .chroma .ch, .chroma .cm, .chroma .c1, .chroma .cs { color: var(--overlay1); font-style: italic; }
+.chroma .cp, .chroma .cpf { color: var(--clay); }
+
+/* keywords */
+.chroma .k, .chroma .kc, .chroma .kr { color: var(--blood-400); font-weight: 500; }
+.chroma .kd, .chroma .kn { color: var(--blood-400); }
+.chroma .kp { color: var(--rose); }
+.chroma .kt { color: var(--gold); }
+
+/* names */
+.chroma .n  { color: var(--subtext1); }
+.chroma .na { color: var(--gold); }
+.chroma .nb, .chroma .bp { color: var(--teal); }
+.chroma .nc, .chroma .nn { color: var(--text); }
+.chroma .nd, .chroma .ni { color: var(--clay); }
+.chroma .ne { color: var(--blood-300); }
+.chroma .nf, .chroma .fm { color: var(--text); font-weight: 500; }
+.chroma .nl { color: var(--rose); }
+.chroma .no { color: var(--ember); }
+.chroma .nt { color: var(--blood-400); }
+.chroma .nv, .chroma .vc, .chroma .vg, .chroma .vi, .chroma .vm { color: var(--subtext1); }
+.chroma .py { color: var(--gold); }
+
+/* literals */
+.chroma .l, .chroma .ld { color: var(--sage); }
+.chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .dl,
+.chroma .sd, .chroma .s2, .chroma .sh, .chroma .si, .chroma .sx,
+.chroma .s1, .chroma .ss { color: var(--sage); }
+.chroma .se { color: var(--ember); font-weight: 500; }
+.chroma .sr { color: var(--teal); }
+.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi,
+.chroma .il, .chroma .mo { color: var(--ember); }
+
+/* operators & punctuation */
+.chroma .o, .chroma .ow { color: var(--rose); }
+.chroma .p { color: var(--overlay2); }
+
+/* diff / generic */
+.chroma .gd { color: var(--blood-300); background: rgba(196, 39, 64, 0.1); }
+.chroma .gi { color: var(--sage); background: rgba(111, 155, 115, 0.1); }
+.chroma .gh, .chroma .gu { color: var(--text); font-weight: 600; }
+.chroma .ge { font-style: italic; }
+.chroma .gs { font-weight: 600; }
+.chroma .gl { text-decoration: underline; }
+.chroma .gt, .chroma .err { color: var(--blood-400); }
+.chroma .gp { color: var(--overlay1); }
+
+/* line numbers & highlighted lines */
+.chroma .lnt, .chroma .ln, .chroma .lnlinks {
+  color: var(--ink-500);
+  user-select: none;
+  margin-right: 0.9rem;
+}
+
+.chroma .hl {
+  display: block;
+  background: rgba(196, 39, 64, 0.1);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* table-based line numbers layout */
+.chroma .lntable { border-spacing: 0; padding: 0; margin: 0; border: none; width: auto; }
+.chroma .lntable td { padding: 0; border: none; vertical-align: top; }
+.chroma .lntd { padding: 0 !important; border: none !important; }

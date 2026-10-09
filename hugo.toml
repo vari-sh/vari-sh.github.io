@@ -1,11 +1,12 @@
 baseURL = "https://vari.sh/"
 languageCode = "en"
 title = "vari.sh"
-theme = "catppuccin-hugo"
+theme = "cremisi"
 
 [markup]
   [markup.highlight]
-    style = "catppuccin-mocha"
+    # Colours come from the theme's own css/syntax.css (class-based output).
+    style = "monokai"
     lineNos = false
     noClasses = false
   [markup.goldmark.renderer]
@@ -15,16 +16,17 @@ theme = "catppuccin-hugo"
     endLevel = 4
 
 [params]
-  description = "Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire."
-  authorRole = "Ethical Hacker & Security Researcher"
-  heroEyebrow  = "Welcome to my lair"
-  heroTitle    = "Hacking, Research<br><em>&amp; Dark Arts</em>"
-  heroSubtitle = "Ethical hacker, security researcher, and digital sorcerer. Welcome to my grimoire."
+  description = "Field notes from the other side of the EDR: Windows internals, syscalls, and the dark craft of red teaming."
+  authorRole = "Red Teamer & Offensive Security Researcher"
+  heroEyebrow  = "Enter the Grimoire"
+  heroTitle    = "Exploits, Rituals<br><em>&amp; Red Team Craft</em>"
+  heroSubtitle = "Windows internals, EDR evasion, and the dark craft of red teaming — written down as field notes for fellow sorcerers of the offensive arts."
 
   github = "https://github.com/vari-sh"
 
-  toc    = true
-  search = false
+  toc             = true
+  search          = false
+  syntaxHighlight = true
 
   [params.author]
     name = "vari.sh"

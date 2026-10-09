@@ -1,0 +1,37 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+
+    <div class="footer-sigil" aria-hidden="true">
+      {{ partial "sigil.html" . }}
+    </div>
+
+    <div class="footer-brand">
+      <a href="{{ "/" | relURL }}" class="site-logo">
+        <span class="logo-icon" aria-hidden="true">🧙‍♂️</span>
+        <span>{{ .Site.Title }}</span>
+      </a>
+    </div>
+
+    <p class="footer-tagline">
+      {{ .Site.Params.description | default "A grimoire of exploits, research, and dark arts." }}
+    </p>
+
+    <ul class="footer-links">
+      <li><a href="{{ "/" | relURL }}">Home</a></li>
+      <li><a href="{{ "/posts/" | relURL }}">Posts</a></li>
+      <li><a href="{{ "/tags/" | relURL }}">Tags</a></li>
+      <li><a href="{{ "/" | relURL }}#about">About</a></li>
+      {{ with .Site.Params.github }}<li><a href="{{ . }}" target="_blank" rel="noopener">GitHub</a></li>{{ end }}
+      {{ with .Site.Params.twitter }}<li><a href="https://twitter.com/{{ . }}" target="_blank" rel="noopener">Twitter</a></li>{{ end }}
+      {{ with .Site.Params.mastodon }}<li><a href="{{ . }}" target="_blank" rel="noopener">Mastodon</a></li>{{ end }}
+      <li><a href="{{ "/index.xml" | relURL }}">RSS</a></li>
+    </ul>
+
+    <div class="footer-bottom">
+      © {{ now.Year }} {{ if reflect.IsMap .Site.Params.author }}{{ .Site.Params.author.name | default .Site.Title }}{{ else }}{{ .Site.Params.author | default .Site.Title }}{{ end }} ·
+      Built with <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a> ·
+      Theme <span style="color:var(--subtext0)">Cremisi</span>
+    </div>
+
+  </div>
+</footer>

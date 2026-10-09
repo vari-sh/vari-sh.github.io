@@ -1,14 +1,14 @@
-/* Catppuccin Hugo — main.js */
+/* vari.sh — main.js */
 (() => {
   'use strict';
 
   /* ── Theme Toggle ── */
-  const THEME_KEY = 'catppuccin-theme';
+  const THEME_KEY = 'varish-theme';
   const html = document.documentElement;
 
   function getTheme() {
     return localStorage.getItem(THEME_KEY) ||
-      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'latte' : 'mocha');
+      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'ivory' : 'obsidian');
   }
 
   function setTheme(theme) {
@@ -20,13 +20,13 @@
   function updateThemeBtn(theme) {
     const btn = document.getElementById('theme-toggle');
     if (!btn) return;
-    btn.innerHTML = theme === 'mocha' ? '☀️' : '🌙';
-    btn.title = theme === 'mocha' ? 'Switch to Latte (light)' : 'Switch to Mocha (dark)';
+    btn.innerHTML = theme === 'obsidian' ? '🕯️' : '🌙';
+    btn.title = theme === 'obsidian' ? 'Switch to Ivory (light)' : 'Switch to Obsidian (dark)';
   }
 
   function toggleTheme() {
-    const current = html.getAttribute('data-theme') || 'mocha';
-    setTheme(current === 'mocha' ? 'latte' : 'mocha');
+    const current = html.getAttribute('data-theme') || 'obsidian';
+    setTheme(current === 'obsidian' ? 'ivory' : 'obsidian');
   }
 
   // Init
@@ -43,8 +43,25 @@
     if (toggle && nav) {
       toggle.addEventListener('click', () => {
         const open = nav.classList.toggle('open');
+        toggle.classList.toggle('open', open);
         toggle.setAttribute('aria-expanded', open);
       });
+    }
+
+    /* ── Scroll Reveal ── */
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const targets = document.querySelectorAll('[data-reveal]');
+    if (targets.length && !reduced && 'IntersectionObserver' in window) {
+      document.body.classList.add('reveal-ready');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+      targets.forEach(el => io.observe(el));
     }
 
     /* ── Back to Top ── */
