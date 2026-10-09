@@ -10,11 +10,13 @@ summary: "Architecture and implementation of Obolos, a syscall engine that combi
 toc: true
 ---
 
-# 🪙 Obolos: Building a Polymorphic Syscall Engine with Full Stack Spoofing
+# Obolos: Building a Polymorphic Syscall Engine with Full Stack Spoofing
 
 > **Disclaimer.** This material is published for educational and research purposes only. Understanding offensive techniques is essential for building better defenses. The author assumes no responsibility for misuse.
 
 ---
+
+![Doppelganger](/images/obolos.png)
 
 ## 01 — Threat Model and Motivation
 
