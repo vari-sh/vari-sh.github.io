@@ -1376,6 +1376,12 @@ pre code {
   margin-top: 0;
 }
 
+/* the page opens on an epigraph, so it shouldn't stack margins with the label */
+.about-card .post-content > blockquote:first-child { margin-top: 0; }
+
+/* the portraits float, so a heading must never end up squeezed beside one */
+.about-card .post-content h2 { clear: both; }
+
 .about-card .post-content img {
   max-width: 172px;
   border-radius: 3px;
