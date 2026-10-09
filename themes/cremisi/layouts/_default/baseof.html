@@ -3,6 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  {{/* Apply the stored theme before first paint, so neither the palette
+       nor the toggle icon flashes the wrong state on every page load. */}}
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('varish-theme');
+        if (!t) {
+          t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'ivory' : 'obsidian';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) { /* private mode: keep the default */ }
+    })();
+  </script>
   <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
   <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
 

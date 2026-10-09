@@ -425,6 +425,12 @@ hr.section-divider::after {
   color: var(--accent-bright);
 }
 
+/* theme toggle — the icon follows data-theme, never JS */
+.theme-icon { line-height: 1; }
+.theme-icon--ivory { display: none; }
+[data-theme="ivory"] .theme-icon--obsidian { display: none; }
+[data-theme="ivory"] .theme-icon--ivory { display: inline; }
+
 /* reading progress */
 .reading-progress-track {
   position: absolute;

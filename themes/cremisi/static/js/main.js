@@ -2,40 +2,41 @@
 (() => {
   'use strict';
 
-  /* ── Theme Toggle ── */
+  /* ── Theme Toggle ──
+     The theme is applied before first paint by the inline script in
+     <head>, and the button's icon is picked by CSS from [data-theme].
+     This only has to persist the choice and keep the label honest. */
   const THEME_KEY = 'varish-theme';
   const html = document.documentElement;
 
-  function getTheme() {
-    return localStorage.getItem(THEME_KEY) ||
-      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'ivory' : 'obsidian');
+  function currentTheme() {
+    return html.getAttribute('data-theme') === 'ivory' ? 'ivory' : 'obsidian';
   }
 
   function setTheme(theme) {
     html.setAttribute('data-theme', theme);
-    localStorage.setItem(THEME_KEY, theme);
-    updateThemeBtn(theme);
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* private mode */ }
+    updateThemeLabel(theme);
   }
 
-  function updateThemeBtn(theme) {
+  function updateThemeLabel(theme) {
     const btn = document.getElementById('theme-toggle');
     if (!btn) return;
-    btn.innerHTML = theme === 'obsidian' ? '🕯️' : '🌙';
-    btn.title = theme === 'obsidian' ? 'Switch to Ivory (light)' : 'Switch to Obsidian (dark)';
+    const label = theme === 'obsidian'
+      ? 'Switch to Ivory (light)'
+      : 'Switch to Obsidian (dark)';
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
   }
 
   function toggleTheme() {
-    const current = html.getAttribute('data-theme') || 'obsidian';
-    setTheme(current === 'obsidian' ? 'ivory' : 'obsidian');
+    setTheme(currentTheme() === 'obsidian' ? 'ivory' : 'obsidian');
   }
-
-  // Init
-  setTheme(getTheme());
 
   document.addEventListener('DOMContentLoaded', () => {
     const themeBtn = document.getElementById('theme-toggle');
     if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
-    updateThemeBtn(getTheme());
+    updateThemeLabel(currentTheme());
 
     /* ── Mobile Menu ── */
     const toggle = document.getElementById('mobile-toggle');

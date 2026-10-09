@@ -30,8 +30,11 @@
         </a>
         {{ end }}
 
-        <button class="btn-icon" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
-          ☀️
+        {{/* Both icons ship in the markup; CSS shows the one matching
+             data-theme, so there is nothing for JS to swap in. */}}
+        <button class="btn-icon" id="theme-toggle" aria-label="Switch theme" title="Switch theme">
+          <span class="theme-icon theme-icon--obsidian" aria-hidden="true">🕯️</span>
+          <span class="theme-icon theme-icon--ivory" aria-hidden="true">🌙</span>
         </button>
 
         {{ with .Site.Params.github }}
