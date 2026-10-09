@@ -1,28 +1,28 @@
 {{/* Cremisi sigil — the theme's ornamental mark. Pure SVG, no assets. */}}
 <svg class="sigil" viewBox="0 0 120 120" fill="none" aria-hidden="true" focusable="false">
   {{/* outer ring */}}
-  <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-opacity="0.18" stroke-width="1"/>
+  <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-opacity="0.3" stroke-width="1"/>
 
   {{/* rotating dashed ring */}}
   <g class="sigil-ring">
-    <circle cx="60" cy="60" r="49" stroke="currentColor" stroke-opacity="0.55"
-            stroke-width="1" stroke-dasharray="2 7" stroke-linecap="round"/>
+    <circle cx="60" cy="60" r="49" stroke="currentColor" stroke-opacity="0.75"
+            stroke-width="1.2" stroke-dasharray="3 7" stroke-linecap="round"/>
   </g>
 
   {{/* radiating ticks */}}
-  <g class="sigil-ring--reverse" stroke="currentColor" stroke-opacity="0.4" stroke-width="1">
+  <g class="sigil-ring--reverse" stroke="currentColor" stroke-opacity="0.5" stroke-width="1">
     <path d="M60 4v9M60 107v9M4 60h9M107 60h9"/>
     <path d="M20.4 20.4l6.4 6.4M93.2 93.2l6.4 6.4M99.6 20.4l-6.4 6.4M26.8 93.2l-6.4 6.4"
-          stroke-opacity="0.22"/>
+          stroke-opacity="0.3"/>
   </g>
 
   {{/* inner ring */}}
-  <circle cx="60" cy="60" r="34" stroke="currentColor" stroke-opacity="0.2" stroke-width="1"/>
+  <circle cx="60" cy="60" r="34" stroke="currentColor" stroke-opacity="0.32" stroke-width="1"/>
 
   {{/* central lozenge */}}
   <rect x="47.5" y="47.5" width="25" height="25" transform="rotate(45 60 60)"
-        stroke="currentColor" stroke-opacity="0.8" stroke-width="1"/>
+        stroke="currentColor" stroke-opacity="0.9" stroke-width="1"/>
   <rect x="53.5" y="53.5" width="13" height="13" transform="rotate(45 60 60)"
-        stroke="currentColor" stroke-opacity="0.45" stroke-width="1"/>
+        stroke="currentColor" stroke-opacity="0.55" stroke-width="1"/>
   <circle cx="60" cy="60" r="2.6" fill="currentColor"/>
 </svg>

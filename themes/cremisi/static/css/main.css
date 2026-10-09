@@ -292,11 +292,11 @@ hr.section-divider::after {
 .sigil { display: block; color: var(--accent); }
 .sigil-ring {
   transform-origin: 60px 60px;
-  animation: sigilTurn 80s linear infinite;
+  animation: sigilTurn 26s linear infinite;
 }
 .sigil-ring--reverse {
   transform-origin: 60px 60px;
-  animation: sigilTurn 120s linear infinite reverse;
+  animation: sigilTurn 42s linear infinite reverse;
 }
 
 @keyframes sigilTurn {
@@ -469,23 +469,16 @@ hr.section-divider::after {
 
 .hero > .container { position: relative; z-index: 1; }
 
-/* the seal — a watermark behind the title, centred on it */
-.hero-titleblock { position: relative; }
-
 .hero-sigil {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: clamp(290px, 48vw, 480px);
-  transform: translate(-50%, -50%);
-  opacity: 0.5;
-  pointer-events: none;
-  z-index: 0;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.9rem;
 }
 
-.hero-sigil .sigil { width: 100%; height: auto; }
-
-[data-theme="ivory"] .hero-sigil { opacity: 0.42; }
+.hero-sigil .sigil {
+  width: clamp(104px, 11vw, 150px);
+  height: clamp(104px, 11vw, 150px);
+}
 
 .hero-eyebrow {
   display: inline-flex;
@@ -511,8 +504,6 @@ hr.section-divider::after {
 .hero-eyebrow::after { background: linear-gradient(90deg, var(--accent), transparent); }
 
 .hero-title {
-  position: relative;
-  z-index: 1;
   font-family: 'Cinzel', serif;
   font-weight: 600;
   font-size: var(--step-5);
@@ -1623,7 +1614,6 @@ pre code {
   .site-nav.open { display: flex; }
 
   .hero { padding: 3.5rem 0 3rem; }
-  .hero-sigil { width: clamp(240px, 78vw, 330px); opacity: 0.4; }
   .hero-cta { gap: 0.75rem; }
   .btn { padding: 0.75rem 1.3rem; }
 
