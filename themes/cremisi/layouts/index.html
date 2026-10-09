@@ -3,15 +3,18 @@
 {{/* ── HERO ── */}}
 <section class="hero">
   <div class="container">
-    <div class="hero-sigil animate-fade-up">
-      {{ partial "sigil.html" . }}
-    </div>
-    <p class="hero-eyebrow animate-fade-up animate-delay-1">
+    <p class="hero-eyebrow animate-fade-up">
       {{ .Site.Params.heroEyebrow | default "Enter the Grimoire" }}
     </p>
-    <h1 class="hero-title animate-fade-up animate-delay-1">
-      {{ with .Site.Params.heroTitle }}{{ . | safeHTML }}{{ else }}Exploits, Rituals<br><em>&amp; Red Team Craft</em>{{ end }}
-    </h1>
+    {{/* the seal sits behind the title, centred on it */}}
+    <div class="hero-titleblock animate-fade-up animate-delay-1">
+      <div class="hero-sigil" aria-hidden="true">
+        {{ partial "sigil.html" . }}
+      </div>
+      <h1 class="hero-title">
+        {{ with .Site.Params.heroTitle }}{{ . | safeHTML }}{{ else }}Exploits, Rituals<br><em>&amp; Red Team Craft</em>{{ end }}
+      </h1>
+    </div>
     <p class="hero-subtitle animate-fade-up animate-delay-2">
       {{ .Site.Params.heroSubtitle | default .Site.Params.description }}
     </p>
