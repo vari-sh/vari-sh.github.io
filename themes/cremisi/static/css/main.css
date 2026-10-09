@@ -1382,18 +1382,18 @@ pre code {
 /* the portraits float, so a heading must never end up squeezed beside one */
 .about-card .post-content h2 { clear: both; }
 
+/* round medallions — object-fit keeps them true circles even if a future
+   image isn't square, and no desaturation: these emblems carry the palette */
 .about-card .post-content img {
-  max-width: 172px;
-  border-radius: 3px;
+  width: 172px;
+  height: 172px;
+  object-fit: cover;
+  border-radius: 50%;
   float: right;
   margin: 0.3rem 0 1.4rem 2rem;
   border: 1px solid var(--hairline);
   box-shadow: var(--shadow-sm);
-  filter: grayscale(0.2) contrast(1.02);
-  transition: filter 0.4s ease;
 }
-
-.about-card .post-content img:hover { filter: grayscale(0) contrast(1); }
 
 /* ═══ CALLOUTS ═══ */
 .callout {
@@ -1634,6 +1634,7 @@ pre code {
   .about-card .post-content img {
     float: none;
     margin: 0 auto 1.5rem;
-    max-width: 150px;
+    width: 150px;
+    height: 150px;
   }
 }
