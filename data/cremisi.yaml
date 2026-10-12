@@ -2,14 +2,12 @@
 materials:
   - key: ground
     en: Crypt stone
-    it: pietra di cripta
     obsidian: "#171a1c"
     ivory: "#f4eee2"
     role: Background
     story: The cold slab on which everything rests.
   - key: ink
     en: Bone / ink
-    it: osso / inchiostro
     obsidian: "#e9e1d1"
     ivory: "#2b2733"
     role: Text, variables
@@ -17,7 +15,6 @@ materials:
     token: true
   - key: iron
     en: Wrought iron
-    it: ferro battuto
     obsidian: "#9a948c"
     ivory: "#64606c"
     role: Punctuation
@@ -25,7 +22,6 @@ materials:
     token: true
   - key: incense
     en: Incense
-    it: incenso / fumo
     obsidian: "#9e8d99"
     ivory: "#8a7f8c"
     role: Comments
@@ -33,21 +29,18 @@ materials:
     exempt: true
   - key: crimson
     en: Crimson
-    it: cremisi pieno
     obsidian: "#c42740"
     ivory: "#c42740"
     role: Accent, caret, selection
     story: The heart of the reliquary, identical in both variants.
   - key: crimson_deep
     en: Crimson deep
-    it: cremisi profondo
     obsidian: "#7e1023"
     ivory: "#7e1023"
     role: Selection border
     story: Blood clotted at the edges of the selection.
   - key: blood
     en: Blood
-    it: sangue
     obsidian: "#e2586a"
     ivory: "#bb1f39"
     role: Keywords, control flow, booleans, tags, exceptions
@@ -55,7 +48,6 @@ materials:
     token: true
   - key: lapis
     en: Lapis
-    it: lapis di messale
     obsidian: "#6886bb"
     ivory: "#2d5c9c"
     role: Functions
@@ -63,7 +55,6 @@ materials:
     token: true
   - key: tallow
     en: Tallow
-    it: sego di candela
     obsidian: "#dccb9a"
     ivory: "#7e6410"
     role: Types, classes, namespaces, attributes
@@ -71,7 +62,6 @@ materials:
     token: true
   - key: amber
     en: Amber
-    it: ambra
     obsidian: "#cf9142"
     ivory: "#9f5c12"
     role: Numbers, constants
@@ -79,7 +69,6 @@ materials:
     token: true
   - key: malachite
     en: Malachite
-    it: malachite
     obsidian: "#44a078"
     ivory: "#2f7a4e"
     role: Strings
@@ -87,7 +76,6 @@ materials:
     token: true
   - key: verdigris
     en: Verdigris
-    it: verderame
     obsidian: "#5f9a86"
     ivory: "#1f7064"
     role: Properties, escapes, regex
@@ -95,7 +83,6 @@ materials:
     token: true
   - key: amethyst
     en: Amethyst
-    it: ametista
     obsidian: "#9c7bb0"
     ivory: "#7e3a9e"
     role: Builtins, self
@@ -103,7 +90,6 @@ materials:
     token: true
   - key: wine
     en: Wine
-    it: vino
     obsidian: "#b27a90"
     ivory: "#8a3f64"
     role: Operators, imports
@@ -111,7 +97,6 @@ materials:
     token: true
   - key: petal
     en: Withered petal
-    it: petalo appassito
     obsidian: "#c58f96"
     ivory: "#a8465f"
     role: Parameters
@@ -119,7 +104,6 @@ materials:
     token: true
   - key: sealwax
     en: Sealing wax
-    it: ceralacca
     obsidian: "#c6784c"
     ivory: "#a24d20"
     role: Decorators, annotations
