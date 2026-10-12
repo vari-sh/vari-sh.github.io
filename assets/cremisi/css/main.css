@@ -223,7 +223,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(800px 400px at 50% 0%, rgba(196, 39, 64, .07), transparent 70%);
 }
-.sec-head { position: relative; text-align: center; margin-bottom: clamp(48px, 7vw, 80px); }
+.sec-head { position: relative; isolation: isolate; text-align: center; margin-bottom: clamp(48px, 7vw, 80px); }
 .numeral {
   position: absolute; top: -.36em; left: 50%; translate: -50% 0; z-index: -1;
   font-family: var(--f-title); font-weight: 600; font-size: clamp(6rem, 16vw, 11rem); line-height: 1;
