@@ -112,10 +112,10 @@ materials:
 
 ui_vars:
   - key: border
-    obsidian: "#272a2c"
+    obsidian: "#27272c"
     ivory: "#e4ddcc"
   - key: gutter_fg
-    obsidian: "#4a4e50"
+    obsidian: "#4a4a50"
     ivory: "#b3aa9a"
 
 globals:
