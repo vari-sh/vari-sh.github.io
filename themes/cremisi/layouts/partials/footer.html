@@ -30,7 +30,7 @@
     <div class="footer-bottom">
       © {{ now.Year }} {{ if reflect.IsMap .Site.Params.author }}{{ .Site.Params.author.name | default .Site.Title }}{{ else }}{{ .Site.Params.author | default .Site.Title }}{{ end }} ·
       Built with <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a> ·
-      Theme <span style="color:var(--subtext0)">Cremisi</span>
+      Theme <a href="{{ "/cremisi/" | relURL }}">Cremisi</a>
     </div>
 
   </div>

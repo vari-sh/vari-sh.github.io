@@ -246,8 +246,10 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .c-blood { color: var(--blood); } .c-bone { color: var(--bone); } .c-lapis { color: var(--lapis); }
 .c-stone { color: var(--iron); }
 
-.triad { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(12px, 2vw, 22px); align-items: end; }
-.pillar { margin: 0; text-align: center; }
+.triad { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto; column-gap: clamp(12px, 2vw, 22px); }
+.pillar { margin: 0; text-align: center; display: grid; grid-row: span 2; grid-template-rows: subgrid; }
+.pillar-frame { align-self: end; }
+.pillar figcaption { align-self: start; }
 .pillar-arch {
   position: relative; aspect-ratio: 1 / 2.3; clip-path: url(#arch); overflow: hidden;
   background:

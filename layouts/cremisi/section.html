@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cremisi — a gothic colour scheme for Sublime Text and Hugo · {{ site.Title }}</title>
   <meta name="description" content="{{ .Params.description }}">
-  <meta name="author" content="{{ site.Params.author }}">
+  <meta name="author" content="{{ with site.Params.author }}{{ if reflect.IsMap . }}{{ .name }}{{ else }}{{ . }}{{ end }}{{ end }}">
   <meta name="theme-color" content="#08090a">
   <meta property="og:title" content="Cremisi">
   <meta property="og:description" content="{{ .Params.description }}">
@@ -392,7 +392,7 @@
   {{ partial "cremisi/rose.html" "rose rose-foot" }}
   <p class="footer-title">Cremisi</p>
   <p class="footer-motto">Ex umbra in lucem</p>
-  <p class="footer-meta">Forged by <strong>{{ site.Params.author }}</strong> · Obsidian &amp; Ivory · <a href="{{ "/" | relURL }}">vari.sh</a> · <a href="#top">Back to top ↑</a></p>
+  <p class="footer-meta">Forged by <strong>{{ with site.Params.author }}{{ if reflect.IsMap . }}{{ .name }}{{ else }}{{ . }}{{ end }}{{ end }}</strong> · Obsidian &amp; Ivory · <a href="{{ "/" | relURL }}">vari.sh</a> · <a href="#top">Back to top ↑</a></p>
 </footer>
 
 <div class="toast" role="status" aria-live="polite" data-toast></div>
