@@ -1,0 +1,20 @@
+%YAML 1.2
+---
+# Liturgical calendar of the crypt
+abbey: Santa Maria del Cremisi
+founded: 1137
+sealed: true
+prior: null
+canonical_hours: &hours
+  - matins
+  - lauds
+  - vespers
+  - compline
+crypt:
+  temperature: 11.5
+  candles_lit: 7
+  hours: *hours
+  inscription: |
+    Here rests what was kept,
+    beneath cold stone and red wax.
+  motto: "Ex umbra in lucem"

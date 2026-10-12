@@ -1,0 +1,33 @@
+{{- $id := .id | default "rose" -}}
+<svg class="rose {{ .class }}" viewBox="-200 -200 400 400" fill="none" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="rose-ring-{{ $id }}" d="M0,-176 A176,176 0 1,1 -0.01,-176"/>
+  </defs>
+  <g stroke="currentColor" stroke-width="0.8">
+    <circle r="197"/>
+    <circle r="190" stroke-width="2.2"/>
+    <circle r="162"/>
+    <circle r="156" stroke-width="0.5"/>
+    <circle r="62" stroke-width="1.4"/>
+    <circle r="34"/>
+    <circle r="12" stroke-width="1.4"/>
+    {{- range seq 0 11 }}
+    {{- $a := mul . 30 }}
+    <g transform="rotate({{ $a }})">
+      <path d="M-15,-66 L-15,-118 Q-15,-140 0,-150 Q15,-140 15,-118 L15,-66 Z"/>
+      <path d="M-8,-74 L-8,-114 Q-8,-128 0,-135 Q8,-128 8,-114 L8,-74 Z" stroke-width="0.5"/>
+      <circle cy="-100" r="4"/>
+      <line y1="-12" y2="-34"/>
+      <line y1="-34" y2="-62" stroke-width="0.5"/>
+    </g>
+    <g transform="rotate({{ add $a 15 }})">
+      <circle cy="-140" r="9"/>
+      <circle cy="-140" r="3" stroke-width="0.5"/>
+      <path d="M0,-62 Q10,-90 0,-122 Q-10,-90 0,-62" stroke-width="0.5"/>
+    </g>
+    {{- end }}
+  </g>
+  {{- if .text }}
+  <text class="rose-text"><textPath href="#rose-ring-{{ $id }}">QUIS CUSTODIET IPSOS CUSTODES · PER UMBRAS AD NUCLEUM · NULLUM CASTELLUM INEXPUGNABILE ·</textPath></text>
+  {{- end }}
+</svg>

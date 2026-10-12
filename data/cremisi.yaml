@@ -1,0 +1,254 @@
+# Single source of the palette: the page, syntax.css and the .sublime-color-scheme files derive from here.
+materials:
+  - key: ground
+    en: Crypt stone
+    it: pietra di cripta
+    obsidian: "#171a1c"
+    ivory: "#f4eee2"
+    role: Background
+    story: The cold slab on which everything rests.
+  - key: ink
+    en: Bone / ink
+    it: osso / inchiostro
+    obsidian: "#e9e1d1"
+    ivory: "#2b2733"
+    role: Text, variables
+    story: Polished bone, scriptorium ink.
+    token: true
+  - key: iron
+    en: Wrought iron
+    it: ferro battuto
+    obsidian: "#9a948c"
+    ivory: "#64606c"
+    role: Punctuation
+    story: The grilles that divide, the nails that hold.
+    token: true
+  - key: incense
+    en: Incense
+    it: incenso / fumo
+    obsidian: "#9e8d99"
+    ivory: "#8a7f8c"
+    role: Comments
+    story: Smoke that rises and fades between the lines.
+    exempt: true
+  - key: crimson
+    en: Crimson
+    it: cremisi pieno
+    obsidian: "#c42740"
+    ivory: "#c42740"
+    role: Accent, caret, selection
+    story: The heart of the reliquary, identical in both variants.
+  - key: crimson_deep
+    en: Crimson deep
+    it: cremisi profondo
+    obsidian: "#7e1023"
+    ivory: "#7e1023"
+    role: Selection border
+    story: Blood clotted at the edges of the selection.
+  - key: blood
+    en: Blood
+    it: sangue
+    obsidian: "#e2586a"
+    ivory: "#bb1f39"
+    role: Keywords, control flow, booleans, tags, exceptions
+    story: The word that commands.
+    token: true
+  - key: lapis
+    en: Lapis
+    it: lapis di messale
+    obsidian: "#6886bb"
+    ivory: "#2d5c9c"
+    role: Functions
+    story: The only cold note, ground for missals.
+    token: true
+  - key: tallow
+    en: Tallow
+    it: sego di candela
+    obsidian: "#dccb9a"
+    ivory: "#7e6410"
+    role: Types, classes, namespaces, attributes
+    story: Candle wax for the names that endure.
+    token: true
+  - key: amber
+    en: Amber
+    it: ambra
+    obsidian: "#cf9142"
+    ivory: "#9f5c12"
+    role: Numbers, constants
+    story: Ancient resin that traps the numbers.
+    token: true
+  - key: malachite
+    en: Malachite
+    it: malachite
+    obsidian: "#44a078"
+    ivory: "#2f7a4e"
+    role: Strings
+    story: Green stone for quoted words.
+    token: true
+  - key: verdigris
+    en: Verdigris
+    it: verderame
+    obsidian: "#5f9a86"
+    ivory: "#1f7064"
+    role: Properties, escapes, regex
+    story: The copper that ages on church doors.
+    token: true
+  - key: amethyst
+    en: Amethyst
+    it: ametista
+    obsidian: "#9c7bb0"
+    ivory: "#7e3a9e"
+    role: Builtins, self
+    story: A bishop's gem for what is born with the language.
+    token: true
+  - key: wine
+    en: Wine
+    it: vino
+    obsidian: "#b27a90"
+    ivory: "#8a3f64"
+    role: Operators, imports
+    story: The chalice of operators.
+    token: true
+  - key: petal
+    en: Withered petal
+    it: petalo appassito
+    obsidian: "#c58f96"
+    ivory: "#a8465f"
+    role: Parameters
+    story: Dried petals pressed between the pages.
+    token: true
+  - key: sealwax
+    en: Sealing wax
+    it: ceralacca
+    obsidian: "#c6784c"
+    ivory: "#a24d20"
+    role: Decorators, annotations
+    story: The seal pressed upon decorators.
+    token: true
+
+ui_vars:
+  - key: border
+    obsidian: "#272a2c"
+    ivory: "#e4ddcc"
+  - key: gutter_fg
+    obsidian: "#4a4e50"
+    ivory: "#b3aa9a"
+
+globals:
+  - [background, "var(ground)"]
+  - [foreground, "var(ink)"]
+  - [caret, "var(blood)"]
+  - [line_highlight, "color(var(ink) alpha(0.05))"]
+  - [selection, "color(var(crimson) alpha(0.24))"]
+  - [selection_border, "var(crimson_deep)"]
+  - [inactive_selection, "color(var(crimson) alpha(0.12))"]
+  - [gutter, "var(ground)"]
+  - [gutter_foreground, "var(gutter_fg)"]
+  - [gutter_foreground_highlight, "var(blood)"]
+  - [highlight, "var(blood)"]
+  - [find_highlight, "var(amber)"]
+  - [find_highlight_foreground, "var(ground)"]
+  - [invisibles, "color(var(ink) alpha(0.10))"]
+  - [guide, "color(var(ink) alpha(0.06))"]
+  - [active_guide, "color(var(ink) alpha(0.16))"]
+  - [stack_guide, "color(var(ink) alpha(0.10))"]
+  - [brackets_foreground, "var(blood)"]
+  - [bracket_contents_foreground, "var(blood)"]
+  - [tags_foreground, "var(blood)"]
+  - [accent, "var(crimson)"]
+  - [line_diff_added, "var(malachite)"]
+  - [line_diff_modified, "var(amber)"]
+  - [line_diff_deleted, "var(blood)"]
+  - [minimap_border, "var(border)"]
+  - [shadow, "color(var(ground) alpha(0.6))"]
+
+rules:
+  - { name: Comments, scope: "comment, punctuation.definition.comment", fg: incense, style: italic }
+  - { name: Keywords and declarations, scope: "keyword, storage.modifier, storage.type.function, storage.type.class", fg: blood, style: italic }
+  - { name: Control flow, scope: "keyword.control", fg: blood, style: bold }
+  - { name: Imports, scope: "keyword.control.import, keyword.control.at-rule, keyword.other.import, meta.preprocessor", fg: wine, style: italic }
+  - { name: Operators, scope: "keyword.operator, punctuation.accessor", fg: wine }
+  - { name: Functions, scope: "entity.name.function, variable.function, support.function, meta.function-call", fg: lapis, style: italic }
+  - { name: Builtins and self, scope: "support.function.builtin, variable.language", fg: amethyst, style: italic }
+  - { name: Types, scope: "storage.type, support.type, entity.name.type", fg: tallow, style: italic }
+  - { name: Classes and namespaces, scope: "entity.name.class, entity.name.struct, entity.name.namespace, support.class, entity.other.inherited-class", fg: tallow, style: italic }
+  - { name: Strings, scope: "string, string.quoted, string.unquoted", fg: malachite }
+  - { name: Escapes and regex, scope: "constant.character.escape, constant.other.placeholder, string.regexp", fg: verdigris }
+  - { name: Numbers, scope: "constant.numeric", fg: amber }
+  - { name: Language constants, scope: "constant.language", fg: amber, style: italic }
+  - { name: Booleans, scope: "constant.language.boolean", fg: blood, style: bold italic }
+  - { name: Other constants, scope: "constant.other, variable.other.constant", fg: amber }
+  - { name: Parameters, scope: "variable.parameter", fg: petal, style: italic }
+  - { name: Variables, scope: "variable, variable.other", fg: ink }
+  - { name: Properties, scope: "variable.other.member, variable.other.property, meta.mapping.key string", fg: verdigris }
+  - { name: Decorators, scope: "entity.name.decorator, meta.decorator, meta.annotation, punctuation.definition.annotation", fg: sealwax }
+  - { name: Attributes, scope: "entity.other.attribute-name", fg: tallow, style: italic }
+  - { name: Tags, scope: "entity.name.tag", fg: blood }
+  - { name: Exceptions, scope: "support.type.exception, support.class.exception", fg: blood, style: italic }
+  - { name: Punctuation, scope: "punctuation", fg: iron }
+  - { name: Invalid, scope: "invalid, invalid.illegal", fg: "#ffffff", bg: crimson }
+  - { name: Diff deleted, scope: "markup.deleted", fg: blood }
+  - { name: Diff inserted, scope: "markup.inserted", fg: malachite }
+  - { name: Diff changed, scope: "markup.changed", fg: amber }
+  - { name: Markdown h1, scope: "markup.heading.1", fg: blood, style: bold }
+  - { name: Markdown h2, scope: "markup.heading.2", fg: amber, style: bold }
+  - { name: Markdown h3, scope: "markup.heading.3", fg: tallow, style: bold }
+  - { name: Markdown h4, scope: "markup.heading.4", fg: malachite, style: bold }
+  - { name: Markdown h5, scope: "markup.heading.5", fg: lapis, style: bold }
+  - { name: Markdown h6, scope: "markup.heading.6", fg: wine, style: bold }
+  - { name: Markdown bold, scope: "markup.bold", fg: tallow, style: bold }
+  - { name: Markdown italic, scope: "markup.italic", fg: petal, style: italic }
+  - { name: Markdown links, scope: "markup.underline.link, meta.link", fg: lapis, style: underline }
+  - { name: Markdown raw, scope: "markup.raw", fg: malachite }
+  - { name: Markdown quotes, scope: "markup.quote", fg: incense, style: italic }
+  - { name: Markdown lists and heading marks, scope: "markup.list punctuation.definition.list_item, punctuation.definition.heading", fg: blood }
+  - { name: JSON keys, scope: "meta.mapping.key.json string", fg: verdigris }
+  - { name: JSON constants, scope: "constant.language.json", fg: amber, style: italic }
+  - { name: YAML keys, scope: "meta.mapping.key.yaml string, entity.name.tag.yaml", fg: verdigris }
+  - { name: YAML anchors and aliases, scope: "entity.name.other.anchor.yaml, variable.other.alias.yaml, punctuation.definition.anchor.yaml, punctuation.definition.alias.yaml", fg: amethyst }
+  - { name: YAML directives and tags, scope: "meta.directive.yaml, keyword.other.directive.yaml, storage.type.tag-handle.yaml", fg: wine }
+  - { name: YAML block strings, scope: "string.unquoted.block.yaml", fg: malachite }
+  - { name: YAML constants, scope: "constant.language.yaml, constant.language.boolean.yaml, constant.language.null.yaml", fg: amber, style: italic }
+
+styles:
+  - name: Italic
+    css: italic
+    sample: def
+    roles: [Comments, Keywords and declarations, Imports, Functions, Types and classes, Parameters, Attributes, Builtins and self, Constants, Exceptions]
+  - name: Bold
+    css: bold
+    sample: return
+    roles: ["Control flow: if, for, while, return"]
+  - name: Bold italic
+    css: bolditalic
+    sample: "True"
+    roles: [Booleans]
+  - name: Regular
+    css: regular
+    sample: '"amen"'
+    roles: [Strings, Numbers, Operators, Punctuation, Variables]
+
+samples:
+  - { file: reliquary.py, lang: python, label: Python, hl: 25, col: 9 }
+  - { file: candle.rs, lang: rust, label: Rust, hl: 20, col: 9 }
+  - { file: scriptorium.ts, lang: typescript, label: TypeScript, hl: 23, col: 7 }
+  - { file: calendar.yaml, lang: yaml, label: YAML, hl: 6, col: 9 }
+  - { file: codex.html, lang: html, label: HTML, hl: 10, col: 7 }
+
+principles:
+  - title: Crypt stone
+    text: The dark ground is cold slate grey, the stone of a crypt.
+  - title: Crimson rules
+    text: Keywords, control flow, booleans and accents all speak with the voice of blood.
+  - title: A single cold note
+    text: Lapis blue is the one strong cool hue, reserved for functions.
+  - title: Earthly matter
+    text: Desaturated, warm, earthy and mineral colours, drawn from wax, resin, copper and stone.
+
+decisions:
+  - "The editor background is slate #171a1c: the cold stone of a crypt."
+  - "On the website the code background stays much darker than the stone, so contrast only improves there."
+  - "Tallow and malachite carry types and strings, warm and mineral."
+  - "Lapis took over functions, the one cold note in the palette."
+  - "Incense lives in comments, a soft smoke that recedes behind the code."
+  - "Crimson #c42740 is the only colour shared by both variants. It is the accent."

@@ -20,7 +20,7 @@ theme = "cremisi"
   authorRole = "Red Teamer & Offensive Security Researcher"
   heroEyebrow  = "Enter the Grimoire"
   heroTitle    = "Exploits, Rituals<br><em>&amp; Red Team Craft</em>"
-  heroSubtitle = "Windows internals, EDR evasion, and the dark craft of red teaming — written down as field notes for fellow sorcerers of the offensive arts."
+  heroSubtitle = "Windows internals, EDR evasion, and the dark craft of red teaming, written down as field notes for fellow sorcerers of the offensive arts."
 
   github = "https://github.com/vari-sh"
 
@@ -48,6 +48,10 @@ theme = "cremisi"
     name   = "About"
     url    = "/#about"
     weight = 4
+  [[menu.main]]
+    name   = "Cremisi"
+    url    = "/cremisi/"
+    weight = 5
 
 [taxonomies]
   tag      = "tags"

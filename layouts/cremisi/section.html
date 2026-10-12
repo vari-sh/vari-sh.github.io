@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="{{ site.Language.Locale | default "en" }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cremisi — a gothic colour scheme for Sublime Text and Hugo · {{ site.Title }}</title>
+  <meta name="description" content="{{ .Params.description }}">
+  <meta name="author" content="{{ site.Params.author }}">
+  <meta name="theme-color" content="#08090a">
+  <meta property="og:title" content="Cremisi">
+  <meta property="og:description" content="{{ .Params.description }}">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="{{ "cremisi/favicon.svg" | relURL }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
+  {{- $syntax := resources.Get "cremisi/css/syntax.css" | resources.ExecuteAsTemplate "cremisi/css/syntax.css" hugo.Data.cremisi | minify | fingerprint }}
+  {{- $main := resources.Get "cremisi/css/main.css" | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $syntax.RelPermalink }}" integrity="{{ $syntax.Data.Integrity }}">
+  <link rel="stylesheet" href="{{ $main.RelPermalink }}" integrity="{{ $main.Data.Integrity }}">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <clipPath id="arch" clipPathUnits="objectBoundingBox">
+      <path d="M0,1 L0,0.5 A1,0.62 0 0,1 0.5,0 A1,0.62 0 0,1 1,0.5 L1,1 Z"/>
+    </clipPath>
+    <linearGradient id="spire-shade" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".22"/>
+      <stop offset=".38" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".68" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".32"/>
+    </linearGradient>
+    <linearGradient id="spire-fade" x1="0" x2="0" y1="0" y2="1">
+      <stop offset=".55" stop-color="#070809" stop-opacity="0"/>
+      <stop offset="1" stop-color="#070809" stop-opacity=".7"/>
+    </linearGradient>
+  </svg>
+  <div class="grain" aria-hidden="true"></div>
+  {{- $d := hugo.Data.cremisi -}}
+{{- $ground := index $d.materials 0 -}}
+{{- $schemeO := partial "cremisi/sublime.html" "obsidian" -}}
+{{- $schemeI := partial "cremisi/sublime.html" "ivory" -}}
+{{- $synDL := resources.Get "cremisi/css/syntax.css" | resources.ExecuteAsTemplate "cremisi/downloads/cremisi-syntax.css" $d -}}
+
+<header class="nav" data-nav>
+  <a class="nav-brand" href="#top" aria-label="Cremisi, back to top">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 L22 10 L22 30 L10 30 L10 10 Z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M16 9 L19 13 L19 26 L13 26 L13 13 Z" fill="currentColor"/></svg>
+    <span>Cremisi</span>
+  </a>
+  <nav class="nav-links" aria-label="Sections">
+    <a href="#concept">Concept</a>
+    <a href="#materials">Materials</a>
+    <a href="#scriptorium">Scriptorium</a>
+    <a href="#contrast">Contrast</a>
+    <a href="#install">Install</a>
+  </nav>
+  <div class="nav-right">
+    <a class="nav-back" href="{{ "/" | relURL }}">← vari.sh</a>
+    <a class="nav-cta" href="#install">Download</a>
+  </div>
+</header>
+
+<main id="top">
+
+  {{/* ───────────── HERO ───────────── */}}
+  <section class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    {{ partial "cremisi/rose.html" "rose rose-hero" }}
+    <div class="embers" aria-hidden="true">
+      {{- range seq 1 22 }}
+      <span style="{{ printf "--x:%d%%;--d:%ds;--delay:-%ds;--s:%dpx" (mod (mul . 37) 100) (add 9 (mod (mul . 7) 11)) (mod (mul . 13) 17) (add 2 (mod . 3)) | safeCSS }}"></span>
+      {{- end }}
+    </div>
+
+    <div class="hero-inner">
+      <p class="kicker reveal">✠ &nbsp;A reliquary of materials&nbsp; ✠</p>
+      <h1 class="hero-title reveal" data-spotlight>Cremisi<span class="hero-light" aria-hidden="true">Cremisi</span></h1>
+      <p class="hero-sub reveal">A gothic, arcane colour scheme for <strong>Sublime Text</strong> and <strong>Hugo</strong>.<br>Every colour is born from an object: blood, bone, stone, amber, verdigris.</p>
+      <div class="hero-actions reveal">
+        <a class="btn btn-primary" href="#install">Download the theme</a>
+        <a class="btn btn-ghost" href="#materials">Open the materials</a>
+      </div>
+      <div class="hero-variants reveal">
+        <span class="variant-chip"><i style="{{ printf "background:%s" $ground.obsidian | safeCSS }}"></i>Obsidian</span>
+        <span class="sep">◆</span>
+        <span class="variant-chip"><i style="{{ printf "background:%s" $ground.ivory | safeCSS }}"></i>Ivory</span>
+      </div>
+    </div>
+
+    <div class="facade" aria-hidden="true">
+      {{- range $i, $m := $d.materials }}{{ if ne $m.key "ground" }}
+      {{- $dist := math.Abs (sub $i 8) }}
+      {{- $grow := add 1 (mul (math.Max 0 (sub 3 $dist)) 0.2) }}
+      <span class="spire" style="{{ printf "--c:%s;--i:%d;--g:%.2f" $m.obsidian $i $grow | safeCSS }}">
+        <svg viewBox="0 0 40 100">
+          <path class="sp-body" d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z"/>
+          <path d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z" fill="url(#spire-shade)"/>
+          <path class="sp-vault" d="M5,100 L5,41.5 A30,30 0 0,1 20,15.5 A30,30 0 0,1 35,41.5 L35,100"/>
+          <g transform="translate(20 32)">
+            <circle class="sp-dark" r="7"/>
+            <circle class="sp-tracery" r="4.6"/>
+            <path class="sp-tracery" d="M0,-6.2V6.2M-5.37,-3.1L5.37,3.1M-5.37,3.1L5.37,-3.1"/>
+            <circle class="sp-light" r="1.3"/>
+          </g>
+          <path class="sp-dark" d="M9,60 L9,50 A5,5 0 0,1 11.5,45.67 A5,5 0 0,1 14,50 L14,60 Z"/>
+          <path class="sp-dark" d="M26,60 L26,50 A5,5 0 0,1 28.5,45.67 A5,5 0 0,1 31,50 L31,60 Z"/>
+          <path class="sp-dark" d="M13,100 L13,74 A14,14 0 0,1 20,61.88 A14,14 0 0,1 27,74 L27,100 Z"/>
+          <path d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z" fill="url(#spire-fade)"/>
+        </svg>
+      </span>
+      {{- end }}{{ end }}
+    </div>
+
+    <a class="scroll-cue" href="#concept" aria-label="Scroll down">
+      <span class="drop"></span>
+    </a>
+  </section>
+
+  {{/* ───────────── I · CONCEPT ───────────── */}}
+  <section class="section" id="concept">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="numeral">I</span>
+        <p class="kicker">Concept</p>
+        <h2>Blood, bone, stone</h2>
+        {{ partial "cremisi/ornament.html" }}
+      </div>
+
+      <div class="concept">
+        <div class="concept-text reveal">
+          <p class="lede">Cremisi is a <em>cabinet of materials</em>: every hue comes from a real substance, desaturated, earthy, mineral.</p>
+          <p>The backbone never changes. <strong class="c-blood">Blood</strong> is the protagonist, <strong class="c-bone">bone</strong> is the text, <strong class="c-stone">stone</strong> is the ground. Everything else revolves around these three.</p>
+          <p>Its colours are wax, resin and oxidised copper, with a single cold note: <strong class="c-lapis">lapis</strong>, ground for illuminated missals.</p>
+        </div>
+        <div class="triad reveal">
+          {{- range slice "blood" "ink" "ground" }}
+          {{- $k := . }}
+          {{- range $d.materials }}{{ if eq .key $k }}
+          <figure class="pillar pillar-{{ .key }}">
+            <div class="pillar-frame"><div class="pillar-arch" style="{{ printf "--c:%s" .obsidian | safeCSS }}"><span></span></div></div>
+            <figcaption>
+              <span class="pillar-name">{{ index (split .en " / ") 0 }}</span>
+              <code>{{ .obsidian }}</code>
+            </figcaption>
+          </figure>
+          {{- end }}{{ end }}
+          {{- end }}
+        </div>
+      </div>
+
+      <ol class="principles">
+        {{- range $i, $p := $d.principles }}
+        <li class="principle reveal" style="{{ printf "--delay:%dms" (mul $i 90) | safeCSS }}">
+          <span class="principle-num">{{ index (slice "I" "II" "III" "IV") $i }}</span>
+          <h3>{{ $p.title }}</h3>
+          <p>{{ $p.text }}</p>
+        </li>
+        {{- end }}
+      </ol>
+    </div>
+  </section>
+
+  {{/* ───────────── II · MATERIALS ───────────── */}}
+  <section class="section section-dark" id="materials">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="numeral">II</span>
+        <p class="kicker">Palette</p>
+        <h2>The materials</h2>
+        {{ partial "cremisi/ornament.html" }}
+        <p class="sec-intro">Sixteen materials with the same names in both variants: only the values change. Click a colour to copy its hex.</p>
+      </div>
+
+      <div class="variant-scope" data-variant="obsidian" data-variant-scope>
+        <div class="switch reveal" role="group" aria-label="Variant">
+          <button type="button" class="is-active" data-set-variant="obsidian" aria-pressed="true">Obsidian</button>
+          <button type="button" data-set-variant="ivory" aria-pressed="false">Ivory</button>
+          <span class="switch-thumb" aria-hidden="true"></span>
+        </div>
+
+        <div class="swatches">
+          {{- range $i, $m := $d.materials }}
+          {{- $co := partial "cremisi/contrast.html" (dict "fg" $m.obsidian "bg" $ground.obsidian) }}
+          {{- $ci := partial "cremisi/contrast.html" (dict "fg" $m.ivory "bg" $ground.ivory) }}
+          <article class="swatch reveal" style="{{ printf "--o:%s;--i:%s;--go:%s;--gi:%s;--delay:%dms" $m.obsidian $m.ivory $ground.obsidian $ground.ivory (mul (mod $i 4) 70) | safeCSS }}">
+            <button type="button" class="swatch-plate" data-copy-o="{{ $m.obsidian }}" data-copy-i="{{ $m.ivory }}" aria-label="Copy the {{ $m.en }} colour">
+              <span class="swatch-arch"></span>
+              <span class="swatch-frame" aria-hidden="true"></span>
+            </button>
+            <div class="swatch-body">
+              <h3>{{ $m.en }}</h3>
+              <p class="swatch-en"><em lang="it">{{ $m.it }}</em> · <code>{{ $m.key }}</code></p>
+              <p class="swatch-hex"><span class="v-o">{{ $m.obsidian }}</span><span class="v-i">{{ $m.ivory }}</span></p>
+              <p class="swatch-role">{{ $m.role }}</p>
+              <p class="swatch-story">{{ $m.story }}</p>
+              {{- if or $m.token $m.exempt }}
+              <p class="swatch-ratio">
+                <span class="v-o">{{ printf "%.2f" $co }}:1</span><span class="v-i">{{ printf "%.2f" $ci }}:1</span>
+                {{- if $m.exempt }}<em class="badge badge-muted">exempt</em>{{ else }}<em class="badge">AA</em>{{ end }}
+              </p>
+              {{- end }}
+            </div>
+          </article>
+          {{- end }}
+        </div>
+
+        <div class="ui-vars reveal">
+          <span class="ui-label">Interface variables</span>
+          {{- range $d.ui_vars }}
+          <span class="ui-var" style="{{ printf "--o:%s;--i:%s" .obsidian .ivory | safeCSS }}"><i></i><code>{{ .key }}</code><span class="v-o">{{ .obsidian }}</span><span class="v-i">{{ .ivory }}</span></span>
+          {{- end }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* ───────────── III · SCRIPTORIUM ───────────── */}}
+  <section class="section" id="scriptorium">
+    <div class="wrap wrap-wide">
+      <div class="sec-head reveal">
+        <span class="numeral">III</span>
+        <p class="kicker">Preview</p>
+        <h2>The scriptorium</h2>
+        {{ partial "cremisi/ornament.html" }}
+        <p class="sec-intro">The theme at work in five languages. Italic for declarations, functions and types, bold for control flow, bold italic for booleans.</p>
+      </div>
+
+      <div class="editor-scope" data-variant="obsidian" data-variant-scope>
+      <div class="editor reveal" data-tabs>
+        <div class="editor-bar">
+          <div class="editor-seals" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="editor-tabs" role="tablist" aria-label="Sample files">
+            {{- range $i, $s := $d.samples }}
+            <button type="button" role="tab" class="editor-tab{{ if eq $i 0 }} is-active{{ end }}" aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}" aria-controls="pane-{{ $i }}" id="tab-{{ $i }}" data-tab="{{ $i }}">{{ $s.file }}</button>
+            {{- end }}
+          </div>
+          <div class="switch switch-sm" role="group" aria-label="Variant">
+            <button type="button" class="is-active" data-set-variant="obsidian" aria-pressed="true">Obsidian</button>
+            <button type="button" data-set-variant="ivory" aria-pressed="false">Ivory</button>
+            <span class="switch-thumb" aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="editor-body">
+          {{- range $i, $s := $d.samples }}
+          {{- $code := (resources.Get (printf "cremisi/samples/%s" $s.file)).Content }}
+          <div class="editor-pane{{ if eq $i 0 }} is-active{{ end }}" role="tabpanel" id="pane-{{ $i }}" aria-labelledby="tab-{{ $i }}" data-pane="{{ $i }}" data-lang="{{ $s.label }}" data-ln="{{ $s.hl }}" data-col="{{ $s.col }}"{{ if ne $i 0 }} hidden{{ end }}>
+            {{ transform.Highlight $code $s.lang (printf "lineNos=inline,hl_lines=%d" $s.hl) }}
+          </div>
+          {{- end }}
+        </div>
+        <div class="editor-status">
+          <span class="status-theme">Cremisi <span class="v-o">Obsidian</span><span class="v-i">Ivory</span></span>
+          <span class="status-right"><span data-status-lang>{{ (index $d.samples 0).label }}</span><span>UTF-8</span><span data-status-pos>Line {{ (index $d.samples 0).hl }}, Column {{ (index $d.samples 0).col }}</span></span>
+        </div>
+      </div>
+
+      <div class="legend reveal">
+        {{- range $d.materials }}{{ if .token }}
+        <span class="legend-item" style="{{ printf "--c:var(--syn-%s)" (replace .key "_" "-") | safeCSS }}"><i></i>{{ .en }}</span>
+        {{- end }}{{ end }}
+      </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* ───────────── IV · VOICES ───────────── */}}
+  <section class="section section-dark" id="voices">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="numeral">IV</span>
+        <p class="kicker">Typography of code</p>
+        <h2>Four voices</h2>
+        {{ partial "cremisi/ornament.html" }}
+        <p class="sec-intro">Each font style carries a meaning. The shape of the letter tells you the role before the colour does.</p>
+      </div>
+      <div class="voices">
+        {{- range $i, $s := $d.styles }}
+        <article class="voice reveal" style="{{ printf "--delay:%dms" (mul $i 90) | safeCSS }}">
+          <div class="voice-sample voice-{{ $s.css }}">{{ $s.sample }}</div>
+          <h3>{{ $s.name }}</h3>
+          <ul>{{ range $s.roles }}<li>{{ . }}</li>{{ end }}</ul>
+        </article>
+        {{- end }}
+      </div>
+    </div>
+  </section>
+
+  {{/* ───────────── V · CONTRAST ───────────── */}}
+  <section class="section" id="contrast">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="numeral">V</span>
+        <p class="kicker">Legibility</p>
+        <h2>The rule of contrast</h2>
+        {{ partial "cremisi/ornament.html" }}
+        <p class="sec-intro">Every code token clears the WCAG threshold of <strong>4.5:1</strong> against its own variant's background. Only comments, the smoke of incense, may fall below.</p>
+      </div>
+
+      {{- $max := 16.0 }}
+      {{- $th := mul (div 4.5 $max) 100 }}
+      <div class="chart reveal" style="{{ printf "--th:%.3f%%;--go:%s;--gi:%s" $th $ground.obsidian $ground.ivory | safeCSS }}">
+        <div class="chart-head">
+          <span></span>
+          <span>Obsidian <code>{{ $ground.obsidian }}</code></span>
+          <span>Ivory <code>{{ $ground.ivory }}</code></span>
+        </div>
+        {{- range $d.materials }}{{ if or .token .exempt }}
+        {{- $co := partial "cremisi/contrast.html" (dict "fg" .obsidian "bg" $ground.obsidian) }}
+        {{- $ci := partial "cremisi/contrast.html" (dict "fg" .ivory "bg" $ground.ivory) }}
+        <div class="chart-row{{ if .exempt }} is-exempt{{ end }}">
+          <span class="chart-label">{{ .en }}{{ if .exempt }} <em>exempt</em>{{ end }}</span>
+          <span class="track track-o"><span class="bar" style="{{ printf "--w:%.2f%%;--c:%s" (math.Min 100 (mul (div $co $max) 100)) .obsidian | safeCSS }}"></span><b>{{ printf "%.2f" $co }}</b></span>
+          <span class="track track-i"><span class="bar" style="{{ printf "--w:%.2f%%;--c:%s" (math.Min 100 (mul (div $ci $max) 100)) .ivory | safeCSS }}"></span><b>{{ printf "%.2f" $ci }}</b></span>
+        </div>
+        {{- end }}{{ end }}
+        <div class="chart-foot">
+          <span></span>
+          <span class="th-label">AA threshold · 4.5:1</span>
+          <span class="th-label">AA threshold · 4.5:1</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* ───────────── VI · INSTALL ───────────── */}}
+  <section class="section section-dark" id="install">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="numeral">VI</span>
+        <p class="kicker">Rite of entry</p>
+        <h2>Install Cremisi</h2>
+        {{ partial "cremisi/ornament.html" }}
+      </div>
+
+      <div class="install">
+        <article class="rite reveal">
+          <header>
+            <span class="rite-icon" aria-hidden="true">S</span>
+            <h3>Sublime Text</h3>
+          </header>
+          <ol class="steps">
+            <li>Download both variants below.</li>
+            <li>Copy them into your <code>Packages/User</code> folder (<em>Preferences → Browse Packages…</em>).</li>
+            <li>Open the command palette and run <code>UI: Select Color Scheme</code>.</li>
+          </ol>
+          <div class="downloads">
+            <a class="btn btn-primary" href="{{ $schemeO.RelPermalink }}" download="Cremisi Obsidian.sublime-color-scheme">Obsidian</a>
+            <a class="btn btn-ivory" href="{{ $schemeI.RelPermalink }}" download="Cremisi Ivory.sublime-color-scheme">Ivory</a>
+          </div>
+        </article>
+
+        <article class="rite reveal" style="--delay:120ms">
+          <header>
+            <span class="rite-icon" aria-hidden="true">H</span>
+            <h3>Hugo</h3>
+          </header>
+          <ol class="steps">
+            <li>Enable Chroma classes in <code>hugo.toml</code>.</li>
+            <li>Include <code>cremisi-syntax.css</code> in your theme.</li>
+            <li>Set <code>data-theme="obsidian"</code> or <code>"ivory"</code> on the <code>&lt;html&gt;</code> element.</li>
+          </ol>
+          <div class="snippet" data-variant="obsidian">
+            {{ transform.Highlight "[markup.highlight]\n  noClasses = false" "toml" }}
+          </div>
+          <div class="downloads">
+            <a class="btn btn-ghost" href="{{ $synDL.RelPermalink }}" download>cremisi-syntax.css</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  {{/* ───────────── VII · DECISIONS ───────────── */}}
+  <section class="section" id="decisions">
+    <div class="wrap wrap-narrow">
+      <div class="sec-head reveal">
+        <span class="numeral">VII</span>
+        <p class="kicker">The codex of decisions</p>
+        <h2>What was chosen</h2>
+        {{ partial "cremisi/ornament.html" }}
+      </div>
+      <ol class="codex">
+        {{- range $i, $t := $d.decisions }}
+        <li class="reveal"><span class="codex-num">{{ index (slice "i" "ii" "iii" "iv" "v" "vi") $i }}.</span><p>{{ $t }}</p></li>
+        {{- end }}
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  {{ partial "cremisi/rose.html" "rose rose-foot" }}
+  <p class="footer-title">Cremisi</p>
+  <p class="footer-motto">Ex umbra in lucem</p>
+  <p class="footer-meta">Forged by <strong>{{ site.Params.author }}</strong> · Obsidian &amp; Ivory · <a href="{{ "/" | relURL }}">vari.sh</a> · <a href="#top">Back to top ↑</a></p>
+</footer>
+
+<div class="toast" role="status" aria-live="polite" data-toast></div>
+  {{- $js := resources.Get "cremisi/js/main.js" | js.Build (dict "minify" true) | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+</body>
+</html>

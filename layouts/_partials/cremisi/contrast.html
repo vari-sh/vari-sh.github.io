@@ -1,0 +1,3 @@
+{{- $a := partial "cremisi/lum.html" .fg -}}
+{{- $b := partial "cremisi/lum.html" .bg -}}
+{{- return div (add (math.Max $a $b) 0.05) (add (math.Min $a $b) 0.05) -}}

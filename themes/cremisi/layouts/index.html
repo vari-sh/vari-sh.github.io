@@ -2,10 +2,15 @@
 
 {{/* ── HERO ── */}}
 <section class="hero">
+  <div class="hero-rose" aria-hidden="true">
+    {{ partial "rose.html" (dict "id" "hero" "text" true) }}
+  </div>
+  <div class="hero-embers" aria-hidden="true">
+    {{- range seq 1 22 }}
+    <span style="{{ printf "--x:%d%%;--d:%ds;--delay:-%ds;--s:%dpx" (mod (mul . 37) 100) (add 9 (mod (mul . 7) 11)) (mod (mul . 13) 17) (add 2 (mod . 3)) | safeCSS }}"></span>
+    {{- end }}
+  </div>
   <div class="container">
-    <div class="hero-sigil animate-fade-up">
-      {{ partial "sigil.html" . }}
-    </div>
     <p class="hero-eyebrow animate-fade-up animate-delay-1">
       {{ .Site.Params.heroEyebrow | default "Enter the Grimoire" }}
     </p>

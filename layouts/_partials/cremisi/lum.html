@@ -1,0 +1,11 @@
+{{- $h := strings.TrimPrefix "#" . -}}
+{{- $lin := slice -}}
+{{- range slice 0 2 4 -}}
+  {{- $c := div (float (int (printf "0x%s" (substr $h . 2)))) 255.0 -}}
+  {{- if le $c 0.03928 -}}
+    {{- $lin = $lin | append (div $c 12.92) -}}
+  {{- else -}}
+    {{- $lin = $lin | append (math.Pow (div (add $c 0.055) 1.055) 2.4) -}}
+  {{- end -}}
+{{- end -}}
+{{- return add (add (mul 0.2126 (index $lin 0)) (mul 0.7152 (index $lin 1))) (mul 0.0722 (index $lin 2)) -}}

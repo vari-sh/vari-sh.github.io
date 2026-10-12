@@ -151,4 +151,35 @@
       wrapper.appendChild(btn);
     });
   });
+
+  /* ── Hero title spotlight: a soft light that trails the cursor ── */
+  document.querySelectorAll('.hero-title em').forEach((el) => {
+    const light = document.createElement('span');
+    light.className = 'hero-light';
+    light.setAttribute('aria-hidden', 'true');
+    light.textContent = el.textContent;
+    el.appendChild(light);
+
+    let tx = 0, ty = 0, x = 0, y = 0, raf = 0;
+    const paint = () => {
+      el.style.setProperty('--mx', `${x}px`);
+      el.style.setProperty('--my', `${y}px`);
+    };
+    const step = () => {
+      x += (tx - x) * 0.12;
+      y += (ty - y) * 0.12;
+      paint();
+      raf = Math.abs(tx - x) + Math.abs(ty - y) > 0.5 ? requestAnimationFrame(step) : 0;
+    };
+    const target = (e) => {
+      const r = el.getBoundingClientRect();
+      tx = e.clientX - r.left;
+      ty = e.clientY - r.top;
+    };
+    el.addEventListener('pointerenter', (e) => { target(e); x = tx; y = ty; paint(); });
+    el.addEventListener('pointermove', (e) => {
+      target(e);
+      if (!raf) raf = requestAnimationFrame(step);
+    });
+  });
 })();

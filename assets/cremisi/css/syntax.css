@@ -1,0 +1,59 @@
+/* Cremisi — Chroma highlighting for Hugo. Obsidian / Ivory, by vari.sh */
+:root,
+[data-theme="obsidian"],
+[data-variant="obsidian"] {
+{{- range .materials }}
+  --syn-{{ replace .key "_" "-" }}: {{ .obsidian }};
+{{- end }}
+{{- range .ui_vars }}
+  --syn-{{ replace .key "_" "-" }}: {{ .obsidian }};
+{{- end }}
+}
+
+[data-theme="ivory"],
+[data-variant="ivory"] {
+{{- range .materials }}
+  --syn-{{ replace .key "_" "-" }}: {{ .ivory }};
+{{- end }}
+{{- range .ui_vars }}
+  --syn-{{ replace .key "_" "-" }}: {{ .ivory }};
+{{- end }}
+}
+
+.chroma { color: var(--syn-ink); background: transparent; }
+
+.chroma .c, .chroma .ch, .chroma .cm, .chroma .c1, .chroma .cs { color: var(--syn-incense); font-style: italic; }
+.chroma .cp, .chroma .cpf { color: var(--syn-wine); font-style: italic; }
+
+.chroma .k, .chroma .kr, .chroma .kp { color: var(--syn-blood); font-weight: 500; }
+.chroma .kd { color: var(--syn-blood); font-style: italic; }
+.chroma .kn { color: var(--syn-wine); font-style: italic; }
+.chroma .kc { color: var(--syn-blood); font-weight: 500; font-style: italic; }
+.chroma .kt { color: var(--syn-tallow); font-style: italic; }
+
+.chroma .nc, .chroma .nn, .chroma .na { color: var(--syn-tallow); font-style: italic; }
+.chroma .nf, .chroma .fm { color: var(--syn-lapis); font-style: italic; }
+.chroma .nb, .chroma .bp { color: var(--syn-amethyst); font-style: italic; }
+.chroma .nd { color: var(--syn-sealwax); }
+.chroma .ne { color: var(--syn-blood); font-style: italic; }
+.chroma .nt { color: var(--syn-blood); }
+.chroma .no { color: var(--syn-amber); }
+.chroma .py { color: var(--syn-verdigris); }
+.chroma .n, .chroma .nx, .chroma .nl, .chroma .ni, .chroma .nv,
+.chroma .vc, .chroma .vg, .chroma .vi, .chroma .vm { color: var(--syn-ink); }
+
+.chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .dl, .chroma .sd,
+.chroma .s2, .chroma .sh, .chroma .sx, .chroma .s1, .chroma .ss { color: var(--syn-malachite); }
+.chroma .se, .chroma .sr, .chroma .si { color: var(--syn-verdigris); }
+
+.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .il, .chroma .mo { color: var(--syn-amber); }
+
+.chroma .o, .chroma .ow { color: var(--syn-wine); }
+.chroma .p { color: var(--syn-iron); }
+.chroma .err { color: var(--syn-blood); }
+
+.chroma .gd { color: var(--syn-blood); }
+.chroma .gi { color: var(--syn-malachite); }
+.chroma .gh, .chroma .gu { color: var(--syn-blood); font-weight: 700; }
+.chroma .ge { color: var(--syn-petal); font-style: italic; }
+.chroma .gs { color: var(--syn-tallow); font-weight: 700; }
