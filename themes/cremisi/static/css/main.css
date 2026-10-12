@@ -41,6 +41,21 @@
   --rose:  #b4677a;
   --clay:  #a9614f;
 
+  /* syntax highlighting (Chroma) */
+  --syn-ink:        #e9e1d1;
+  --syn-blood:      #e2586a;
+  --syn-lapis:      #6886bb;
+  --syn-tallow:     #dccb9a;
+  --syn-amber:      #cf9142;
+  --syn-malachite:  #44a078;
+  --syn-verdigris:  #5f9a86;
+  --syn-amethyst:   #9c7bb0;
+  --syn-wine:       #b27a90;
+  --syn-petal:      #c58f96;
+  --syn-sealwax:    #c6784c;
+  --syn-incense:    #9e8d99;
+  --syn-iron:       #9a948c;
+
   /* semantic */
   --base:          var(--ink-050);
   --mantle:        var(--ink-100);
@@ -117,6 +132,21 @@
   --teal:  #296b67;
   --rose:  #8a3d52;
   --clay:  #7c3f2f;
+
+  /* syntax highlighting (Chroma) — darkened against the real --crust (#ded0b6), not a flat parchment white */
+  --syn-ink:        #2b2733;
+  --syn-blood:      #ac1d35;
+  --syn-lapis:      #2c5998;
+  --syn-tallow:     #6d560e;
+  --syn-amber:      #824c0f;
+  --syn-malachite:  #276440;
+  --syn-verdigris:  #1c6359;
+  --syn-amethyst:   #7e3a9e;
+  --syn-wine:       #8a3f64;
+  --syn-petal:      #913d52;
+  --syn-sealwax:    #8e441c;
+  --syn-incense:    #8a7f8c;
+  --syn-iron:       #5b5762;
 
   --accent:        var(--blood-500);
   --accent-deep:   var(--blood-700);
