@@ -2,7 +2,7 @@
 materials:
   - key: ground
     en: Crypt stone
-    obsidian: "#171a1c"
+    obsidian: "#17171c"
     ivory: "#f4eee2"
     role: Background
     story: The cold slab on which everything rests.
@@ -230,7 +230,7 @@ principles:
     text: Desaturated, warm, earthy and mineral colours, drawn from wax, resin, copper and stone.
 
 decisions:
-  - "The editor background is slate #171a1c: the cold stone of a crypt."
+  - "The editor background is slate #17171c: the cold stone of a crypt."
   - "On the website the code background stays much darker than the stone, so contrast only improves there."
   - "Tallow and malachite carry types and strings, warm and mineral."
   - "Lapis took over functions, the one cold note in the palette."
