@@ -231,7 +231,7 @@ principles:
 
 decisions:
   - "The editor background is slate #17171c: the cold stone of a crypt."
-  - "On the website the code background stays much darker than the stone, so contrast only improves there."
+  - "Amethyst marks builtins and self, the words the language owns."
   - "Tallow and malachite carry types and strings, warm and mineral."
   - "Lapis took over functions, the one cold note in the palette."
   - "Incense lives in comments, a soft smoke that recedes behind the code."
