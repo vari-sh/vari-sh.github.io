@@ -77,7 +77,7 @@ materials:
   - key: verdigris
     en: Verdigris
     obsidian: "#6bb3b0"
-    ivory: "#1f7064"
+    ivory: "#1a706d"
     role: Properties, escapes, regex
     story: The cold patina that ages on church doors.
     token: true
