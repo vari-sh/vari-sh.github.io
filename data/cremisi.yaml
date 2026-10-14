@@ -51,7 +51,7 @@ materials:
     obsidian: "#6886bb"
     ivory: "#2d5c9c"
     role: Functions
-    story: The only cold note, ground for missals.
+    story: The deep cold note, ground for missals.
     token: true
   - key: tallow
     en: Tallow
@@ -76,10 +76,10 @@ materials:
     token: true
   - key: verdigris
     en: Verdigris
-    obsidian: "#5f9a86"
+    obsidian: "#6bb3b0"
     ivory: "#1f7064"
     role: Properties, escapes, regex
-    story: The copper that ages on church doors.
+    story: The cold patina that ages on church doors.
     token: true
   - key: amethyst
     en: Amethyst
@@ -224,8 +224,8 @@ principles:
     text: The dark ground is cold slate grey, the stone of a crypt.
   - title: Crimson rules
     text: Keywords, control flow, booleans and accents all speak with the voice of blood.
-  - title: A single cold note
-    text: Lapis blue is the one strong cool hue, reserved for functions.
+  - title: Two cold notes
+    text: Lapis blue for functions, verdigris for properties. Every other hue is warm or mineral.
   - title: Earthly matter
     text: Desaturated, warm, earthy and mineral colours, drawn from wax, resin, copper and stone.
 
@@ -233,6 +233,6 @@ decisions:
   - "The editor background is slate #17171c: the cold stone of a crypt."
   - "Amethyst marks builtins and self, the words the language owns."
   - "Tallow and malachite carry types and strings, warm and mineral."
-  - "Lapis took over functions, the one cold note in the palette."
+  - "Lapis and verdigris are the only cold notes: functions, then properties and escapes."
   - "Incense lives in comments, a soft smoke that recedes behind the code."
   - "Crimson #c42740 is the only colour shared by both variants. It is the accent."
