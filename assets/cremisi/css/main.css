@@ -429,6 +429,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .chroma .k.is-import { color: var(--syn-wine); font-style: italic; font-weight: 400; }
 .chroma .kc.is-bool { font-weight: 700; font-style: italic; }
 .chroma .kc.is-null, .chroma .k.is-null { color: var(--syn-amber); font-style: italic; font-weight: 400; }
+.chroma .is-prop { color: var(--syn-verdigris); }
 
 .editor-status {
   display: flex; justify-content: space-between; gap: 16px; padding: 6px 16px;

@@ -78,14 +78,14 @@ materials:
     en: Verdigris
     obsidian: "#6bb3b0"
     ivory: "#1a706d"
-    role: Properties, escapes, regex
+    role: Properties, members, JSON and YAML keys
     story: The cold patina that ages on church doors.
     token: true
   - key: amethyst
     en: Amethyst
     obsidian: "#9c7bb0"
     ivory: "#7e3a9e"
-    role: Builtins, self
+    role: Builtins, self, YAML anchors
     story: A bishop's gem for what is born with the language.
     token: true
   - key: wine
@@ -106,8 +106,8 @@ materials:
     en: Sealing wax
     obsidian: "#c6784c"
     ivory: "#a24d20"
-    role: Decorators, annotations
-    story: The seal pressed upon decorators.
+    role: Decorators, annotations, escapes, placeholders, regex
+    story: The seal pressed upon decorators, and on the escapes set inside strings.
     token: true
 
 ui_vars:
@@ -157,7 +157,7 @@ rules:
   - { name: Types, scope: "storage.type, support.type, entity.name.type", fg: tallow, style: italic }
   - { name: Classes and namespaces, scope: "entity.name.class, entity.name.struct, entity.name.namespace, support.class, entity.other.inherited-class", fg: tallow, style: italic }
   - { name: Strings, scope: "string, string.quoted, string.unquoted", fg: malachite }
-  - { name: Escapes and regex, scope: "constant.character.escape, constant.other.placeholder, string.regexp", fg: verdigris }
+  - { name: Escapes and regex, scope: "constant.character.escape, constant.other.placeholder, string.regexp", fg: sealwax }
   - { name: Numbers, scope: "constant.numeric", fg: amber }
   - { name: Language constants, scope: "constant.language", fg: amber, style: italic }
   - { name: Booleans, scope: "constant.language.boolean", fg: blood, style: bold italic }
@@ -215,6 +215,7 @@ styles:
 samples:
   - { file: reliquary.py, lang: python, label: Python, hl: 25, col: 9 }
   - { file: candle.rs, lang: rust, label: Rust, hl: 20, col: 9 }
+  - { file: ossuary.c, lang: c, label: C, hl: 27, col: 5 }
   - { file: scriptorium.ts, lang: typescript, label: TypeScript, hl: 23, col: 7 }
   - { file: calendar.yaml, lang: yaml, label: YAML, hl: 6, col: 9 }
   - { file: codex.html, lang: html, label: HTML, hl: 10, col: 7 }
@@ -232,7 +233,8 @@ principles:
 decisions:
   - "The editor background is slate #17171c: the cold stone of a crypt."
   - "Amethyst marks builtins and self, the words the language owns."
+  - "Sealing wax marks decorators outside strings, escapes and regex inside them: the two never meet."
   - "Tallow and malachite carry types and strings, warm and mineral."
-  - "Lapis and verdigris are the only cold notes: functions, then properties and escapes."
+  - "Lapis and verdigris are the only cold notes: functions, then properties and keys."
   - "Incense lives in comments, a soft smoke that recedes behind the code."
   - "Crimson #c42740 is the only colour shared by both variants. It is the accent."

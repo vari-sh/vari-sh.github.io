@@ -39,12 +39,17 @@
 .chroma .nt { color: var(--syn-blood); }
 .chroma .no { color: var(--syn-amber); }
 .chroma .py { color: var(--syn-verdigris); }
+/* Chroma tags YAML and JSON keys as .nt, like HTML tags: give them back to verdigris */
+[data-lang="yaml" i] .chroma .nt, .chroma [data-lang="yaml" i] .nt,
+[data-lang="json" i] .chroma .nt, .chroma [data-lang="json" i] .nt { color: var(--syn-verdigris); }
+/* ...and YAML anchors and aliases as .cp: they belong to amethyst */
+[data-lang="yaml" i] .chroma .cp, .chroma [data-lang="yaml" i] .cp { color: var(--syn-amethyst); font-style: normal; }
 .chroma .n, .chroma .nx, .chroma .nl, .chroma .ni, .chroma .nv,
 .chroma .vc, .chroma .vg, .chroma .vi, .chroma .vm { color: var(--syn-ink); }
 
 .chroma .s, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .dl, .chroma .sd,
 .chroma .s2, .chroma .sh, .chroma .sx, .chroma .s1, .chroma .ss { color: var(--syn-malachite); }
-.chroma .se, .chroma .sr, .chroma .si { color: var(--syn-verdigris); }
+.chroma .se, .chroma .sr, .chroma .si { color: var(--syn-sealwax); }
 
 .chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .il, .chroma .mo { color: var(--syn-amber); }
 

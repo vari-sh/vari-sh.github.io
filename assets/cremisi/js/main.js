@@ -123,6 +123,25 @@ for (const el of $$(".chroma .k, .chroma .kr, .chroma .kc")) {
   else el.classList.add("is-decl");
 }
 
+// Chroma leaves member access as plain names: after . or -> and not called, it is a property.
+const tokenAfter = (el) => {
+  let n = el.nextSibling;
+  while (n && !n.textContent.trim()) n = n.nextSibling;
+  return n ? n.textContent.trim() : "";
+};
+for (const el of $$(".chroma .n, .chroma .nx")) {
+  const prev = el.previousSibling;
+  if (prev && (prev.textContent.endsWith(".") || prev.textContent === "->") && !tokenAfter(el).startsWith("(")) el.classList.add("is-prop");
+}
+
+// Chroma does not mark printf placeholders in C strings: wrap them like the other interpolations.
+for (const el of $$('[data-lang="C"] .chroma .s')) {
+  if (!el.textContent.includes("%")) continue;
+  el.innerHTML = el.textContent
+    .replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c])
+    .replace(/%(?:%|[-+ #0]*\d*(?:\.\d+)?(?:hh|h|ll|l|z|j|t|L)?[diouxXeEfFgGaAcspn])/g, (m) => m === "%%" ? `<span class="se">${m}</span>` : `<span class="si">${m}</span>`);
+}
+
 // Caret at the column shown in the status bar
 for (const pane of $$("[data-pane]")) {
   const line = pane.querySelector(".hl .cl");
