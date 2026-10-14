@@ -15,8 +15,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
   {{- $syntax := resources.Get "cremisi/css/syntax.css" | resources.ExecuteAsTemplate "cremisi/css/syntax.css" hugo.Data.cremisi | minify | fingerprint }}
+  {{- $scales := resources.Get "cremisi/css/scales.css" | resources.ExecuteAsTemplate "cremisi/css/scales.css" hugo.Data.cremisi | minify | fingerprint }}
   {{- $main := resources.Get "cremisi/css/main.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $syntax.RelPermalink }}" integrity="{{ $syntax.Data.Integrity }}">
+  <link rel="stylesheet" href="{{ $scales.RelPermalink }}" integrity="{{ $scales.Data.Integrity }}">
   <link rel="stylesheet" href="{{ $main.RelPermalink }}" integrity="{{ $main.Data.Integrity }}">
 </head>
 <body>
@@ -50,6 +52,7 @@
   <nav class="nav-links" aria-label="Sections">
     <a href="#concept">Concept</a>
     <a href="#materials">Materials</a>
+    <a href="#scales">Scales</a>
     <a href="#scriptorium">Scriptorium</a>
     <a href="#contrast">Contrast</a>
     <a href="#install">Install</a>
@@ -214,11 +217,127 @@
     </div>
   </section>
 
-  {{/* ───────────── III · SCRIPTORIUM ───────────── */}}
-  <section class="section" id="scriptorium">
-    <div class="wrap wrap-wide">
+  {{/* ───────────── III · SCALES ───────────── */}}
+  {{- $scalesCSS := resources.Get "cremisi/css/scales.css" | resources.ExecuteAsTemplate "cremisi/downloads/cremisi-scales.css" $d }}
+  {{- $step := dict }}
+  {{- range $d.scales }}{{ $k := .key }}{{ range .steps }}{{ $step = merge $step (dict (printf "%s-%d" $k .n) .hex) }}{{ end }}{{ end }}
+  <section class="section" id="scales">
+    <div class="wrap">
       <div class="sec-head reveal">
         <span class="numeral">III</span>
+        <p class="kicker">Beyond the editor</p>
+        <h2>Two scales</h2>
+        {{ partial "cremisi/ornament.html" }}
+        <p class="sec-intro">Eleven steps of <strong>stone</strong> and eleven of <strong>blood</strong>, interpolated in OKLCH, for building interfaces on top of Cremisi. Structure and identity, and nothing else, on purpose: syntax highlighting stays with the materials. Click a step to copy its hex.</p>
+      </div>
+
+      {{- range $d.scales }}
+      {{- $key := .key }}
+      <div class="scale scale-{{ .key }} reveal">
+        <header class="scale-head">
+          <h3>{{ .name }}</h3>
+          <p class="scale-role">{{ .role }}</p>
+          <p class="scale-text">{{ .text }}</p>
+        </header>
+        <ol class="ramp">
+          {{- range $i, $s := .steps }}
+          {{- $co := partial "cremisi/contrast.html" (dict "fg" $s.hex "bg" $ground.obsidian) }}
+          {{- $ci := partial "cremisi/contrast.html" (dict "fg" $s.hex "bg" $ground.ivory) }}
+          <li class="step{{ if $s.is }} is-theme{{ end }}{{ if ge $co 7.0 }} is-light{{ end }}" style="{{ printf "--c:%s;--delay:%dms" $s.hex (mul $i 40) | safeCSS }}">
+            <button type="button" class="step-chip" data-copy-o="{{ $s.hex }}" data-copy-i="{{ $s.hex }}" aria-label="Copy {{ $key }} {{ $s.n }}, {{ $s.hex }}">
+              {{- if $s.is }}<span class="step-mark" title="Already in the theme: {{ $s.is }}">◆</span>{{ end }}
+            </button>
+            <span class="step-info">
+              <span class="step-n">{{ $s.n }}</span>
+              <code class="step-hex">{{ $s.hex }}</code>
+              <span class="step-hue" title="OKLCH hue">{{ $s.h }}°</span>
+              <span class="step-is">{{ with $s.is }}= {{ . }}{{ end }}</span>
+            </span>
+            <span class="step-ratios">
+            <span class="step-ratio on-o {{ if ge $co 4.5 }}is-aa{{ else if ge $co 3.0 }}is-large{{ else }}is-low{{ end }}" title="On Obsidian ground {{ $ground.obsidian }}"><i>Aa</i>{{ printf "%.2f" $co }}</span>
+            <span class="step-ratio on-i {{ if ge $ci 4.5 }}is-aa{{ else if ge $ci 3.0 }}is-large{{ else }}is-low{{ end }}" title="On Ivory ground {{ $ground.ivory }}"><i>Aa</i>{{ printf "%.2f" $ci }}</span>
+            </span>
+          </li>
+          {{- end }}
+        </ol>
+      </div>
+      {{- end }}
+
+      <p class="ramp-key reveal">
+        <span><b class="key-mark">◆</b>already a colour of the theme</span>
+        <span><b class="step-ratio is-aa"></b>4.5:1 or more: text</span>
+        <span><b class="step-ratio is-large"></b>3:1: large text, borders, icons</span>
+        <span><b class="step-ratio is-low"></b>below 3:1: surfaces only</span>
+      </p>
+
+      <div class="mocks">
+        {{- range slice "obsidian" "ivory" }}
+        {{- $v := . }}
+        {{- $vars := slice }}
+        {{- range $d.scale_ui }}{{ $vars = $vars | append (printf "--ui-%s:var(--cremisi-%s)" .key (index . $v)) }}{{ end }}
+        <figure class="mock-frame reveal">
+          <div class="mock mock-{{ $v }}" style="{{ delimit $vars ";" | safeCSS }}" role="img" aria-label="An example interface in {{ title $v }}, built only from the stone and blood scales">
+            <div class="mock-bar"><i></i><i></i><i></i><span>reliquary · inventory</span></div>
+            <div class="mock-body">
+              <div class="mock-side">
+                <p class="mock-label">Chapels</p>
+                <span>Nave</span><span>Apse</span><span class="is-on">Crypt</span><span>Cloister</span>
+              </div>
+              <div class="mock-main">
+                <div class="mock-head"><h4>Crypt</h4><span class="mock-badge">3 sealed</span></div>
+                <div class="mock-field"><span>Search the relics…</span></div>
+                <ul class="mock-list">
+                  <li><b>Agatha</b><span>bone · III c.</span></li>
+                  <li class="is-del"><b>Lucia</b><span>removed from niche 2</span></li>
+                  <li><b>Cecilia</b><span>ash · V c.</span></li>
+                </ul>
+                <div class="mock-alert"><strong>The ossuary is full.</strong> 64 of 64 niches are sealed.</div>
+                <div class="mock-actions"><span class="mock-btn">Inter</span><span class="mock-btn mock-btn-ghost">Cancel</span><span class="mock-link">Open the codex</span></div>
+              </div>
+            </div>
+          </div>
+          <figcaption>{{ title $v }}</figcaption>
+        </figure>
+        {{- end }}
+      </div>
+
+      {{- $half := div (add (len $d.scale_ui) 1) 2 }}
+      <div class="recipe reveal">
+        {{- range slice (first $half $d.scale_ui) (after $half $d.scale_ui) }}
+        <div class="recipe-col">
+          <div class="recipe-row recipe-headrow"><span>Role</span><span>Obsidian</span><span>Ivory</span></div>
+          {{- range . }}
+          <div class="recipe-row">
+            <span class="recipe-role">{{ .role }}</span>
+            <span class="recipe-step"><i style="{{ printf "background:%s" (index $step .obsidian) | safeCSS }}"></i><code>{{ .obsidian }}</code></span>
+            <span class="recipe-step"><i style="{{ printf "background:%s" (index $step .ivory) | safeCSS }}"></i><code>{{ .ivory }}</code></span>
+          </div>
+          {{- end }}
+        </div>
+        {{- end }}
+      </div>
+
+      <div class="take reveal">
+        <div class="take-text">
+          <h3>Take them with you</h3>
+          <p>Twenty-two custom properties, <code>--cremisi-stone-*</code> and <code>--cremisi-blood-*</code>. The example above is built from nothing else: map them to roles in your own interface, as in the table, and Obsidian and Ivory follow.</p>
+          <div class="downloads">
+            <button type="button" class="btn btn-primary" data-copy-code="#scales-css">Copy the variables</button>
+            <a class="btn btn-ghost" href="{{ $scalesCSS.RelPermalink }}" download>cremisi-scales.css</a>
+          </div>
+        </div>
+        <div class="snippet snippet-scales" id="scales-css">
+          {{ transform.Highlight $scalesCSS.Content "css" }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* ───────────── IV · SCRIPTORIUM ───────────── */}}
+  <section class="section section-dark" id="scriptorium">
+    <div class="wrap wrap-wide">
+      <div class="sec-head reveal">
+        <span class="numeral">IV</span>
         <p class="kicker">Preview</p>
         <h2>The scriptorium</h2>
         {{ partial "cremisi/ornament.html" }}
@@ -263,11 +382,11 @@
     </div>
   </section>
 
-  {{/* ───────────── IV · VOICES ───────────── */}}
-  <section class="section section-dark" id="voices">
+  {{/* ───────────── V · VOICES ───────────── */}}
+  <section class="section" id="voices">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="numeral">IV</span>
+        <span class="numeral">V</span>
         <p class="kicker">Typography of code</p>
         <h2>Four voices</h2>
         {{ partial "cremisi/ornament.html" }}
@@ -285,11 +404,11 @@
     </div>
   </section>
 
-  {{/* ───────────── V · CONTRAST ───────────── */}}
-  <section class="section" id="contrast">
+  {{/* ───────────── VI · CONTRAST ───────────── */}}
+  <section class="section section-dark" id="contrast">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="numeral">V</span>
+        <span class="numeral">VI</span>
         <p class="kicker">Legibility</p>
         <h2>The rule of contrast</h2>
         {{ partial "cremisi/ornament.html" }}
@@ -322,11 +441,11 @@
     </div>
   </section>
 
-  {{/* ───────────── VI · INSTALL ───────────── */}}
-  <section class="section section-dark" id="install">
+  {{/* ───────────── VII · INSTALL ───────────── */}}
+  <section class="section" id="install">
     <div class="wrap">
       <div class="sec-head reveal">
-        <span class="numeral">VI</span>
+        <span class="numeral">VII</span>
         <p class="kicker">Rite of entry</p>
         <h2>Install Cremisi</h2>
         {{ partial "cremisi/ornament.html" }}
@@ -370,18 +489,18 @@
     </div>
   </section>
 
-  {{/* ───────────── VII · DECISIONS ───────────── */}}
-  <section class="section" id="decisions">
+  {{/* ───────────── VIII · DECISIONS ───────────── */}}
+  <section class="section section-dark" id="decisions">
     <div class="wrap wrap-narrow">
       <div class="sec-head reveal">
-        <span class="numeral">VII</span>
+        <span class="numeral">VIII</span>
         <p class="kicker">The codex of decisions</p>
         <h2>What was chosen</h2>
         {{ partial "cremisi/ornament.html" }}
       </div>
       <ol class="codex">
         {{- range $i, $t := $d.decisions }}
-        <li class="reveal"><span class="codex-num">{{ index (slice "i" "ii" "iii" "iv" "v" "vi") $i }}.</span><p>{{ $t }}</p></li>
+        <li class="reveal"><span class="codex-num">{{ index (slice "i" "ii" "iii" "iv" "v" "vi" "vii" "viii" "ix" "x") $i }}.</span><p>{{ $t }}</p></li>
         {{- end }}
       </ol>
     </div>

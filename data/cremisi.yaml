@@ -50,7 +50,7 @@ materials:
     en: Lapis
     obsidian: "#6886bb"
     ivory: "#2d5c9c"
-    role: Functions
+    role: Functions, JSON and YAML keys
     story: The deep cold note, ground for missals.
     token: true
   - key: tallow
@@ -78,7 +78,7 @@ materials:
     en: Verdigris
     obsidian: "#6bb3b0"
     ivory: "#1a706d"
-    role: Properties, members, JSON and YAML keys
+    role: Properties, members
     story: The cold patina that ages on church doors.
     token: true
   - key: amethyst
@@ -92,7 +92,7 @@ materials:
     en: Wine
     obsidian: "#b27a90"
     ivory: "#8a3f64"
-    role: Operators, imports
+    role: Operators, imports, key-value colons
     story: The chalice of operators.
     token: true
   - key: petal
@@ -112,10 +112,10 @@ materials:
 
 ui_vars:
   - key: border
-    obsidian: "#27272c"
-    ivory: "#e4ddcc"
+    obsidian: "#302f35"
+    ivory: "#e9e1d1"
   - key: gutter_fg
-    obsidian: "#4a4a50"
+    obsidian: "#4e4a50"
     ivory: "#b3aa9a"
 
 globals:
@@ -164,7 +164,7 @@ rules:
   - { name: Other constants, scope: "constant.other, variable.other.constant", fg: amber }
   - { name: Parameters, scope: "variable.parameter", fg: petal, style: italic }
   - { name: Variables, scope: "variable, variable.other", fg: ink }
-  - { name: Properties, scope: "variable.other.member, variable.other.property, meta.mapping.key string", fg: verdigris }
+  - { name: Properties, scope: "variable.other.member, variable.other.property", fg: verdigris }
   - { name: Decorators, scope: "entity.name.decorator, meta.decorator, meta.annotation, punctuation.definition.annotation", fg: sealwax }
   - { name: Attributes, scope: "entity.other.attribute-name", fg: tallow, style: italic }
   - { name: Tags, scope: "entity.name.tag", fg: blood }
@@ -186,9 +186,10 @@ rules:
   - { name: Markdown raw, scope: "markup.raw", fg: malachite }
   - { name: Markdown quotes, scope: "markup.quote", fg: incense, style: italic }
   - { name: Markdown lists and heading marks, scope: "markup.list punctuation.definition.list_item, punctuation.definition.heading", fg: blood }
-  - { name: JSON keys, scope: "meta.mapping.key.json string", fg: verdigris }
+  - { name: Mapping keys, scope: "meta.mapping.key string, meta.mapping.key string.quoted, meta.mapping.key string.unquoted", fg: lapis }
+  - { name: Key-value separators, scope: "punctuation.separator.key-value, punctuation.separator.mapping.key-value", fg: wine }
   - { name: JSON constants, scope: "constant.language.json", fg: amber, style: italic }
-  - { name: YAML keys, scope: "meta.mapping.key.yaml string, entity.name.tag.yaml", fg: verdigris }
+  - { name: YAML keys, scope: "meta.mapping.key.yaml string, meta.mapping.key.yaml string.quoted, meta.mapping.key.yaml string.unquoted, entity.name.tag.yaml", fg: lapis }
   - { name: YAML anchors and aliases, scope: "entity.name.other.anchor.yaml, variable.other.alias.yaml, punctuation.definition.anchor.yaml, punctuation.definition.alias.yaml", fg: amethyst }
   - { name: YAML directives and tags, scope: "meta.directive.yaml, keyword.other.directive.yaml, storage.type.tag-handle.yaml", fg: wine }
   - { name: YAML block strings, scope: "string.unquoted.block.yaml", fg: malachite }
@@ -226,7 +227,7 @@ principles:
   - title: Crimson rules
     text: Keywords, control flow, booleans and accents all speak with the voice of blood.
   - title: Two cold notes
-    text: Lapis blue for functions, verdigris for properties. Every other hue is warm or mineral.
+    text: Lapis blue for functions and keys, verdigris for properties. Every other hue is warm or mineral.
   - title: Earthly matter
     text: Desaturated, warm, earthy and mineral colours, drawn from wax, resin, copper and stone.
 
@@ -235,6 +236,61 @@ decisions:
   - "Amethyst marks builtins and self, the words the language owns."
   - "Sealing wax marks decorators outside strings, escapes and regex inside them: the two never meet."
   - "Tallow and malachite carry types and strings, warm and mineral."
-  - "Lapis and verdigris are the only cold notes: functions, then properties and keys."
+  - "Lapis and verdigris are the only cold notes: functions and keys, then properties."
   - "Incense lives in comments, a soft smoke that recedes behind the code."
   - "Crimson #c42740 is the only colour shared by both variants. It is the accent."
+  - "Only two tonal scales, stone and blood: structure and identity. Syntax highlighting stays with the materials."
+
+# Tonal scales (OKLCH interpolation): for building interfaces on top of Cremisi, not for syntax.
+# h = OKLCH hue in degrees; is = the theme colour that step already is.
+scales:
+  - key: stone
+    name: Stone
+    role: Structure
+    text: "Not a neutral grey. The hue slides from warm bone at 85° to the violet stone of the crypt at 285°, crossing a faintly rosy grey on the way: the family of incense. Ivory and Obsidian are the same stone, read from opposite ends."
+    steps:
+      - { n: 50, hex: "#f4eee2", h: 85, is: Ivory ground }
+      - { n: 100, hex: "#e9e1d1", h: 85, is: "Obsidian ink, Ivory border" }
+      - { n: 200, hex: "#cfc6b8", h: 79 }
+      - { n: 300, hex: "#b3aa9a", h: 82, is: Ivory gutter }
+      - { n: 400, hex: "#9a948c", h: 75, is: Obsidian iron }
+      - { n: 500, hex: "#827a76", h: 49 }
+      - { n: 600, hex: "#696164", h: 353 }
+      - { n: 700, hex: "#4e4a50", h: 315, is: Obsidian gutter }
+      - { n: 800, hex: "#302f35", h: 293, is: Obsidian border }
+      - { n: 900, hex: "#17171c", h: 286, is: Obsidian ground }
+      - { n: 950, hex: "#0c0c10", h: 285 }
+  - key: blood
+    name: Blood
+    role: Identity
+    text: "Steps 400 to 800 are the reds the theme already speaks. Above them the scale opens toward the petal, for badges and alerts on Ivory; below, it thickens into clotted blood, for error and diff grounds on Obsidian."
+    steps:
+      - { n: 50, hex: "#feeff0", h: 13 }
+      - { n: 100, hex: "#ffddde", h: 16 }
+      - { n: 200, hex: "#febec1", h: 16 }
+      - { n: 300, hex: "#fa969f", h: 14 }
+      - { n: 400, hex: "#ef6f80", h: 14 }
+      - { n: 500, hex: "#e2586a", h: 16, is: blood }
+      - { n: 600, hex: "#c42740", h: 19, is: crimson }
+      - { n: 700, hex: "#a11730", h: 19 }
+      - { n: 800, hex: "#7e1023", h: 19, is: crimson deep }
+      - { n: 900, hex: "#52151f", h: 15 }
+      - { n: 950, hex: "#301419", h: 10 }
+
+# The interface example in the scales section, built only from scale steps.
+scale_ui:
+  - { key: ground, role: Ground, obsidian: stone-900, ivory: stone-50 }
+  - { key: sunken, role: Sidebar, obsidian: stone-950, ivory: stone-100 }
+  - { key: border, role: Borders, obsidian: stone-800, ivory: stone-200 }
+  - { key: field, role: Field border, obsidian: stone-700, ivory: stone-300 }
+  - { key: text, role: Text, obsidian: stone-100, ivory: stone-900 }
+  - { key: muted, role: Muted text, obsidian: stone-400, ivory: stone-600 }
+  - { key: accent, role: Accent, obsidian: blood-600, ivory: blood-600 }
+  - { key: on-accent, role: On accent, obsidian: stone-50, ivory: stone-50 }
+  - { key: link, role: Links, obsidian: blood-400, ivory: blood-700 }
+  - { key: focus, role: Focus ring, obsidian: blood-500, ivory: blood-500 }
+  - { key: badge-bg, role: Badge, obsidian: blood-900, ivory: blood-100 }
+  - { key: badge-fg, role: Badge text, obsidian: blood-200, ivory: blood-800 }
+  - { key: alert-bg, role: Alert, obsidian: blood-950, ivory: blood-50 }
+  - { key: alert-bd, role: Alert border, obsidian: blood-800, ivory: blood-200 }
+  - { key: alert-fg, role: Alert text, obsidian: blood-200, ivory: blood-800 }

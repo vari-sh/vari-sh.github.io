@@ -134,6 +134,14 @@ for (const el of $$(".chroma .n, .chroma .nx")) {
   if (prev && (prev.textContent.endsWith(".") || prev.textContent === "->") && !tokenAfter(el).startsWith("(")) el.classList.add("is-prop");
 }
 
+// Chroma leaves the key-value colon of YAML and JSON as plain punctuation.
+for (const el of $$('[data-lang="YAML"] .chroma .p, [data-lang="JSON"] .chroma .p')) {
+  if (el.textContent.trim() === ":") el.classList.add("is-sep");
+}
+for (const el of $$('[data-lang="YAML"] .chroma .l')) {
+  if (el.textContent.startsWith("%")) el.classList.add("is-directive");
+}
+
 // Chroma does not mark printf placeholders in C strings: wrap them like the other interpolations.
 for (const el of $$('[data-lang="C"] .chroma .s')) {
   if (!el.textContent.includes("%")) continue;
@@ -163,11 +171,11 @@ for (const pane of $$("[data-pane]")) {
 // Copy hex
 const toast = document.querySelector("[data-toast]");
 let toastTimer;
-const showToast = (hex) => {
+const showToast = (text, colour) => {
   toast.innerHTML = "";
   const sw = document.createElement("i");
-  sw.style.background = hex;
-  toast.append(sw, `${hex} copied`);
+  sw.style.background = colour;
+  toast.append(sw, text);
   toast.classList.add("is-visible");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 1800);
@@ -181,6 +189,20 @@ for (const plate of $$("[data-copy-o]")) {
     } catch {
       /* clipboard unavailable (insecure context or permissions): still show the value */
     }
-    showToast(hex);
+    showToast(`${hex} copied`, hex);
+  });
+}
+
+// Copy a code snippet
+for (const btn of $$("[data-copy-code]")) {
+  btn.addEventListener("click", async () => {
+    const code = document.querySelector(btn.dataset.copyCode)?.querySelector("code");
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code.textContent);
+    } catch {
+      /* clipboard unavailable: nothing to copy into */
+    }
+    showToast("Variables copied", "#c42740");
   });
 }

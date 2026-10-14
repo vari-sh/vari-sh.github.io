@@ -26,9 +26,11 @@
 .chroma .nt { color: var(--syn-blood); }
 .chroma .no { color: var(--syn-amber); }
 .chroma .py { color: var(--syn-verdigris); }
-/* Chroma tags YAML and JSON keys as .nt, like HTML tags: give them back to verdigris */
+/* Chroma tags YAML and JSON keys as .nt, like HTML tags: keys belong to lapis */
 [data-lang="yaml" i] .chroma .nt, .chroma [data-lang="yaml" i] .nt,
-[data-lang="json" i] .chroma .nt, .chroma [data-lang="json" i] .nt { color: var(--syn-verdigris); }
+[data-lang="json" i] .chroma .nt, .chroma [data-lang="json" i] .nt { color: var(--syn-lapis); }
+/* ...and plain YAML scalars as .l: they are unquoted strings */
+[data-lang="yaml" i] .chroma .l, .chroma [data-lang="yaml" i] .l { color: var(--syn-malachite); }
 /* ...and YAML anchors and aliases as .cp: they belong to amethyst */
 [data-lang="yaml" i] .chroma .cp, .chroma [data-lang="yaml" i] .cp { color: var(--syn-amethyst); font-style: normal; }
 .chroma .n, .chroma .nx, .chroma .nl, .chroma .ni,

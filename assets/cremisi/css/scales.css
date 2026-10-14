@@ -1,0 +1,9 @@
+/* Cremisi tonal scales · stone for structure, blood for identity */
+:root {
+{{- range $i, $s := .scales }}{{ if $i }}
+{{ end }}
+{{- range $s.steps }}
+  --cremisi-{{ $s.key }}-{{ .n }}: {{ .hex }};
+{{- end }}
+{{- end }}
+}
