@@ -188,7 +188,7 @@
           <article class="swatch reveal" style="{{ printf "--o:%s;--i:%s;--go:%s;--gi:%s;--delay:%dms" $m.obsidian $m.ivory $ground.obsidian $ground.ivory (mul (mod $i 4) 70) | safeCSS }}">
             <button type="button" class="swatch-plate" data-copy-o="{{ $m.obsidian }}" data-copy-i="{{ $m.ivory }}" aria-label="Copy the {{ $m.en }} colour">
               <span class="swatch-arch"></span>
-              <span class="swatch-frame" aria-hidden="true"></span>
+              <svg class="swatch-frame" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0,1 L0,0.5 A1,0.62 0 0,1 0.5,0 A1,0.62 0 0,1 1,0.5 L1,1"/></svg>
             </button>
             <div class="swatch-body">
               <h3>{{ $m.en }}</h3>
@@ -245,6 +245,7 @@
           {{- $ci := partial "cremisi/contrast.html" (dict "fg" $s.hex "bg" $ground.ivory) }}
           <li class="step{{ if $s.is }} is-theme{{ end }}{{ if ge $co 7.0 }} is-light{{ end }}" style="{{ printf "--c:%s;--delay:%dms" $s.hex (mul $i 40) | safeCSS }}">
             <button type="button" class="step-chip" data-copy-o="{{ $s.hex }}" data-copy-i="{{ $s.hex }}" aria-label="Copy {{ $key }} {{ $s.n }}, {{ $s.hex }}">
+              <svg class="step-outline" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0,1 L0,0.5 A1,0.62 0 0,1 0.5,0 A1,0.62 0 0,1 1,0.5 L1,1"/></svg>
               {{- if $s.is }}<span class="step-mark" title="Already in the theme: {{ $s.is }}">◆</span>{{ end }}
             </button>
             <span class="step-info">
