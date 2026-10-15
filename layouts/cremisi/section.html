@@ -42,8 +42,6 @@
 {{- $ground := index $d.materials 0 -}}
 {{- $schemeO := partial "cremisi/sublime.html" "obsidian" -}}
 {{- $schemeI := partial "cremisi/sublime.html" "ivory" -}}
-{{- $synDL := resources.Get "cremisi/css/syntax.css" | resources.ExecuteAsTemplate "cremisi/downloads/cremisi-syntax.css" $d -}}
-{{- $synDL.Publish -}}
 
 <header class="nav" data-nav>
   <a class="nav-brand" href="#top" aria-label="Cremisi, back to top">
@@ -485,7 +483,7 @@
             {{ transform.Highlight "{\n  \"window.autoDetectColorScheme\": true,\n  \"workbench.preferredDarkColorTheme\": \"Cremisi Obsidian\",\n  \"workbench.preferredLightColorTheme\": \"Cremisi Ivory\"\n}" "json" }}
           </div>
           <div class="downloads">
-            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-theme-0.1.0.vsix" | relURL }}" download>cremisi-theme-0.1.0.vsix</a>
+            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-theme-0.1.1.vsix" | relURL }}" download>cremisi-theme-0.1.1.vsix</a>
           </div>
         </article>
       </div>

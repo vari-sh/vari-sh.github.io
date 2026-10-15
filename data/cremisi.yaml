@@ -182,7 +182,7 @@ rules:
   - { name: Markdown h6, scope: "markup.heading.6", fg: wine, style: bold }
   - { name: Markdown bold, scope: "markup.bold", fg: tallow, style: bold }
   - { name: Markdown italic, scope: "markup.italic", fg: petal, style: italic }
-  - { name: Markdown links, scope: "markup.underline.link, meta.link", fg: lapis, style: underline }
+  - { name: Markdown links, scope: "markup.underline.link, meta.link", fg: lapis }
   - { name: Markdown raw, scope: "markup.raw", fg: malachite }
   - { name: Markdown quotes, scope: "markup.quote", fg: incense, style: italic }
   - { name: Markdown lists and heading marks, scope: "markup.list punctuation.definition.list_item, punctuation.definition.heading", fg: blood }
