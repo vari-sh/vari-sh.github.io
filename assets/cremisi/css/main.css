@@ -468,7 +468,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .voice li::before { content: "†"; position: absolute; left: 0; color: var(--crimson); font-size: .8em; top: .1em; }
 
 /* ── CHART ─────────────────────────────── */
-.chart { display: grid; gap: 10px; }
+.chart { display: grid; gap: 10px; --lane: 64px; }
 .chart-head, .chart-row, .chart-foot { display: grid; grid-template-columns: minmax(130px, 200px) 1fr 1fr; gap: 18px; align-items: center; }
 .chart-head span { font-family: var(--f-title); font-size: .74rem; letter-spacing: .2em; text-transform: uppercase; color: var(--tallow); }
 .chart-head code { color: var(--iron); letter-spacing: 0; margin-left: 6px; }
@@ -480,12 +480,12 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .track-o { background: var(--go); border: 1px solid var(--line); }
 .track-i { background: var(--gi); }
 .track::after {
-  content: ""; position: absolute; top: 0; bottom: 0; left: var(--th); width: 0; border-left: 1px dashed;
+  content: ""; position: absolute; top: 0; bottom: 0; left: calc((100% - var(--lane)) * var(--t)); width: 0; border-left: 1px dashed;
 }
 .track-o::after { border-color: rgba(233, 225, 209, .45); }
 .track-i::after { border-color: rgba(43, 39, 51, .5); }
 .bar {
-  height: 10px; width: var(--w); background: var(--c); margin-left: 0; border-radius: 0 6px 6px 0;
+  height: 10px; width: calc((100% - var(--lane)) * var(--f)); flex: none; background: var(--c); margin-left: 0; border-radius: 0 6px 6px 0;
   transform-origin: left; transform: scaleX(0); transition: transform 1.3s var(--ease);
 }
 .chart.is-visible .bar { transform: scaleX(1); }
@@ -493,7 +493,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .track-o b { color: #e9e1d1; background: var(--go); padding: 0 4px; }
 .track-i b { color: #2b2733; background: var(--gi); padding: 0 4px; }
 .is-exempt .track { opacity: .7; }
-.chart-foot .th-label { position: relative; padding-left: var(--th); font-size: .7rem; color: var(--iron); letter-spacing: .08em; translate: -40px 0; white-space: nowrap; }
+.chart-foot .th-label { position: relative; padding-left: calc((100% - var(--lane)) * var(--t)); font-size: .7rem; color: var(--iron); letter-spacing: .08em; translate: -40px 0; white-space: nowrap; }
 
 /* ── SCALES ─────────────────────────────── */
 .scale + .scale { margin-top: clamp(56px, 7vw, 84px); }
@@ -590,7 +590,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 
 .step-info, .step-ratios { display: contents; }
 /* ── INSTALL ─────────────────────────────── */
-.install { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.install { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .rite {
   position: relative; padding: clamp(28px, 4vw, 44px); border: 1px solid var(--line);
   background: linear-gradient(160deg, var(--stone-2), var(--crypt)); display: flex; flex-direction: column;
@@ -611,7 +611,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
   content: counter(s, upper-roman); position: absolute; left: 0; top: .1em; width: 28px; text-align: center;
   font-family: var(--f-title); font-weight: 700; color: var(--crimson); font-size: .9rem;
 }
-.steps code { color: var(--tallow); background: rgba(0, 0, 0, .35); padding: 2px 6px; border: 1px solid var(--line); }
+.steps code { color: var(--tallow); background: rgba(0, 0, 0, .35); padding: 2px 6px; border: 1px solid var(--line); overflow-wrap: break-word; }
 .steps em { color: var(--bone); font-style: normal; }
 .snippet { background: #070708; border: 1px solid var(--line); padding: 0 18px; margin-bottom: 26px; }
 .snippet pre { padding: 14px 0; font-size: .86rem; }
@@ -670,7 +670,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 @media (max-width: 860px) {
   .concept { grid-template-columns: 1fr; }
   .triad { max-width: 440px; margin-inline: auto; width: 100%; }
-  .install { grid-template-columns: 1fr; }
+  .install { grid-template-columns: minmax(0, 1fr); }
   .editor-bar { flex-wrap: wrap; }
   .editor-tabs { order: 3; flex-basis: 100%; }
   .editor-seals { margin-right: auto; }

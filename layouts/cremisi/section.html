@@ -416,8 +416,8 @@
       </div>
 
       {{- $max := 16.0 }}
-      {{- $th := mul (div 4.5 $max) 100 }}
-      <div class="chart reveal" style="{{ printf "--th:%.3f%%;--go:%s;--gi:%s" $th $ground.obsidian $ground.ivory | safeCSS }}">
+      {{- $th := div 4.5 $max }}
+      <div class="chart reveal" style="{{ printf "--t:%.4f;--go:%s;--gi:%s" $th $ground.obsidian $ground.ivory | safeCSS }}">
         <div class="chart-head">
           <span></span>
           <span>Obsidian <code>{{ $ground.obsidian }}</code></span>
@@ -428,8 +428,8 @@
         {{- $ci := partial "cremisi/contrast.html" (dict "fg" .ivory "bg" $ground.ivory) }}
         <div class="chart-row{{ if .exempt }} is-exempt{{ end }}">
           <span class="chart-label">{{ .en }}{{ if .exempt }} <em>exempt</em>{{ end }}</span>
-          <span class="track track-o"><span class="bar" style="{{ printf "--w:%.2f%%;--c:%s" (math.Min 100 (mul (div $co $max) 100)) .obsidian | safeCSS }}"></span><b>{{ printf "%.2f" $co }}</b></span>
-          <span class="track track-i"><span class="bar" style="{{ printf "--w:%.2f%%;--c:%s" (math.Min 100 (mul (div $ci $max) 100)) .ivory | safeCSS }}"></span><b>{{ printf "%.2f" $ci }}</b></span>
+          <span class="track track-o"><span class="bar" style="{{ printf "--f:%.4f;--c:%s" (math.Min 1 (div $co $max)) .obsidian | safeCSS }}"></span><b>{{ printf "%.2f" $co }}</b></span>
+          <span class="track track-i"><span class="bar" style="{{ printf "--f:%.4f;--c:%s" (math.Min 1 (div $ci $max)) .ivory | safeCSS }}"></span><b>{{ printf "%.2f" $ci }}</b></span>
         </div>
         {{- end }}{{ end }}
         <div class="chart-foot">
