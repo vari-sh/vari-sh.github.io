@@ -67,6 +67,13 @@ materials:
     role: Numbers, constants
     story: Ancient resin that traps the numbers.
     token: true
+  - key: sealwax
+    en: Sealing wax
+    obsidian: "#c6784c"
+    ivory: "#a24d20"
+    role: Decorators, annotations, escapes, placeholders, regex
+    story: The seal pressed upon decorators, and on the escapes set inside strings.
+    token: true
   - key: malachite
     en: Malachite
     obsidian: "#44a078"
@@ -101,13 +108,6 @@ materials:
     ivory: "#a8465f"
     role: Parameters
     story: Dried petals pressed between the pages.
-    token: true
-  - key: sealwax
-    en: Sealing wax
-    obsidian: "#c6784c"
-    ivory: "#a24d20"
-    role: Decorators, annotations, escapes, placeholders, regex
-    story: The seal pressed upon decorators, and on the escapes set inside strings.
     token: true
 
 ui_vars:
