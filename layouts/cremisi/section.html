@@ -43,6 +43,7 @@
 {{- $schemeO := partial "cremisi/sublime.html" "obsidian" -}}
 {{- $schemeI := partial "cremisi/sublime.html" "ivory" -}}
 {{- $synDL := resources.Get "cremisi/css/syntax.css" | resources.ExecuteAsTemplate "cremisi/downloads/cremisi-syntax.css" $d -}}
+{{- $synDL.Publish -}}
 
 <header class="nav" data-nav>
   <a class="nav-brand" href="#top" aria-label="Cremisi, back to top">
@@ -78,7 +79,7 @@
     <div class="hero-inner">
       <p class="kicker reveal">✠ &nbsp;A reliquary of materials&nbsp; ✠</p>
       <h1 class="hero-title reveal" data-spotlight>Cremisi<span class="hero-light" aria-hidden="true">Cremisi</span></h1>
-      <p class="hero-sub reveal">A gothic, arcane colour scheme for <strong>Sublime Text</strong> and <strong>Hugo</strong>.<br>Every colour is born from an object: blood, bone, stone, amber, verdigris.</p>
+      <p class="hero-sub reveal">A gothic, arcane colour scheme for <strong>Sublime Text</strong>, <strong>VS Code</strong> and more.<br>Every colour is born from an object: blood, bone, stone, amber, verdigris.</p>
       <div class="hero-actions reveal">
         <a class="btn btn-primary" href="#install">Download the theme</a>
         <a class="btn btn-ghost" href="#materials">Open the materials</a>
@@ -450,7 +451,7 @@
         <p class="kicker">Rite of entry</p>
         <h2>Install Cremisi</h2>
         {{ partial "cremisi/ornament.html" }}
-        <p class="sec-intro">Every port of the theme lives in one repository: <a href="https://github.com/vari-sh/Cremisi-Theme">vari-sh/Cremisi-Theme</a>.</p>
+        <p class="sec-intro">Sublime Text and VS Code are below. Further ports are available in the repository: <a href="https://github.com/vari-sh/Cremisi-Theme">vari-sh/Cremisi-Theme</a>.</p>
       </div>
 
       <div class="install">
@@ -472,19 +473,19 @@
 
         <article class="rite reveal" style="--delay:120ms">
           <header>
-            <span class="rite-icon" aria-hidden="true">H</span>
-            <h3>Hugo</h3>
+            <span class="rite-icon" aria-hidden="true">V</span>
+            <h3>VS Code</h3>
           </header>
           <ol class="steps">
-            <li>Enable Chroma classes in <code>hugo.toml</code>.</li>
-            <li>Include <code>cremisi-syntax.css</code> in your theme.</li>
-            <li>Set <code>data-theme="obsidian"</code> or <code>"ivory"</code> on the <code>&lt;html&gt;</code> element.</li>
+            <li>Download the extension below.</li>
+            <li>Open the command palette and run <code>Extensions: Install from VSIX…</code>.</li>
+            <li>Run <code>Preferences: Color Theme</code> and pick <em>Cremisi Obsidian</em> or <em>Cremisi Ivory</em>. To follow the system appearance:</li>
           </ol>
           <div class="snippet" data-variant="obsidian">
-            {{ transform.Highlight "[markup.highlight]\n  noClasses = false" "toml" }}
+            {{ transform.Highlight "{\n  \"window.autoDetectColorScheme\": true,\n  \"workbench.preferredDarkColorTheme\": \"Cremisi Obsidian\",\n  \"workbench.preferredLightColorTheme\": \"Cremisi Ivory\"\n}" "json" }}
           </div>
           <div class="downloads">
-            <a class="btn btn-ghost" href="{{ $synDL.RelPermalink }}" download>cremisi-syntax.css</a>
+            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-theme-0.1.0.vsix" | relURL }}" download>cremisi-theme-0.1.0.vsix</a>
           </div>
         </article>
       </div>
