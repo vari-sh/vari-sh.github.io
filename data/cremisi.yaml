@@ -232,14 +232,13 @@ principles:
     text: Desaturated, warm, earthy and mineral colours, drawn from wax, resin, copper and stone.
 
 decisions:
-  - "The editor background is slate #17171c: the cold stone of a crypt."
-  - "Amethyst marks builtins and self, the words the language owns."
-  - "Sealing wax marks decorators outside strings, escapes and regex inside them: the two never meet."
-  - "Tallow and malachite carry types and strings, warm and mineral."
-  - "Lapis and verdigris are the only cold notes: functions and keys, then properties."
-  - "Incense lives in comments, a soft smoke that recedes behind the code."
   - "Crimson #c42740 is the only colour shared by both variants. It is the accent."
-  - "Only two tonal scales, stone and blood: structure and identity. Syntax highlighting stays with the materials."
+  - "Rather than black, the editor background is slate #17171c: the cold stone of a crypt."
+  - "Every hue runs warm except lapis and verdigris, the only cold notes: functions and keys, then properties."
+  - "Malachite and tallow carry strings and types; amethyst marks builtins and self, the words the language owns."
+  - "Incense lives in comments, a soft smoke that recedes behind the code."
+  - "Sealing wax marks decorators outside strings, escapes and regex inside them: the two never meet."
+  - "Interfaces get only two tonal scales, stone and blood: structure and identity. Syntax highlighting stays with the materials."
 
 # Tonal scales (OKLCH interpolation): for building interfaces on top of Cremisi, not for syntax.
 # h = OKLCH hue in degrees; is = the theme colour that step already is.
