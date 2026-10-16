@@ -475,15 +475,16 @@
             <h3>VS Code</h3>
           </header>
           <ol class="steps">
-            <li>Download the extension below.</li>
-            <li>Open the command palette and run <code>Extensions: Install from VSIX…</code>.</li>
+            <li>Install <em>Cremisi</em> from the Visual Studio Marketplace: search for it in the Extensions view, or press <code>Ctrl+P</code> and run <code>ext install vari-sh.cremisi-theme</code>.</li>
+            <li>For VSCodium or an offline machine, download the extension below and run <code>Extensions: Install from VSIX…</code>.</li>
             <li>Run <code>Preferences: Color Theme</code> and pick <em>Cremisi Obsidian</em> or <em>Cremisi Ivory</em>. To follow the system appearance:</li>
           </ol>
           <div class="snippet" data-variant="obsidian">
             {{ transform.Highlight "{\n  \"window.autoDetectColorScheme\": true,\n  \"workbench.preferredDarkColorTheme\": \"Cremisi Obsidian\",\n  \"workbench.preferredLightColorTheme\": \"Cremisi Ivory\"\n}" "json" }}
           </div>
           <div class="downloads">
-            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-theme-0.1.1.vsix" | relURL }}" download>cremisi-theme-0.1.1.vsix</a>
+            <a class="btn btn-primary" href="https://marketplace.visualstudio.com/items?itemName=vari-sh.cremisi-theme">Marketplace</a>
+            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-theme-0.2.0.vsix" | relURL }}" download>cremisi-theme-0.2.0.vsix</a>
           </div>
         </article>
       </div>
