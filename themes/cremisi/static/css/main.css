@@ -626,38 +626,51 @@ hr.section-divider::after {
 
 /* ═══ BUTTONS ═══ */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.82rem 1.7rem;
-  border: 1px solid transparent;
-  border-radius: 2px;
-  font-family: 'Montserrat', sans-serif;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  --btn-frame: transparent;
+  font-family: 'Cinzel', serif;
   font-size: var(--step--2);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.2em;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease,
-              box-shadow 0.25s ease, transform 0.25s ease;
+  /* beveled reliquary shape, cut on both ends */
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+  transition: background 0.25s ease, color 0.25s ease,
+              box-shadow 0.25s ease, transform 0.25s ease, filter 0.25s ease;
 }
 
-.btn svg { transition: transform 0.25s ease; }
+/* a 1px inner frame that follows the bevel */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--btn-frame);
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%, 1px 50%, 12.5px calc(100% - 1px), calc(100% - 12.5px) calc(100% - 1px), calc(100% - 1px) 50%, calc(100% - 12.5px) 1px, 12.5px 1px, 1px 50%, 0 50%);
+  pointer-events: none;
+}
+
+.btn svg { position: relative; transition: transform 0.25s ease; }
 .btn:hover svg { transform: translateX(3px); }
 
 /* filled — the primary call */
 .btn-primary,
 .btn-primary:visited {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: linear-gradient(180deg, var(--blood-500), var(--blood-700));
+  --btn-frame: rgba(255, 200, 200, 0.25);
   color: #fff;
+  box-shadow: 0 10px 34px -12px rgba(196, 39, 64, 0.8);
 }
 
 .btn-primary:hover {
-  background: var(--accent-bright);
-  border-color: var(--accent-bright);
-  box-shadow: 0 0 28px rgba(196, 39, 64, 0.45);
+  filter: brightness(1.12);
+  box-shadow: 0 14px 40px -12px rgba(196, 39, 64, 0.85);
   transform: translateY(-2px);
 }
 
@@ -665,14 +678,14 @@ hr.section-divider::after {
 .btn-outline,
 .btn-outline:visited {
   background: transparent;
-  border-color: var(--border);
+  --btn-frame: var(--border);
   color: var(--subtext1);
 }
 
 .btn-outline:hover {
   background: var(--accent-wash);
-  border-color: var(--accent-deep);
-  color: var(--text);
+  --btn-frame: var(--accent-deep);
+  color: var(--gold);
   transform: translateY(-2px);
 }
 
@@ -1102,9 +1115,22 @@ hr.section-divider::after {
 
 .post-content blockquote > * + * { margin-top: 0.8rem; }
 
-.post-content ul, .post-content ol { padding-left: 1.3rem; }
+.post-content ul, .post-content ol { padding-left: 1.5rem; }
 .post-content li { margin-bottom: 0.45rem; }
-.post-content li::marker { color: var(--accent-deep); }
+.post-content ol > li::marker { color: var(--accent); font-family: 'Cinzel', serif; font-weight: 600; }
+
+/* gothic bullet — a dagger in place of the disc */
+.post-content ul { list-style: none; }
+.post-content ul > li { position: relative; }
+.post-content ul > li::before {
+  content: '\2020';
+  position: absolute;
+  left: -1.25rem;
+  top: 0.02em;
+  color: var(--accent);
+  font-size: 0.92em;
+  line-height: inherit;
+}
 
 .post-content hr {
   border: none;
