@@ -16,7 +16,7 @@
       <p class="post-description">{{ . }}</p>
       {{ end }}
 
-      <div class="rule-double" aria-hidden="true"></div>
+      {{ partial "ornament.html" . }}
 
       <div class="post-header-foot">
         {{ $authorName := "" }}

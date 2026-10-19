@@ -294,6 +294,17 @@ main { flex: 1; }
   border-bottom: 1px solid var(--hairline-soft);
 }
 
+/* the crimson diamond rule — a line flanking a filled lozenge, as on /cremisi */
+.ornament {
+  display: block;
+  width: 220px;
+  max-width: 70%;
+  height: 22px;
+  margin: 1.5rem 0 0;
+  color: var(--accent);
+}
+.ornament--center { margin-left: auto; margin-right: auto; }
+
 /* divider with a crimson lozenge at its centre */
 hr.section-divider {
   position: relative;
@@ -620,8 +631,9 @@ hr.section-divider::after {
 }
 
 .hero-rule {
-  max-width: 220px;
   margin: 3.25rem auto 0;
+  display: flex;
+  justify-content: center;
 }
 
 /* ═══ BUTTONS ═══ */
