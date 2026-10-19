@@ -50,15 +50,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  {{/* Styles */}}
-  <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
+  {{/* Styles — fingerprinted so the URL changes on every edit and caches bust */}}
+  {{ with resources.Get "css/main.css" | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+  {{ end }}
   {{ range .Site.Params.customCSS -}}
     <link rel="stylesheet" href="{{ . | relURL }}">
   {{ end }}
 
   {{/* Syntax Highlighting */}}
   {{ if .Site.Params.syntaxHighlight }}
-  <link rel="stylesheet" href="{{ "css/syntax.css" | relURL }}">
+  {{ with resources.Get "css/syntax.css" | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+  {{ end }}
   {{ end }}
 
   {{ partial "head-extra.html" . }}
