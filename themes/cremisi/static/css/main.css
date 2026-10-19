@@ -8,38 +8,38 @@
 
 /* ═══ TOKENS ═══ */
 :root, [data-theme="obsidian"] {
-  /* ink — warm-neutral charcoals, no blue/violet cast */
-  --ink-000: #070708;
-  --ink-050: #0b0b0c;
-  --ink-100: #101011;
-  --ink-200: #161617;
-  --ink-300: #1f1f21;
-  --ink-400: #2b2b2e;
-  --ink-500: #45454a;
-  --ink-600: #636368;
-  --ink-700: #8a8a8f;
+  /* stone — the violet-cast crypt greys of the canonical palette */
+  --ink-000: #08080a;
+  --ink-050: #0c0c10;
+  --ink-100: #121217;
+  --ink-200: #17171c;
+  --ink-300: #212026;
+  --ink-400: #302f35;
+  --ink-500: #4e4a50;
+  --ink-600: #696164;
+  --ink-700: #827a76;
 
   /* bone — warm off-whites */
-  --bone-300: #a6a39e;
-  --bone-200: #c9c5bf;
-  --bone-100: #ece8e1;
+  --bone-300: #bdb4a5;
+  --bone-200: #cfc6b8;
+  --bone-100: #e9e1d1;
 
   /* blood — the one accent that matters */
-  --blood-900: #430c15;
-  --blood-800: #5f1020;
-  --blood-700: #81182b;
-  --blood-600: #a21f35;
+  --blood-900: #301419;
+  --blood-800: #52151f;
+  --blood-700: #7e1023;
+  --blood-600: #a11730;
   --blood-500: #c42740;
-  --blood-400: #d9485d;
-  --blood-300: #e8788a;
+  --blood-400: #e2586a;
+  --blood-300: #ef6f80;
 
   /* secondary jewels — used sparingly (code, callouts, tags) */
-  --ember: #c4752f;
-  --gold:  #bfa052;
-  --sage:  #6f9b73;
-  --teal:  #4e8f8a;
-  --rose:  #b4677a;
-  --clay:  #a9614f;
+  --ember: #c6784c;
+  --gold:  #dccb9a;
+  --sage:  #44a078;
+  --teal:  #6bb3b0;
+  --rose:  #b27a90;
+  --clay:  #c58f96;
 
   /* syntax highlighting (Chroma) */
   --syn-ink:        #e9e1d1;
@@ -104,65 +104,65 @@
 
 /* ═══ IVORY — aged parchment ═══ */
 [data-theme="ivory"] {
-  --ink-000: #ded0b6;
-  --ink-050: #f4efe4;
-  --ink-100: #ece4d3;
-  --ink-200: #e3d9c4;
-  --ink-300: #d6c8ad;
-  --ink-400: #c3b394;
-  --ink-500: #9c8c6e;
-  --ink-600: #7d6d52;
-  --ink-700: #63553e;
+  --ink-000: #e9e1d1;
+  --ink-050: #f4eee2;
+  --ink-100: #ece6da;
+  --ink-200: #e9e1d1;
+  --ink-300: #ddd4c4;
+  --ink-400: #cfc6b8;
+  --ink-500: #b3aa9a;
+  --ink-600: #9a948c;
+  --ink-700: #827a76;
 
-  --bone-300: #564a37;
-  --bone-200: #40372a;
-  --bone-100: #241e17;
+  --bone-300: #4e4a50;
+  --bone-200: #302f35;
+  --bone-100: #2b2733;
 
-  --blood-900: #3d0a13;
-  --blood-800: #5a1020;
-  --blood-700: #7a172a;
-  --blood-600: #8f1d32;
-  --blood-500: #9b2135;
-  --blood-400: #b22a3f;
-  --blood-300: #c4505f;
+  --blood-900: #301419;
+  --blood-800: #52151f;
+  --blood-700: #7e1023;
+  --blood-600: #a11730;
+  --blood-500: #c42740;
+  --blood-400: #e2586a;
+  --blood-300: #ef6f80;
 
-  --ember: #96501c;
-  --gold:  #85661d;
-  --sage:  #3f7049;
-  --teal:  #296b67;
-  --rose:  #8a3d52;
-  --clay:  #7c3f2f;
+  --ember: #a24d20;
+  --gold:  #7e6410;
+  --sage:  #2f7a4e;
+  --teal:  #1a706d;
+  --rose:  #8a3f64;
+  --clay:  #a8465f;
 
-  /* syntax highlighting (Chroma) — darkened against the real --crust (#ded0b6), not a flat parchment white */
+  /* syntax highlighting (Chroma) — the canonical Ivory materials, on the parchment ground */
   --syn-ink:        #2b2733;
-  --syn-blood:      #ac1d35;
-  --syn-lapis:      #2c5998;
-  --syn-tallow:     #6d560e;
-  --syn-amber:      #824c0f;
-  --syn-sealwax:    #8e441c;
-  --syn-malachite:  #276440;
-  --syn-verdigris:  #17625f;
+  --syn-blood:      #bb1f39;
+  --syn-lapis:      #2d5c9c;
+  --syn-tallow:     #7e6410;
+  --syn-amber:      #9f5c12;
+  --syn-sealwax:    #a24d20;
+  --syn-malachite:  #2f7a4e;
+  --syn-verdigris:  #1a706d;
   --syn-amethyst:   #7e3a9e;
   --syn-wine:       #8a3f64;
-  --syn-petal:      #913d52;
+  --syn-petal:      #a8465f;
   --syn-incense:    #8a7f8c;
-  --syn-iron:       #5b5762;
+  --syn-iron:       #64606c;
 
   --accent:        var(--blood-500);
   --accent-deep:   var(--blood-700);
   --accent-bright: var(--blood-400);
 
   --link:          var(--bone-100);
-  --link-rule:     rgba(155, 33, 53, 0.5);
-  --link-hover:    var(--blood-500);
+  --link-rule:     rgba(196, 39, 64, 0.5);
+  --link-hover:    var(--blood-600);
 
   --hairline:      rgba(60, 40, 25, 0.18);
   --hairline-soft: rgba(60, 40, 25, 0.10);
   --border:        var(--ink-400);
 
-  --accent-wash:   rgba(155, 33, 53, 0.07);
-  --accent-wash-2: rgba(155, 33, 53, 0.14);
-  --glow:          0 0 28px rgba(155, 33, 53, 0.14);
+  --accent-wash:   rgba(196, 39, 64, 0.07);
+  --accent-wash-2: rgba(196, 39, 64, 0.14);
+  --glow:          0 0 28px rgba(196, 39, 64, 0.14);
   --shadow:        0 16px 40px rgba(70, 50, 30, 0.16);
   --shadow-sm:     0 6px 18px rgba(70, 50, 30, 0.12);
   --vignette:      radial-gradient(135% 105% at 50% 0%, transparent 55%, rgba(90, 62, 36, 0.20) 100%);
@@ -171,22 +171,22 @@
 /* ═══ IVORY — component refinements ═══ */
 [data-theme="ivory"] body {
   background-image:
-    radial-gradient(ellipse 820px 540px at 12% -12%, rgba(155, 33, 53, 0.08), transparent 62%),
-    radial-gradient(ellipse 760px 520px at 88% -4%, rgba(122, 23, 42, 0.07), transparent 62%);
+    radial-gradient(ellipse 820px 540px at 12% -12%, rgba(196, 39, 64, 0.08), transparent 62%),
+    radial-gradient(ellipse 760px 520px at 88% -4%, rgba(126, 16, 35, 0.07), transparent 62%);
 }
 
-[data-theme="ivory"] ::selection { background: rgba(155, 33, 53, 0.22); }
+[data-theme="ivory"] ::selection { background: rgba(196, 39, 64, 0.22); }
 
 [data-theme="ivory"] .hero::before {
-  background: radial-gradient(ellipse at center, rgba(155, 33, 53, 0.1) 0%, transparent 68%);
+  background: radial-gradient(ellipse at center, rgba(196, 39, 64, 0.1) 0%, transparent 68%);
 }
 
 [data-theme="ivory"] .hero-title { text-shadow: none; }
 [data-theme="ivory"] .hero-title em { animation: none; text-shadow: none; }
 [data-theme="ivory"] .section-title::before,
 [data-theme="ivory"] hr.section-divider::after { box-shadow: none; }
-[data-theme="ivory"] .btn-primary:hover { box-shadow: 0 8px 22px rgba(155, 33, 53, 0.28); }
-[data-theme="ivory"] .back-to-top:hover { box-shadow: 0 8px 20px rgba(155, 33, 53, 0.28); }
+[data-theme="ivory"] .btn-primary:hover { box-shadow: 0 8px 22px rgba(196, 39, 64, 0.28); }
+[data-theme="ivory"] .back-to-top:hover { box-shadow: 0 8px 20px rgba(196, 39, 64, 0.28); }
 [data-theme="ivory"] .reading-progress-bar { box-shadow: none; }
 [data-theme="ivory"] .post-single .post-content > p:first-of-type::first-letter { text-shadow: none; }
 [data-theme="ivory"] .error-code span { text-shadow: none; }
@@ -524,7 +524,7 @@ hr.section-divider::after {
   opacity: 0;
   animation: emberRise var(--d) linear var(--delay) infinite;
 }
-[data-theme="ivory"] .hero-embers span { background: var(--blood-500); box-shadow: 0 0 6px 1px rgba(155, 33, 53, 0.35); }
+[data-theme="ivory"] .hero-embers span { background: var(--blood-500); box-shadow: 0 0 6px 1px rgba(196, 39, 64, 0.35); }
 
 @keyframes emberRise {
   0%   { transform: translate(0, 0); opacity: 0; }
@@ -1241,7 +1241,7 @@ pre code {
   opacity: 1;
   border-color: var(--sage);
   color: var(--sage);
-  background: rgba(111, 155, 115, 0.14);
+  background: rgba(68, 160, 120, 0.14);
 }
 
 /* ═══ TABLE OF CONTENTS ═══ */
@@ -1485,9 +1485,9 @@ pre code {
 
 .callout-icon { font-size: 1.05rem; flex-shrink: 0; line-height: 1.6; }
 
-.callout-note   { background: rgba(78, 143, 138, 0.08); border-color: rgba(78, 143, 138, 0.35); }
-.callout-tip    { background: rgba(111, 155, 115, 0.08); border-color: rgba(111, 155, 115, 0.35); }
-.callout-warn   { background: rgba(191, 160, 82, 0.09);  border-color: rgba(191, 160, 82, 0.38); }
+.callout-note   { background: rgba(107, 179, 176, 0.08); border-color: rgba(107, 179, 176, 0.35); }
+.callout-tip    { background: rgba(68, 160, 120, 0.08); border-color: rgba(68, 160, 120, 0.35); }
+.callout-warn   { background: rgba(207, 145, 66, 0.09);  border-color: rgba(207, 145, 66, 0.38); }
 .callout-danger { background: rgba(196, 39, 64, 0.09);   border-color: rgba(196, 39, 64, 0.4); }
 
 /* ═══ FOOTER — colophon ═══ */

@@ -50,7 +50,7 @@
 
 /* diff / generic */
 .chroma .gd { color: var(--blood-300); background: rgba(196, 39, 64, 0.1); }
-.chroma .gi { color: var(--sage); background: rgba(111, 155, 115, 0.1); }
+.chroma .gi { color: var(--sage); background: rgba(68, 160, 120, 0.1); }
 .chroma .gh, .chroma .gu { color: var(--text); font-weight: 600; }
 .chroma .ge { font-style: italic; }
 .chroma .gs { font-weight: 600; }
