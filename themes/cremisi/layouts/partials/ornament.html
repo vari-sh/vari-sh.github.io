@@ -1,11 +1,19 @@
-<svg class="ornament" viewBox="0 0 240 24" aria-hidden="true" focusable="false">
-  <g fill="none" stroke="currentColor" stroke-width="1">
-    <line x1="0" y1="12" x2="92" y2="12"/>
-    <line x1="148" y1="12" x2="240" y2="12"/>
-    <path d="M92,12 L100,6 L108,12 L100,18 Z"/>
-    <path d="M132,12 L140,6 L148,12 L140,18 Z"/>
-    <path d="M120,1 L128,12 L120,23 L112,12 Z" fill="currentColor"/>
-    <circle cx="86" cy="12" r="1.6" fill="currentColor"/>
-    <circle cx="154" cy="12" r="1.6" fill="currentColor"/>
+<svg class="ornament ornament--center" viewBox="0 0 220 16" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="orn-fl" gradientUnits="userSpaceOnUse" x1="4" y1="0" x2="74" y2="0">
+      <stop offset="0" stop-color="currentColor" stop-opacity="0"/>
+      <stop offset="1" stop-color="currentColor"/>
+    </linearGradient>
+    <linearGradient id="orn-fr" gradientUnits="userSpaceOnUse" x1="146" y1="0" x2="216" y2="0">
+      <stop offset="0" stop-color="currentColor"/>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <line x1="4" y1="8" x2="74" y2="8" stroke="url(#orn-fl)" stroke-width="1"/>
+  <line x1="146" y1="8" x2="216" y2="8" stroke="url(#orn-fr)" stroke-width="1"/>
+  <g fill="currentColor">
+    <path d="M86,8 L92,3.6 L98,8 L92,12.4 Z"/>
+    <path d="M122,8 L128,3.6 L134,8 L128,12.4 Z"/>
+    <path d="M110,1 L118,8 L110,15 L102,8 Z"/>
   </g>
 </svg>

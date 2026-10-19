@@ -183,8 +183,8 @@
 
 [data-theme="ivory"] .hero-title { text-shadow: none; }
 [data-theme="ivory"] .hero-title em { animation: none; text-shadow: none; }
-[data-theme="ivory"] .section-title::before,
-[data-theme="ivory"] hr.section-divider::after { box-shadow: none; }
+[data-theme="ivory"] .section-title::before { box-shadow: none; }
+[data-theme="ivory"] hr.section-divider::after { filter: none; }
 [data-theme="ivory"] .btn-primary:hover { box-shadow: 0 8px 22px rgba(196, 39, 64, 0.28); }
 [data-theme="ivory"] .back-to-top:hover { box-shadow: 0 8px 20px rgba(196, 39, 64, 0.28); }
 [data-theme="ivory"] .reading-progress-bar { box-shadow: none; }
@@ -294,25 +294,34 @@ main { flex: 1; }
   border-bottom: 1px solid var(--hairline-soft);
 }
 
-/* the crimson diamond rule — a line flanking a filled lozenge, as on /cremisi */
+/* the crimson diamond ornament — a filled lozenge in the vocabulary of /cremisi */
 .ornament {
   display: block;
-  width: 220px;
-  max-width: 70%;
-  height: 22px;
-  margin: 1.5rem 0 0;
+  height: auto;
   color: var(--accent);
 }
-.ornament--center { margin-left: auto; margin-right: auto; }
+/* centred, symmetric: line → diamond → lozenge → diamond → line (hero) */
+.ornament--center {
+  width: 200px;
+  margin: 1.6rem auto 0;
+}
+/* left-anchored incipit: lozenge at the title's edge, line fading right (headers) */
+.ornament--rule {
+  width: min(320px, 56%);
+  margin: 1.5rem 0 0;
+}
 
-/* divider with a crimson lozenge at its centre */
+/* ornamental divider — a crimson lozenge flanked by open diamonds, set into a broken hairline */
 hr.section-divider {
   position: relative;
   border: none;
-  height: 1px;
+  height: 16px;
   margin: 4rem 0;
   background: linear-gradient(90deg,
-    transparent, var(--hairline) 18%, var(--hairline) 82%, transparent);
+    transparent, var(--hairline) 15%, var(--hairline) 42%,
+    transparent 46%, transparent 54%,
+    var(--hairline) 58%, var(--hairline) 85%, transparent)
+    no-repeat center / 100% 1px;
   overflow: visible;
 }
 
@@ -321,12 +330,11 @@ hr.section-divider::after {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 7px;
-  height: 7px;
-  margin: -3.5px 0 0 -3.5px;
-  background: var(--accent);
-  transform: rotate(45deg);
-  box-shadow: 0 0 14px rgba(196, 39, 64, 0.5);
+  width: 64px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2016'%3E%3Cg%20fill='none'%20stroke='%23c42740'%20stroke-width='1'%3E%3Cpath%20d='M2%208L9%204L16%208L9%2012Z'/%3E%3Cpath%20d='M48%208L55%204L62%208L55%2012Z'/%3E%3C/g%3E%3Cpath%20d='M32%201.5L40%208L32%2014.5L24%208Z'%20fill='%23c42740'/%3E%3C/svg%3E") no-repeat center / contain;
+  filter: drop-shadow(0 0 5px rgba(196, 39, 64, 0.45));
 }
 
 /* rose window (inline SVG partial) */
@@ -985,7 +993,7 @@ hr.section-divider::after {
   margin-bottom: 1.9rem;
 }
 
-.post-header .rule-double { margin-bottom: 1.5rem; }
+.post-header .ornament { margin-bottom: 2rem; }
 
 .post-header-foot {
   display: flex;
