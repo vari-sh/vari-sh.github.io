@@ -40,8 +40,6 @@
   <div class="grain" aria-hidden="true"></div>
   {{- $d := hugo.Data.cremisi -}}
 {{- $ground := index $d.materials 0 -}}
-{{- $schemeO := partial "cremisi/sublime.html" "obsidian" -}}
-{{- $schemeI := partial "cremisi/sublime.html" "ivory" -}}
 
 <header class="nav" data-nav>
   <a class="nav-brand" href="#top" aria-label="Cremisi, back to top">
@@ -464,8 +462,8 @@
             <li>Open the command palette and run <code>UI: Select Color Scheme</code>.</li>
           </ol>
           <div class="downloads">
-            <a class="btn btn-primary" href="{{ $schemeO.RelPermalink }}" download="Cremisi Obsidian.sublime-color-scheme">Obsidian</a>
-            <a class="btn btn-ivory" href="{{ $schemeI.RelPermalink }}" download="Cremisi Ivory.sublime-color-scheme">Ivory</a>
+            <a class="btn btn-primary" href="{{ "cremisi/downloads/cremisi-obsidian.sublime-color-scheme" | relURL }}" download="Cremisi Obsidian.sublime-color-scheme">Obsidian</a>
+            <a class="btn btn-ivory" href="{{ "cremisi/downloads/cremisi-ivory.sublime-color-scheme" | relURL }}" download="Cremisi Ivory.sublime-color-scheme">Ivory</a>
           </div>
         </article>
 

@@ -1,4 +1,5 @@
-# Single source of the palette: the page, syntax.css and the .sublime-color-scheme files derive from here.
+# Single source of the palette: the page and syntax.css derive from here. The .sublime-color-scheme
+# files come from ports/sublime/generate.py in vari-sh/Cremisi-Theme, like the .vsix.
 materials:
   - key: ground
     en: Crypt stone
