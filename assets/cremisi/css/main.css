@@ -427,9 +427,11 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .chroma .k.is-ctrl { font-weight: 700; font-style: normal; }
 .chroma .k.is-decl, .chroma .kr.is-decl { font-style: italic; font-weight: 400; }
 .chroma .k.is-import { color: var(--syn-wine); font-style: italic; font-weight: 400; }
-.chroma .kc.is-bool { font-weight: 700; font-style: italic; }
-.chroma .kc.is-null, .chroma .k.is-null { color: var(--syn-amber); font-style: italic; font-weight: 400; }
+.chroma .kc.is-bool, .chroma .kc.is-null, .chroma .k.is-null, .chroma .nb.is-null {color: var(--syn-blood); font-weight: 700; font-style: italic; }
+/* in JSON and YAML, booleans and null are values: amber, as in the editors */
+[data-lang="yaml" i] .chroma .kc, [data-lang="json" i] .chroma .kc { color: var(--syn-amber); font-weight: 400; font-style: italic; }
 .chroma .is-prop { color: var(--syn-verdigris); }
+.chroma .is-doc { color: var(--syn-incense); font-style: italic; }
 .chroma .p.is-sep { color: var(--syn-wine); }
 .chroma .l.is-directive { color: var(--syn-wine); font-style: italic; }
 

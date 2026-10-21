@@ -52,7 +52,7 @@
   "rules": [
     {
       "name": "Comments",
-      "scope": "comment - comment.block.documentation.python, punctuation.definition.comment - comment.block.documentation.python",
+      "scope": "comment, punctuation.definition.comment",
       "foreground": "var(incense)",
       "font_style": "italic"
     },
@@ -121,12 +121,6 @@
     {
       "name": "Language constants",
       "scope": "constant.language",
-      "foreground": "var(amber)",
-      "font_style": "italic"
-    },
-    {
-      "name": "Booleans",
-      "scope": "constant.language.boolean",
       "foreground": "var(blood)",
       "font_style": "bold italic"
     },
@@ -322,11 +316,6 @@
       "font_style": "italic"
     },
     {
-      "name": "Python docstrings (Sublime)",
-      "scope": "comment.block.documentation.python",
-      "foreground": "var(malachite)"
-    },
-    {
       "name": "Member access (Sublime)",
       "scope": "meta.property.object, meta.path.rust meta.path.rust variable.other.rust",
       "foreground": "var(verdigris)"
@@ -353,6 +342,12 @@
       "name": "Constant declarations (Sublime)",
       "scope": "entity.name.constant",
       "foreground": "var(amber)"
+    },
+    {
+      "name": "JSON and YAML values (Sublime)",
+      "scope": "source.json constant.language, source.yaml constant.language",
+      "foreground": "var(amber)",
+      "font_style": "italic"
     },
     {
       "name": "Macros (Sublime)",

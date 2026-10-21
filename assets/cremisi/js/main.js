@@ -122,6 +122,10 @@ for (const el of $$(".chroma .k, .chroma .kr, .chroma .kc")) {
   else if (NULLS.has(w)) el.classList.add("is-null");
   else el.classList.add("is-decl");
 }
+// ...and C's NULL is a builtin name to Chroma.
+for (const el of $$('[data-lang="C"] .chroma .nb')) {
+  if (NULLS.has(el.textContent.trim())) el.classList.add("is-null");
+}
 
 // Chroma leaves member access as plain names: after . or -> and not called, it is a property.
 const tokenAfter = (el) => {
@@ -132,6 +136,20 @@ const tokenAfter = (el) => {
 for (const el of $$(".chroma .n, .chroma .nx")) {
   const prev = el.previousSibling;
   if (prev && (prev.textContent.endsWith(".") || prev.textContent === "->") && !tokenAfter(el).startsWith("(")) el.classList.add("is-prop");
+}
+
+// Chroma reads Python docstrings as plain strings: a string that opens its line with """ or ''' is documentation.
+let docQuote = null;
+for (const el of $$('[data-lang="Python"] .chroma .s1, [data-lang="Python"] .chroma .s2, [data-lang="Python"] .chroma .sd')) {
+  const text = el.textContent.trim();
+  if (!docQuote) {
+    let prev = el.previousSibling;
+    while (prev && !prev.textContent.trim()) prev = prev.previousSibling;
+    const quote = text.slice(0, 3);
+    if (prev || (quote !== '"""' && quote !== "'''")) continue;
+    docQuote = text.length > 3 && text.endsWith(quote) ? null : quote;
+  } else if (text.includes(docQuote)) docQuote = null;
+  el.classList.add("is-doc");
 }
 
 // Chroma leaves the key-value colon of YAML and JSON as plain punctuation.
