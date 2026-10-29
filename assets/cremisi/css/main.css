@@ -196,8 +196,6 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .btn-primary { --bg: linear-gradient(180deg, #d4334c, #9a1429); --fg: #fff; --bd: rgba(255, 200, 200, .25); box-shadow: 0 10px 40px -10px rgba(196, 39, 64, .8); }
 .btn-primary:hover { filter: brightness(1.12); color: #fff; }
 .btn-ghost:hover { --bg: rgba(220, 203, 154, .08); color: var(--tallow); }
-.btn-ivory { --bg: #f4eee2; --fg: #2b2733; --bd: rgba(0, 0, 0, .1); }
-.btn-ivory:hover { color: #bb1f39; }
 
 .facade {
   position: absolute; left: 50%; bottom: 0; translate: -50% 0; display: flex; gap: 5px; align-items: flex-end;

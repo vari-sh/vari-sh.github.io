@@ -457,13 +457,16 @@
             <h3>Sublime Text</h3>
           </header>
           <ol class="steps">
-            <li>Download both variants below.</li>
-            <li>Copy them into your <code>Packages/User</code> folder (<em>Preferences → Browse Packages…</em>).</li>
-            <li>Open the command palette and run <code>UI: Select Color Scheme</code>.</li>
+            <li>Install <em>Cremisi Color Scheme</em> from Package Control: open the command palette, run <code>Package Control: Install Package</code> and pick it. Delete any older copies of the schemes in <code>Packages/User</code>: they would override the package.</li>
+            <li>Without Package Control or offline, download the package below and drop it into the <code>Installed Packages</code> folder, next to the one <em>Preferences → Browse Packages…</em> opens.</li>
+            <li>Run <code>UI: Select Color Scheme</code> and pick <em>Cremisi Obsidian</em> or <em>Cremisi Ivory</em>. To follow the system appearance:</li>
           </ol>
+          <div class="snippet" data-variant="obsidian">
+            {{ transform.Highlight "{\n  \"color_scheme\": \"auto\",\n  \"dark_color_scheme\": \"Cremisi Obsidian.sublime-color-scheme\",\n  \"light_color_scheme\": \"Cremisi Ivory.sublime-color-scheme\"\n}" "json" }}
+          </div>
           <div class="downloads">
-            <a class="btn btn-primary" href="{{ "cremisi/downloads/cremisi-obsidian.sublime-color-scheme" | relURL }}" download="Cremisi Obsidian.sublime-color-scheme">Obsidian</a>
-            <a class="btn btn-ivory" href="{{ "cremisi/downloads/cremisi-ivory.sublime-color-scheme" | relURL }}" download="Cremisi Ivory.sublime-color-scheme">Ivory</a>
+            <a class="btn btn-primary" href="https://packagecontrol.io/packages/Cremisi%20Color%20Scheme">Package Control</a>
+            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-color-scheme-1.0.1.sublime-package" | relURL }}" download="Cremisi Color Scheme.sublime-package">.sublime-package</a>
           </div>
         </article>
 

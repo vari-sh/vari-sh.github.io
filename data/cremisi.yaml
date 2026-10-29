@@ -1,5 +1,6 @@
-# Single source of the palette: the page and syntax.css derive from here. The .sublime-color-scheme
-# files come from ports/sublime/generate.py in vari-sh/Cremisi-Theme, like the .vsix.
+# Single source of the palette: the page and syntax.css derive from here. The .sublime-package
+# zips the files of the matching vari-sh/cremisi-sublime tag (built by ports/sublime/generate.py
+# in vari-sh/Cremisi-Theme), like the .vsix.
 materials:
   - key: ground
     en: Crypt stone
