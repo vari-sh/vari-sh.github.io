@@ -154,6 +154,7 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
   font-family: var(--f-title); font-size: .78rem; letter-spacing: .38em; text-transform: uppercase;
   color: var(--tallow); margin: 0 0 18px; font-weight: 500;
 }
+.kicker .cross { display: inline-block; width: .96em; height: 1.2em; vertical-align: -.24em; fill: currentColor; }
 .hero-title {
   position: relative;
   font-family: "Cinzel", serif;

@@ -36,6 +36,9 @@
       <stop offset=".55" stop-color="#070809" stop-opacity="0"/>
       <stop offset="1" stop-color="#070809" stop-opacity=".7"/>
     </linearGradient>
+    <symbol id="cross-celtic" viewBox="0 0 666 832">
+      <path d="M576 250Q558 184 510 136Q462 88 396 70V0H272V70Q206 88 157.5 136Q109 184 92 250H0V375H92Q110 439 158 488Q206 537 272 553V832H396V553Q462 537 510.5 488Q559 439 576 375H666V250ZM336 312 438 375H490Q478 406 454 430.5Q430 455 396 469V416L336 314L334 312L332 314L272 416V469Q206 442 178 375H230L334 312H332L230 250H178Q190 217 214 192.5Q238 168 272 154V207L332 309L334 312L336 309L396 207V154Q429 168 454 192.5Q479 217 490 250H438L336 312H334Z"/>
+    </symbol>
   </svg>
   <div class="grain" aria-hidden="true"></div>
   {{- $d := hugo.Data.cremisi -}}
@@ -73,7 +76,7 @@
     </div>
 
     <div class="hero-inner">
-      <p class="kicker reveal">✠ &nbsp;A reliquary of materials&nbsp; ✠</p>
+      <p class="kicker reveal"><svg class="cross" aria-hidden="true"><use href="#cross-celtic"/></svg> &nbsp;A reliquary of materials&nbsp; <svg class="cross" aria-hidden="true"><use href="#cross-celtic"/></svg></p>
       <h1 class="hero-title reveal" data-spotlight>Cremisi<span class="hero-light" aria-hidden="true">Cremisi</span></h1>
       <p class="hero-sub reveal">A gothic, arcane colour scheme for <strong>Sublime Text</strong>, <strong>VS Code</strong> and more.<br>Every colour is born from an object: blood, bone, stone, amber, verdigris.</p>
       <div class="hero-actions reveal">
