@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ site.Language.Locale | default "en" }}">
+<html lang="{{ site.Language.Locale | default "en" }}" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,9 +11,10 @@
   <meta property="og:description" content="{{ .Params.description }}">
   <meta property="og:type" content="website">
   <link rel="icon" href="{{ "cremisi/favicon.svg" | relURL }}" type="image/svg+xml">
+  <script>document.documentElement.className = "js";</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=UnifrakturCook:wght@700&display=swap">
   {{- $syntax := resources.Get "cremisi/css/syntax.css" | resources.ExecuteAsTemplate "cremisi/css/syntax.css" hugo.Data.cremisi | minify | fingerprint }}
   {{- $scales := resources.Get "cremisi/css/scales.css" | resources.ExecuteAsTemplate "cremisi/css/scales.css" hugo.Data.cremisi | minify | fingerprint }}
   {{- $main := resources.Get "cremisi/css/main.css" | minify | fingerprint }}
@@ -40,9 +41,17 @@
       <path d="M576 250Q558 184 510 136Q462 88 396 70V0H272V70Q206 88 157.5 136Q109 184 92 250H0V375H92Q110 439 158 488Q206 537 272 553V832H396V553Q462 537 510.5 488Q559 439 576 375H666V250ZM336 312 438 375H490Q478 406 454 430.5Q430 455 396 469V416L336 314L334 312L332 314L272 416V469Q206 442 178 375H230L334 312H332L230 250H178Q190 217 214 192.5Q238 168 272 154V207L332 309L334 312L336 309L396 207V154Q429 168 454 192.5Q479 217 490 250H438L336 312H334Z"/>
     </symbol>
   </svg>
-  <div class="grain" aria-hidden="true"></div>
   {{- $d := hugo.Data.cremisi -}}
-{{- $ground := index $d.materials 0 -}}
+  {{- $ground := index $d.materials 0 -}}
+  {{- $m := dict -}}
+  {{- range $d.materials }}{{ $m = merge $m (dict .key .) }}{{ end -}}
+  {{- $glass := slice -}}
+  {{- range slice "blood" "lapis" "tallow" "amber" "sealwax" "malachite" "verdigris" "amethyst" "wine" "petal" "crimson" "ink" }}{{ $glass = $glass | append (index $m .).obsidian }}{{ end }}
+
+  <div class="grain" aria-hidden="true"></div>
+  <div class="veil" aria-hidden="true" data-veil>
+    <svg class="veil-cross"><use href="#cross-celtic"/></svg>
+  </div>
 
 <header class="nav" data-nav>
   <a class="nav-brand" href="#top" aria-label="Cremisi, back to top">
@@ -61,99 +70,89 @@
     <a class="nav-back" href="{{ "/" | relURL }}">← vari.sh</a>
     <a class="nav-cta" href="#install">Download</a>
   </div>
+  <span class="nav-progress" aria-hidden="true"></span>
 </header>
 
+<nav class="rail" aria-label="Chapters" data-rail>
+  {{- range $i, $s := slice (slice "concept" "Concept") (slice "materials" "Materials") (slice "scales" "Scales") (slice "scriptorium" "Scriptorium") (slice "voices" "Voices") (slice "contrast" "Contrast") (slice "install" "Install") (slice "decisions" "Decisions") }}
+  <a href="#{{ index $s 0 }}" data-rail-link><span class="rail-name">{{ index $s 1 }}</span><span class="rail-num">{{ index (slice "I" "II" "III" "IV" "V" "VI" "VII" "VIII") $i }}</span></a>
+  {{- end }}
+</nav>
+
 <main id="top">
+  <div class="lantern" aria-hidden="true" data-lantern><div class="lantern-tracery"></div></div>
 
   {{/* ───────────── HERO ───────────── */}}
-  <section class="hero">
-    <div class="hero-glow" aria-hidden="true"></div>
-    {{ partial "cremisi/rose.html" "rose rose-hero" }}
-    <div class="embers" aria-hidden="true">
-      {{- range seq 1 22 }}
-      <span style="{{ printf "--x:%d%%;--d:%ds;--delay:-%ds;--s:%dpx" (mod (mul . 37) 100) (add 9 (mod (mul . 7) 11)) (mod (mul . 13) 17) (add 2 (mod . 3)) | safeCSS }}"></span>
-      {{- end }}
-    </div>
+  <section class="hero" data-hero>
+    <div class="hero-stage">
+      <div class="hero-fallback" aria-hidden="true">{{ partial "cremisi/rose.html" "rose rose-hero" }}</div>
+      <canvas class="hero-nave" aria-hidden="true" data-nave data-palette="{{ delimit $glass "," }}"></canvas>
+      <div class="hero-scrim" aria-hidden="true"></div>
 
-    <div class="hero-inner">
-      <p class="kicker reveal"><svg class="cross" aria-hidden="true"><use href="#cross-celtic"/></svg> &nbsp;A reliquary of materials&nbsp; <svg class="cross" aria-hidden="true"><use href="#cross-celtic"/></svg></p>
-      <h1 class="hero-title reveal" data-spotlight>Cremisi<span class="hero-light" aria-hidden="true">Cremisi</span></h1>
-      <p class="hero-sub reveal">A gothic, arcane colour scheme for <strong>Sublime Text</strong>, <strong>VS Code</strong> and more.<br>Every colour is born from an object: blood, bone, stone, amber, verdigris.</p>
-      <div class="hero-actions reveal">
-        <a class="btn btn-primary" href="#install">Download the theme</a>
-        <a class="btn btn-ghost" href="#materials">Open the materials</a>
+      <div class="hero-inner" data-hero-inner>
+        <p class="kicker hero-kicker"><svg class="cross" aria-hidden="true"><use href="#cross-celtic"/></svg><span>A reliquary of materials</span><svg class="cross" aria-hidden="true"><use href="#cross-celtic"/></svg></p>
+        <h1 class="hero-title" aria-label="Cremisi" data-spotlight><span class="hero-word" aria-hidden="true">
+          {{- range $i, $c := split "Cremisi" "" }}<span class="ch" style="{{ printf "--i:%d" $i | safeCSS }}">{{ $c }}</span>{{ end -}}
+        </span></h1>
+        <p class="hero-sub">A gothic, arcane colour scheme for <strong>Sublime Text</strong>, <strong>VS Code</strong> and more.<br>Every colour is born from an object: blood, bone, stone, amber, verdigris.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#install" data-magnet><span>Download the theme</span></a>
+          <a class="btn btn-ghost" href="#materials" data-magnet><span>Open the materials</span></a>
+        </div>
+        <div class="hero-variants">
+          <span class="variant-chip"><i style="{{ printf "background:%s" $ground.obsidian | safeCSS }}"></i>Obsidian</span>
+          <span class="sep">◆</span>
+          <span class="variant-chip"><i style="{{ printf "background:%s" $ground.ivory | safeCSS }}"></i>Ivory</span>
+        </div>
       </div>
-      <div class="hero-variants reveal">
-        <span class="variant-chip"><i style="{{ printf "background:%s" $ground.obsidian | safeCSS }}"></i>Obsidian</span>
-        <span class="sep">◆</span>
-        <span class="variant-chip"><i style="{{ printf "background:%s" $ground.ivory | safeCSS }}"></i>Ivory</span>
-      </div>
-    </div>
 
-    <div class="facade" aria-hidden="true">
-      {{- range $i, $m := $d.materials }}{{ if ne $m.key "ground" }}
-      {{- $dist := math.Abs (sub $i 8) }}
-      {{- $grow := add 1 (mul (math.Max 0 (sub 3 $dist)) 0.2) }}
-      <span class="spire" style="{{ printf "--c:%s;--i:%d;--g:%.2f" $m.obsidian $i $grow | safeCSS }}">
-        <svg viewBox="0 0 40 100">
-          <path class="sp-body" d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z"/>
-          <path d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z" fill="url(#spire-shade)"/>
-          <path class="sp-vault" d="M5,100 L5,41.5 A30,30 0 0,1 20,15.5 A30,30 0 0,1 35,41.5 L35,100"/>
-          <g transform="translate(20 32)">
-            <circle class="sp-dark" r="7"/>
-            <circle class="sp-tracery" r="4.6"/>
-            <path class="sp-tracery" d="M0,-6.2V6.2M-5.37,-3.1L5.37,3.1M-5.37,3.1L5.37,-3.1"/>
-            <circle class="sp-light" r="1.3"/>
-          </g>
-          <path class="sp-dark" d="M9,60 L9,50 A5,5 0 0,1 11.5,45.67 A5,5 0 0,1 14,50 L14,60 Z"/>
-          <path class="sp-dark" d="M26,60 L26,50 A5,5 0 0,1 28.5,45.67 A5,5 0 0,1 31,50 L31,60 Z"/>
-          <path class="sp-dark" d="M13,100 L13,74 A14,14 0 0,1 20,61.88 A14,14 0 0,1 27,74 L27,100 Z"/>
-          <path d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z" fill="url(#spire-fade)"/>
-        </svg>
-      </span>
-      {{- end }}{{ end }}
+      <p class="hero-corner hero-corner-l" aria-hidden="true">Ex umbra<br>in lucem</p>
+      <p class="hero-corner hero-corner-r" aria-hidden="true">XVI materials<br>II variants</p>
+      <a class="scroll-cue" href="#concept"><span class="scroll-label">Walk the nave</span><span class="scroll-line"><span class="drop"></span></span></a>
+      <div class="hero-flash" aria-hidden="true"></div>
     </div>
-
-    <a class="scroll-cue" href="#concept" aria-label="Scroll down">
-      <span class="drop"></span>
-    </a>
   </section>
 
   {{/* ───────────── I · CONCEPT ───────────── */}}
   <section class="section" id="concept">
     <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="numeral">I</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>I</span>
         <p class="kicker">Concept</p>
-        <h2>Blood, bone, stone</h2>
+        <h2 data-split>Blood, bone, stone</h2>
         {{ partial "cremisi/ornament.html" }}
       </div>
 
       <div class="concept">
         <div class="concept-text reveal">
-          <p class="lede">Cremisi is a <em>cabinet of materials</em>: every hue comes from a real substance, desaturated, earthy, mineral.</p>
+          <p class="lede"><span class="versal" aria-hidden="true">C</span><span class="sr-only">C</span>remisi is a <em>cabinet of materials</em>: every hue comes from a real substance, desaturated, earthy, mineral.</p>
           <p>The backbone never changes. <strong class="c-blood">Blood</strong> is the protagonist, <strong class="c-bone">bone</strong> is the text, <strong class="c-stone">stone</strong> is the ground. Everything else revolves around these three.</p>
           <p>Its colours are wax, resin and oxidised copper, with two cold notes: <strong class="c-lapis">lapis</strong>, ground for illuminated missals, and <strong class="c-verdigris">verdigris</strong>, the patina on bronze doors.</p>
         </div>
-        <div class="triad reveal">
-          {{- range slice "blood" "ink" "ground" }}
-          {{- $k := . }}
-          {{- range $d.materials }}{{ if eq .key $k }}
-          <figure class="pillar pillar-{{ .key }}">
-            <div class="pillar-frame"><div class="pillar-arch" style="{{ printf "--c:%s" .obsidian | safeCSS }}"><span></span></div></div>
+        <div class="triad" data-variant="obsidian">
+          {{- range $i, $k := slice "blood" "ink" "ground" }}
+          {{- with index $m $k }}
+          <figure class="pillar pillar-{{ .key }} reveal" data-relic-card style="{{ printf "--c:%s;--delay:%dms" .obsidian (mul $i 140) | safeCSS }}">
+            <div class="pillar-niche">
+              <svg class="niche-frame" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0,1 L0,0.5 A1,0.62 0 0,1 0.5,0 A1,0.62 0 0,1 1,0.5 L1,1"/></svg>
+              <span class="niche-back"></span>
+              <span class="niche-aura"></span>
+              <canvas class="relic" data-relic="{{ .key }}" data-o="{{ .obsidian }}" data-i="{{ .ivory }}" aria-hidden="true"></canvas>
+              <span class="niche-plinth"></span>
+            </div>
             <figcaption>
               <span class="pillar-name">{{ index (split .en " / ") 0 }}</span>
               <code>{{ .obsidian }}</code>
             </figcaption>
           </figure>
-          {{- end }}{{ end }}
+          {{- end }}
           {{- end }}
         </div>
       </div>
 
       <ol class="principles">
         {{- range $i, $p := $d.principles }}
-        <li class="principle reveal" style="{{ printf "--delay:%dms" (mul $i 90) | safeCSS }}">
+        <li class="principle reveal" data-tilt style="{{ printf "--delay:%dms" (mul $i 90) | safeCSS }}">
           <span class="principle-num">{{ index (slice "I" "II" "III" "IV") $i }}</span>
           <h3>{{ $p.title }}</h3>
           <p>{{ $p.text }}</p>
@@ -166,12 +165,12 @@
   {{/* ───────────── II · MATERIALS ───────────── */}}
   <section class="section section-dark" id="materials">
     <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="numeral">II</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>II</span>
         <p class="kicker">Palette</p>
-        <h2>The materials</h2>
+        <h2 data-split>The materials</h2>
         {{ partial "cremisi/ornament.html" }}
-        <p class="sec-intro">Sixteen materials with the same names in both variants: only the values change. Click a colour to copy its hex.</p>
+        <p class="sec-intro">Sixteen materials with the same names in both variants: only the values change. Each one is cut here as a stone and set on a plinth of its exact colour. Click a niche to copy its hex.</p>
       </div>
 
       <div class="variant-scope" data-variant="obsidian" data-variant-scope>
@@ -182,27 +181,34 @@
         </div>
 
         <div class="swatches">
-          {{- range $i, $m := $d.materials }}
-          {{- $co := partial "cremisi/contrast.html" (dict "fg" $m.obsidian "bg" $ground.obsidian) }}
-          {{- $ci := partial "cremisi/contrast.html" (dict "fg" $m.ivory "bg" $ground.ivory) }}
-          <article class="swatch reveal" style="{{ printf "--o:%s;--i:%s;--go:%s;--gi:%s;--delay:%dms" $m.obsidian $m.ivory $ground.obsidian $ground.ivory (mul (mod $i 4) 70) | safeCSS }}">
-            <button type="button" class="swatch-plate" data-copy-o="{{ $m.obsidian }}" data-copy-i="{{ $m.ivory }}" aria-label="Copy the {{ $m.en }} colour">
-              <span class="swatch-arch"></span>
-              <svg class="swatch-frame" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0,1 L0,0.5 A1,0.62 0 0,1 0.5,0 A1,0.62 0 0,1 1,0.5 L1,1"/></svg>
+          {{- range $i, $mat := $d.materials }}
+          {{- $co := partial "cremisi/contrast.html" (dict "fg" $mat.obsidian "bg" $ground.obsidian) }}
+          {{- $ci := partial "cremisi/contrast.html" (dict "fg" $mat.ivory "bg" $ground.ivory) }}
+          <article class="swatch reveal" data-relic-card data-tilt style="{{ printf "--o:%s;--i:%s;--go:%s;--gi:%s;--delay:%dms" $mat.obsidian $mat.ivory $ground.obsidian $ground.ivory (mul (mod $i 4) 70) | safeCSS }}">
+            <button type="button" class="swatch-plate" data-copy-o="{{ $mat.obsidian }}" data-copy-i="{{ $mat.ivory }}" aria-label="Copy the {{ $mat.en }} colour">
+              <span class="niche">
+                <svg class="niche-frame" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0,1 L0,0.5 A1,0.62 0 0,1 0.5,0 A1,0.62 0 0,1 1,0.5 L1,1"/></svg>
+                <span class="niche-back"></span>
+                <span class="niche-aura"></span>
+                <canvas class="relic" data-relic="{{ $mat.key }}" data-o="{{ $mat.obsidian }}" data-i="{{ $mat.ivory }}" aria-hidden="true"></canvas>
+                <span class="niche-plinth"></span>
+              </span>
+              <span class="swatch-index" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span>
             </button>
             <div class="swatch-body">
-              <h3>{{ $m.en }}</h3>
-              <p class="swatch-en"><code>{{ $m.key }}</code></p>
-              <p class="swatch-hex"><span class="v-o">{{ $m.obsidian }}</span><span class="v-i">{{ $m.ivory }}</span></p>
-              <p class="swatch-role">{{ $m.role }}</p>
-              <p class="swatch-story">{{ $m.story }}</p>
-              {{- if or $m.token $m.exempt }}
+              <h3>{{ $mat.en }}</h3>
+              <p class="swatch-en"><code>{{ $mat.key }}</code></p>
+              <p class="swatch-hex"><span class="v-o">{{ $mat.obsidian }}</span><span class="v-i">{{ $mat.ivory }}</span></p>
+              <p class="swatch-role">{{ $mat.role }}</p>
+              <p class="swatch-story">{{ $mat.story }}</p>
+              {{- if or $mat.token $mat.exempt }}
               <p class="swatch-ratio">
                 <span class="v-o">{{ printf "%.2f" $co }}:1</span><span class="v-i">{{ printf "%.2f" $ci }}:1</span>
-                {{- if $m.exempt }}<em class="badge badge-muted">exempt</em>{{ else }}<em class="badge">AA</em>{{ end }}
+                {{- if $mat.exempt }}<em class="badge badge-muted">exempt</em>{{ else }}<em class="badge">AA</em>{{ end }}
               </p>
               {{- end }}
             </div>
+            <span class="tilt-glare" aria-hidden="true"></span>
           </article>
           {{- end }}
         </div>
@@ -223,18 +229,18 @@
   {{- range $d.scales }}{{ $k := .key }}{{ range .steps }}{{ $step = merge $step (dict (printf "%s-%d" $k .n) .hex) }}{{ end }}{{ end }}
   <section class="section" id="scales">
     <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="numeral">III</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>III</span>
         <p class="kicker">Beyond the editor</p>
-        <h2>Two scales</h2>
+        <h2 data-split>Two scales</h2>
         {{ partial "cremisi/ornament.html" }}
         <p class="sec-intro">Eleven steps of <strong>stone</strong> and eleven of <strong>blood</strong>, interpolated in OKLCH, for building interfaces on top of Cremisi. Structure and identity, and nothing else, on purpose: syntax highlighting stays with the materials. Click a step to copy its hex.</p>
       </div>
 
       {{- range $d.scales }}
       {{- $key := .key }}
-      <div class="scale scale-{{ .key }} reveal">
-        <header class="scale-head">
+      <div class="scale scale-{{ .key }}" data-ramp>
+        <header class="scale-head reveal">
           <h3>{{ .name }}</h3>
           <p class="scale-role">{{ .role }}</p>
           <p class="scale-text">{{ .text }}</p>
@@ -243,7 +249,7 @@
           {{- range $i, $s := .steps }}
           {{- $co := partial "cremisi/contrast.html" (dict "fg" $s.hex "bg" $ground.obsidian) }}
           {{- $ci := partial "cremisi/contrast.html" (dict "fg" $s.hex "bg" $ground.ivory) }}
-          <li class="step{{ if $s.is }} is-theme{{ end }}{{ if ge $co 7.0 }} is-light{{ end }}" style="{{ printf "--c:%s;--delay:%dms" $s.hex (mul $i 40) | safeCSS }}">
+          <li class="step{{ if $s.is }} is-theme{{ end }}{{ if ge $co 7.0 }} is-light{{ end }}" style="{{ printf "--c:%s;--n:%d" $s.hex $i | safeCSS }}">
             <button type="button" class="step-chip" data-copy-o="{{ $s.hex }}" data-copy-i="{{ $s.hex }}" aria-label="Copy {{ $key }} {{ $s.n }}, {{ $s.hex }}">
               <svg class="step-outline" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path d="M0,1 L0,0.5 A1,0.62 0 0,1 0.5,0 A1,0.62 0 0,1 1,0.5 L1,1"/></svg>
               {{- if $s.is }}<span class="step-mark" title="Already in the theme: {{ $s.is }}">◆</span>{{ end }}
@@ -271,12 +277,11 @@
         <span><b class="step-ratio is-low"></b>below 3:1: surfaces only</span>
       </p>
 
-      <div class="mocks">
-        {{- range slice "obsidian" "ivory" }}
-        {{- $v := . }}
+      <div class="diptych" data-diptych>
+        {{- range $i, $v := slice "obsidian" "ivory" }}
         {{- $vars := slice }}
         {{- range $d.scale_ui }}{{ $vars = $vars | append (printf "--ui-%s:var(--cremisi-%s)" .key (index . $v)) }}{{ end }}
-        <figure class="mock-frame reveal">
+        <figure class="mock-frame leaf leaf-{{ if eq $i 0 }}l{{ else }}r{{ end }}">
           <div class="mock mock-{{ $v }}" style="{{ delimit $vars ";" | safeCSS }}" role="img" aria-label="An example interface in {{ title $v }}, built only from the stone and blood scales">
             <div class="mock-bar"><i></i><i></i><i></i><span>reliquary · inventory</span></div>
             <div class="mock-body">
@@ -323,8 +328,8 @@
           <h3>Take them with you</h3>
           <p>Twenty-two custom properties, <code>--cremisi-stone-*</code> and <code>--cremisi-blood-*</code>. The example above is built from nothing else: map them to roles in your own interface, as in the table, and Obsidian and Ivory follow.</p>
           <div class="downloads">
-            <button type="button" class="btn btn-primary" data-copy-code="#scales-css">Copy the variables</button>
-            <a class="btn btn-ghost" href="{{ $scalesCSS.RelPermalink }}" download>cremisi-scales.css</a>
+            <button type="button" class="btn btn-primary" data-copy-code="#scales-css" data-magnet><span>Copy the variables</span></button>
+            <a class="btn btn-ghost" href="{{ $scalesCSS.RelPermalink }}" download data-magnet><span>cremisi-scales.css</span></a>
           </div>
         </div>
         <div class="snippet snippet-scales" id="scales-css">
@@ -337,16 +342,17 @@
   {{/* ───────────── IV · SCRIPTORIUM ───────────── */}}
   <section class="section section-dark" id="scriptorium">
     <div class="wrap wrap-wide">
-      <div class="sec-head reveal">
-        <span class="numeral">IV</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>IV</span>
         <p class="kicker">Preview</p>
-        <h2>The scriptorium</h2>
+        <h2 data-split>The scriptorium</h2>
         {{ partial "cremisi/ornament.html" }}
-        <p class="sec-intro">The theme at work in six languages. Italic for declarations, functions and types, bold for control flow, bold italic for booleans.</p>
+        <p class="sec-intro">The theme at work in six languages. Italic for declarations, functions and types, bold for control flow, bold italic for booleans. Pick a material below to find it in the code.</p>
       </div>
 
       <div class="editor-scope" data-variant="obsidian" data-variant-scope>
-      <div class="editor reveal" data-tabs>
+      <div class="editor-stage" data-editor-stage>
+      <div class="editor" data-tabs>
         <div class="editor-bar">
           <div class="editor-seals" aria-hidden="true"><i></i><i></i><i></i></div>
           <div class="editor-tabs" role="tablist" aria-label="Sample files">
@@ -373,10 +379,11 @@
           <span class="status-right"><span data-status-lang>{{ (index $d.samples 0).label }}</span><span>UTF-8</span><span data-status-pos>Line {{ (index $d.samples 0).hl }}, Column {{ (index $d.samples 0).col }}</span></span>
         </div>
       </div>
+      </div>
 
-      <div class="legend reveal">
+      <div class="legend reveal" data-legend>
         {{- range $d.materials }}{{ if .token }}
-        <span class="legend-item" style="{{ printf "--c:var(--syn-%s)" (replace .key "_" "-") | safeCSS }}"><i></i>{{ .en }}</span>
+        <button type="button" class="legend-item" data-material="{{ replace .key "_" "-" }}" style="{{ printf "--c:var(--syn-%s)" (replace .key "_" "-") | safeCSS }}"><i></i>{{ .en }}</button>
         {{- end }}{{ end }}
       </div>
       </div>
@@ -386,19 +393,20 @@
   {{/* ───────────── V · VOICES ───────────── */}}
   <section class="section" id="voices">
     <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="numeral">V</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>V</span>
         <p class="kicker">Typography of code</p>
-        <h2>Four voices</h2>
+        <h2 data-split>Four voices</h2>
         {{ partial "cremisi/ornament.html" }}
         <p class="sec-intro">Each font style carries a meaning. The shape of the letter tells you the role before the colour does.</p>
       </div>
       <div class="voices">
         {{- range $i, $s := $d.styles }}
-        <article class="voice reveal" style="{{ printf "--delay:%dms" (mul $i 90) | safeCSS }}">
-          <div class="voice-sample voice-{{ $s.css }}">{{ $s.sample }}</div>
+        <article class="voice reveal" data-tilt style="{{ printf "--delay:%dms" (mul $i 90) | safeCSS }}">
+          <div class="voice-sample voice-{{ $s.css }}">{{ $s.sample }}<span class="caret" aria-hidden="true"></span></div>
           <h3>{{ $s.name }}</h3>
           <ul>{{ range $s.roles }}<li>{{ . }}</li>{{ end }}</ul>
+          <span class="tilt-glare" aria-hidden="true"></span>
         </article>
         {{- end }}
       </div>
@@ -408,30 +416,32 @@
   {{/* ───────────── VI · CONTRAST ───────────── */}}
   <section class="section section-dark" id="contrast">
     <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="numeral">VI</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>VI</span>
         <p class="kicker">Legibility</p>
-        <h2>The rule of contrast</h2>
+        <h2 data-split>The rule of contrast</h2>
         {{ partial "cremisi/ornament.html" }}
         <p class="sec-intro">Every code token clears the WCAG threshold of <strong>4.5:1</strong> against its own variant's background. Only comments, the smoke of incense, may fall below.</p>
       </div>
 
       {{- $max := 16.0 }}
       {{- $th := div 4.5 $max }}
-      <div class="chart reveal" style="{{ printf "--t:%.4f;--go:%s;--gi:%s" $th $ground.obsidian $ground.ivory | safeCSS }}">
+      <div class="chart" data-chart style="{{ printf "--t:%.4f;--go:%s;--gi:%s" $th $ground.obsidian $ground.ivory | safeCSS }}">
         <div class="chart-head">
           <span></span>
           <span>Obsidian <code>{{ $ground.obsidian }}</code></span>
           <span>Ivory <code>{{ $ground.ivory }}</code></span>
         </div>
+        {{- $row := 0 }}
         {{- range $d.materials }}{{ if or .token .exempt }}
         {{- $co := partial "cremisi/contrast.html" (dict "fg" .obsidian "bg" $ground.obsidian) }}
         {{- $ci := partial "cremisi/contrast.html" (dict "fg" .ivory "bg" $ground.ivory) }}
-        <div class="chart-row{{ if .exempt }} is-exempt{{ end }}">
+        <div class="chart-row{{ if .exempt }} is-exempt{{ end }}" style="{{ printf "--r:%d" $row | safeCSS }}">
           <span class="chart-label">{{ .en }}{{ if .exempt }} <em>exempt</em>{{ end }}</span>
-          <span class="track track-o"><span class="bar" style="{{ printf "--f:%.4f;--c:%s" (math.Min 1 (div $co $max)) .obsidian | safeCSS }}"></span><b>{{ printf "%.2f" $co }}</b></span>
-          <span class="track track-i"><span class="bar" style="{{ printf "--f:%.4f;--c:%s" (math.Min 1 (div $ci $max)) .ivory | safeCSS }}"></span><b>{{ printf "%.2f" $ci }}</b></span>
+          <span class="track track-o"><span class="bar" style="{{ printf "--f:%.4f;--c:%s" (math.Min 1 (div $co $max)) .obsidian | safeCSS }}"></span><b data-count="{{ printf "%.2f" $co }}">{{ printf "%.2f" $co }}</b></span>
+          <span class="track track-i"><span class="bar" style="{{ printf "--f:%.4f;--c:%s" (math.Min 1 (div $ci $max)) .ivory | safeCSS }}"></span><b data-count="{{ printf "%.2f" $ci }}">{{ printf "%.2f" $ci }}</b></span>
         </div>
+        {{- $row = add $row 1 }}
         {{- end }}{{ end }}
         <div class="chart-foot">
           <span></span>
@@ -445,16 +455,16 @@
   {{/* ───────────── VII · INSTALL ───────────── */}}
   <section class="section" id="install">
     <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="numeral">VII</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>VII</span>
         <p class="kicker">Rite of entry</p>
-        <h2>Install Cremisi</h2>
+        <h2 data-split>Install Cremisi</h2>
         {{ partial "cremisi/ornament.html" }}
         <p class="sec-intro">Sublime Text and VS Code are below. Further ports are available in the repository: <a href="https://github.com/vari-sh/Cremisi-Theme">vari-sh/Cremisi-Theme</a>.</p>
       </div>
 
       <div class="install">
-        <article class="rite reveal">
+        <article class="rite reveal reveal-l" data-tilt>
           <header>
             <span class="rite-icon" aria-hidden="true">S</span>
             <h3>Sublime Text</h3>
@@ -468,12 +478,13 @@
             {{ transform.Highlight "{\n  \"color_scheme\": \"auto\",\n  \"dark_color_scheme\": \"Cremisi Obsidian.sublime-color-scheme\",\n  \"light_color_scheme\": \"Cremisi Ivory.sublime-color-scheme\"\n}" "json" }}
           </div>
           <div class="downloads">
-            <a class="btn btn-primary" href="https://packagecontrol.io/packages/Cremisi%20Color%20Scheme">Package Control</a>
-            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-color-scheme-1.0.1.sublime-package" | relURL }}" download="Cremisi Color Scheme.sublime-package">.sublime-package</a>
+            <a class="btn btn-primary" href="https://packagecontrol.io/packages/Cremisi%20Color%20Scheme" data-magnet><span>Package Control</span></a>
+            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-color-scheme-1.0.1.sublime-package" | relURL }}" download="Cremisi Color Scheme.sublime-package" data-magnet><span>.sublime-package</span></a>
           </div>
+          <span class="tilt-glare" aria-hidden="true"></span>
         </article>
 
-        <article class="rite reveal" style="--delay:120ms">
+        <article class="rite reveal reveal-r" data-tilt style="--delay:120ms">
           <header>
             <span class="rite-icon" aria-hidden="true">V</span>
             <h3>VS Code</h3>
@@ -487,9 +498,10 @@
             {{ transform.Highlight "{\n  \"window.autoDetectColorScheme\": true,\n  \"workbench.preferredDarkColorTheme\": \"Cremisi Obsidian\",\n  \"workbench.preferredLightColorTheme\": \"Cremisi Ivory\"\n}" "json" }}
           </div>
           <div class="downloads">
-            <a class="btn btn-primary" href="https://marketplace.visualstudio.com/items?itemName=vari-sh.cremisi-theme">Marketplace</a>
-            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-theme-0.2.1.vsix" | relURL }}" download>cremisi-theme-0.2.1.vsix</a>
+            <a class="btn btn-primary" href="https://marketplace.visualstudio.com/items?itemName=vari-sh.cremisi-theme" data-magnet><span>Marketplace</span></a>
+            <a class="btn btn-ghost" href="{{ "cremisi/downloads/cremisi-theme-0.2.1.vsix" | relURL }}" download data-magnet><span>cremisi-theme-0.2.1.vsix</span></a>
           </div>
+          <span class="tilt-glare" aria-hidden="true"></span>
         </article>
       </div>
     </div>
@@ -498,13 +510,13 @@
   {{/* ───────────── VIII · DECISIONS ───────────── */}}
   <section class="section section-dark" id="decisions">
     <div class="wrap wrap-narrow">
-      <div class="sec-head reveal">
-        <span class="numeral">VIII</span>
+      <div class="sec-head" data-head>
+        <span class="numeral" aria-hidden="true" data-parallax>VIII</span>
         <p class="kicker">The codex of decisions</p>
-        <h2>What was chosen</h2>
+        <h2 data-split>What was chosen</h2>
         {{ partial "cremisi/ornament.html" }}
       </div>
-      <ol class="codex">
+      <ol class="codex" data-codex>
         {{- range $i, $t := $d.decisions }}
         <li class="reveal"><span class="codex-num">{{ index (slice "i" "ii" "iii" "iv" "v" "vi" "vii" "viii" "ix" "x") $i }}.</span><p>{{ $t }}</p></li>
         {{- end }}
@@ -518,10 +530,33 @@
   <p class="footer-title">Cremisi</p>
   <p class="footer-motto">Ex umbra in lucem</p>
   <p class="footer-meta">Forged by <strong>{{ with site.Params.author }}{{ if reflect.IsMap . }}{{ .name }}{{ else }}{{ . }}{{ end }}{{ end }}</strong> · Obsidian &amp; Ivory · <a href="{{ "/" | relURL }}">vari.sh</a> · <a href="https://github.com/vari-sh/Cremisi-Theme">Source on GitHub</a> · <a href="#top">Back to top ↑</a></p>
+  <div class="facade" aria-hidden="true" data-facade>
+    {{- range $i, $mat := $d.materials }}{{ if ne $mat.key "ground" }}
+    {{- $dist := math.Abs (sub $i 8) }}
+    {{- $grow := add 1 (mul (math.Max 0 (sub 3 $dist)) 0.2) }}
+    <span class="spire" style="{{ printf "--c:%s;--i:%d;--g:%.2f" $mat.obsidian $i $grow | safeCSS }}">
+      <svg viewBox="0 0 40 100">
+        <path class="sp-body" d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z"/>
+        <path d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z" fill="url(#spire-shade)"/>
+        <path class="sp-vault" d="M5,100 L5,41.5 A30,30 0 0,1 20,15.5 A30,30 0 0,1 35,41.5 L35,100"/>
+        <g transform="translate(20 32)">
+          <circle class="sp-dark" r="7"/>
+          <circle class="sp-tracery" r="4.6"/>
+          <path class="sp-tracery" d="M0,-6.2V6.2M-5.37,-3.1L5.37,3.1M-5.37,3.1L5.37,-3.1"/>
+          <circle class="sp-light" r="1.3"/>
+        </g>
+        <path class="sp-dark" d="M9,60 L9,50 A5,5 0 0,1 11.5,45.67 A5,5 0 0,1 14,50 L14,60 Z"/>
+        <path class="sp-dark" d="M26,60 L26,50 A5,5 0 0,1 28.5,45.67 A5,5 0 0,1 31,50 L31,60 Z"/>
+        <path class="sp-dark" d="M13,100 L13,74 A14,14 0 0,1 20,61.88 A14,14 0 0,1 27,74 L27,100 Z"/>
+        <path d="M0,100 L0,40 A40,40 0 0,1 20,5.36 A40,40 0 0,1 40,40 L40,100 Z" fill="url(#spire-fade)"/>
+      </svg>
+    </span>
+    {{- end }}{{ end }}
+  </div>
 </footer>
 
 <div class="toast" role="status" aria-live="polite" data-toast></div>
-  {{- $js := resources.Get "cremisi/js/main.js" | js.Build (dict "minify" true) | fingerprint }}
+  {{- $js := resources.Get "cremisi/js/main.js" | js.Build (dict "minify" true "target" "es2020") | fingerprint }}
   <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
 </body>
 </html>
