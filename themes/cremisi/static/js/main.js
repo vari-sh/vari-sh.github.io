@@ -152,6 +152,60 @@
     });
   });
 
+  /* ── Tilt & sigil: plates lean towards the pointer, the armillary answers it ── */
+  const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (motionOK) {
+    const live = new Set();
+    let raf = 0;
+    const tick = () => {
+      raf = 0;
+      live.forEach((t) => {
+        t.x += (t.tx - t.x) * 0.12;
+        t.y += (t.ty - t.y) * 0.12;
+        t.paint(t.x, t.y);
+        if (Math.abs(t.tx - t.x) + Math.abs(t.ty - t.y) < 0.01) live.delete(t);
+      });
+      if (live.size) raf = requestAnimationFrame(tick);
+    };
+    const follow = (t) => { live.add(t); if (!raf) raf = requestAnimationFrame(tick); };
+
+    document.querySelectorAll('[data-tilt]').forEach((el) => {
+      const t = { x: 0, y: 0, tx: 0, ty: 0, paint: (x, y) => {
+        el.style.setProperty('--rx', `${x.toFixed(2)}deg`);
+        el.style.setProperty('--ry', `${y.toFixed(2)}deg`);
+      } };
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const nx = (e.clientX - r.left) / r.width, ny = (e.clientY - r.top) / r.height;
+        const max = Math.min(5, 2600 / r.width);
+        t.tx = (0.5 - ny) * 2 * max;
+        t.ty = (nx - 0.5) * 2 * max;
+        el.style.setProperty('--gx', `${(nx * 100).toFixed(1)}%`);
+        el.style.setProperty('--gy', `${(ny * 100).toFixed(1)}%`);
+        el.style.setProperty('--glare', '1');
+        follow(t);
+      });
+      el.addEventListener('pointerleave', () => { t.tx = t.ty = 0; el.style.setProperty('--glare', '0'); follow(t); });
+    });
+
+    const hero = document.querySelector('[data-hero]');
+    const sigil = document.querySelector('[data-sigil]');
+    if (hero && sigil) {
+      const t = { x: 0, y: 0, tx: 0, ty: 0, paint: (x, y) => {
+        sigil.style.setProperty('--sx', x.toFixed(2));
+        sigil.style.setProperty('--sy', y.toFixed(2));
+      } };
+      hero.addEventListener('pointermove', (e) => {
+        const r = hero.getBoundingClientRect();
+        t.tx = ((e.clientY - r.top) / r.height - 0.5) * 70;
+        t.ty = ((e.clientX - r.left) / r.width - 0.5) * 70;
+        follow(t);
+      });
+      hero.addEventListener('pointerleave', () => { t.tx = t.ty = 0; follow(t); });
+    }
+  }
+
   /* ── Hero title spotlight: a soft light that trails the cursor ── */
   document.querySelectorAll('.hero-title em').forEach((el) => {
     const light = document.createElement('span');

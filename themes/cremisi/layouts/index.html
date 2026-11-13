@@ -1,10 +1,8 @@
 {{ define "main" }}
 
 {{/* ── HERO ── */}}
-<section class="hero">
-  <div class="hero-rose" aria-hidden="true">
-    {{ partial "rose.html" (dict "id" "hero" "text" true) }}
-  </div>
+<section class="hero hero--home" data-hero>
+  {{ partial "sigil.html" . }}
   <div class="hero-embers" aria-hidden="true">
     {{- range seq 1 22 }}
     <span style="{{ printf "--x:%d%%;--d:%ds;--delay:-%ds;--s:%dpx" (mod (mul . 37) 100) (add 9 (mod (mul . 7) 11)) (mod (mul . 13) 17) (add 2 (mod . 3)) | safeCSS }}"></span>
@@ -31,6 +29,7 @@
     </div>
     <div class="hero-rule">{{ partial "ornament.html" . }}</div>
   </div>
+  <a class="hero-descend" href="#about" aria-label="Scroll to the grimoire"><span></span></a>
 </section>
 
 {{/* ── ABOUT — rendered from content/_index.md body ── */}}
@@ -43,6 +42,30 @@
         {{ . }}
       </div>
     </div>
+  </div>
+</section>
+{{ end }}
+
+{{/* ── CREMISI — the palette this grimoire is written in ── */}}
+{{ with hugo.Data.cremisi }}
+<section class="cremisi-band">
+  <div class="container">
+    <a class="cremisi-plate" href="{{ "/cremisi/" | relURL }}" data-reveal data-tilt>
+      <div class="cremisi-plate-text">
+        <p class="label">The colours of this grimoire</p>
+        <h2 class="cremisi-plate-title">Cremisi</h2>
+        <p class="cremisi-plate-sub">A gothic, arcane colour scheme. Sixteen materials, two variants, one nave to walk.</p>
+        <span class="post-readmore">Enter the reliquary
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
+      </div>
+      <div class="cremisi-plate-spires" aria-hidden="true">
+        {{- range $i, $m := .materials }}{{ if ne $m.key "ground" }}
+        <i style="{{ printf "--c:%s;--ci:%s;--n:%d" $m.obsidian $m.ivory $i | safeCSS }}"></i>
+        {{- end }}{{ end }}
+      </div>
+      <span class="tilt-glare" aria-hidden="true"></span>
+    </a>
   </div>
 </section>
 {{ end }}
@@ -63,8 +86,9 @@
       <h2 class="section-title">Featured</h2>
       <span class="section-rule"></span>
     </div>
-    <a href="{{ .Permalink }}" class="post-featured" data-reveal>
+    <a href="{{ .Permalink }}" class="post-featured" data-reveal data-tilt>
       <span class="post-featured-mark" aria-hidden="true">{{ with .Params.emoji }}{{ . }}{{ else }}📜{{ end }}</span>
+      <span class="tilt-glare" aria-hidden="true"></span>
       <div class="post-featured-body">
         <div class="post-meta">
           <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">

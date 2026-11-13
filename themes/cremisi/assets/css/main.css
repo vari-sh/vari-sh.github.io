@@ -294,7 +294,7 @@ main { flex: 1; }
   border-bottom: 1px solid var(--hairline-soft);
 }
 
-/* the crimson diamond ornament — a filled lozenge in the vocabulary of /cremisi */
+/* the crimson ornament — the same drawing as on /cremisi */
 .ornament {
   display: block;
   height: auto;
@@ -307,20 +307,20 @@ main { flex: 1; }
 }
 /* left-anchored incipit: lozenge at the title's edge, line fading right (headers) */
 .ornament--rule {
-  width: min(320px, 56%);
+  width: min(320px, 86%);
   margin: 1.5rem 0 0;
 }
 
-/* ornamental divider — a crimson lozenge flanked by open diamonds, set into a broken hairline */
+/* ornamental divider — the /cremisi ornament set into a broken hairline: dots, open diamonds, a tall lozenge */
 hr.section-divider {
   position: relative;
   border: none;
-  height: 16px;
+  height: 24px;
   margin: 4rem 0;
   background: linear-gradient(90deg,
-    transparent, var(--hairline) 15%, var(--hairline) 42%,
-    transparent 46%, transparent 54%,
-    var(--hairline) 58%, var(--hairline) 85%, transparent)
+    transparent, var(--hairline) 15%, var(--hairline) calc(50% - 46px),
+    transparent calc(50% - 46px), transparent calc(50% + 46px),
+    var(--hairline) calc(50% + 46px), var(--hairline) 85%, transparent)
     no-repeat center / 100% 1px;
   overflow: visible;
 }
@@ -330,10 +330,10 @@ hr.section-divider::after {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 64px;
-  height: 16px;
+  width: 76px;
+  height: 24px;
   transform: translate(-50%, -50%);
-  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2016'%3E%3Cg%20fill='none'%20stroke='%23c42740'%20stroke-width='1'%3E%3Cpath%20d='M2%208L9%204L16%208L9%2012Z'/%3E%3Cpath%20d='M48%208L55%204L62%208L55%2012Z'/%3E%3C/g%3E%3Cpath%20d='M32%201.5L40%208L32%2014.5L24%208Z'%20fill='%23c42740'/%3E%3C/svg%3E") no-repeat center / contain;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2076%2024'%3E%3Cg%20fill='none'%20stroke='%23c42740'%20stroke-width='1'%3E%3Cpath%20d='M10%2012L18%206L26%2012L18%2018Z'/%3E%3Cpath%20d='M50%2012L58%206L66%2012L58%2018Z'/%3E%3C/g%3E%3Cg%20fill='%23c42740'%3E%3Cpath%20d='M38%201L46%2012L38%2023L30%2012Z'/%3E%3Ccircle%20cx='4'%20cy='12'%20r='1.6'/%3E%3Ccircle%20cx='72'%20cy='12'%20r='1.6'/%3E%3C/g%3E%3C/svg%3E") no-repeat center / contain;
   filter: drop-shadow(0 0 5px rgba(196, 39, 64, 0.45));
 }
 
@@ -1659,6 +1659,177 @@ pre code {
 
 .page-single { padding: 3.5rem 0 5rem; }
 
+/* ═══ HOME — the sigil: the rose window in three rings, turning like an armillary sphere ═══ */
+.hero--home {
+  display: grid;
+  align-items: center;
+  min-height: min(92vh, 880px);
+  padding: clamp(5.5rem, 16vh, 9.5rem) 0 clamp(5.5rem, 14vh, 8.5rem);
+}
+.hero--home > .container { grid-area: 1 / 1; }
+
+.sigil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(1000px, 160vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  perspective: 1500px;
+  perspective-origin: calc(50% + var(--sy, 0) * 1%) calc(50% + var(--sx, 0) * 1%);
+  pointer-events: none;
+  color: var(--gold);
+  opacity: 0.2;
+  animation: sigilWake 2.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-theme="ivory"] .sigil { opacity: 0.36; }
+
+.sigil-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.sigil-ring svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.sigil-a { animation: gyroA 56s linear infinite; }
+.sigil-b { animation: gyroB 40s linear infinite; }
+.sigil-c { animation: sigilTurn 170s linear infinite; }
+
+/* a tilted ring whose tilt axis walks round: precession */
+@keyframes gyroA {
+  from { transform: rotateZ(0deg) rotateX(63deg) rotateZ(0deg); }
+  to   { transform: rotateZ(360deg) rotateX(63deg) rotateZ(-300deg); }
+}
+@keyframes gyroB {
+  from { transform: rotateZ(40deg) rotateY(56deg) rotateZ(0deg); }
+  to   { transform: rotateZ(-320deg) rotateY(56deg) rotateZ(420deg); }
+}
+@keyframes sigilWake {
+  from { opacity: 0; scale: 0.82; }
+}
+
+.hero-descend {
+  position: absolute;
+  left: 50%;
+  bottom: 1.6rem;
+  width: 1px;
+  height: 46px;
+  translate: -50% 0;
+  background: linear-gradient(var(--overlay0), transparent);
+}
+.hero-descend span {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 7px;
+  height: 10px;
+  translate: -50% 0;
+  background: var(--accent);
+  border-radius: 50% 50% 50% 50% / 62% 62% 40% 40%;
+  animation: heroDrip 2.6s cubic-bezier(0.6, 0, 0.8, 0.6) infinite;
+}
+@keyframes heroDrip {
+  0%   { top: -6px; opacity: 0; }
+  15%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { top: 48px; opacity: 0; }
+}
+
+/* ═══ TILT — plates that lean towards the hand ═══ */
+[data-tilt] { transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
+.post-featured[data-tilt]:hover { transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
+[data-tilt] { transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--glare, 0);
+  transition: opacity 0.5s ease;
+  background: radial-gradient(circle 300px at var(--gx, 50%) var(--gy, 0%), rgba(255, 232, 214, 0.1), transparent 70%);
+}
+[data-theme="ivory"] .tilt-glare {
+  background: radial-gradient(circle 300px at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.55), transparent 70%);
+}
+
+/* ═══ CREMISI PLATE — the palette of this grimoire, as a row of spires ═══ */
+.cremisi-band { padding: 3.5rem 0 0; }
+
+.cremisi-plate,
+.cremisi-plate:visited {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem;
+  align-items: end;
+  padding: 2.3rem 2.6rem 0;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background:
+    linear-gradient(180deg, rgba(236, 232, 225, 0.028), transparent 45%),
+    var(--mantle);
+  border: 1px solid var(--hairline);
+  box-shadow: inset 0 0 0 1px var(--hairline-soft);
+}
+[data-theme="ivory"] .cremisi-plate { background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 45%), var(--mantle); }
+.cremisi-plate:hover { border-color: var(--accent-deep); box-shadow: inset 0 0 0 1px var(--hairline), var(--glow); }
+
+.cremisi-plate-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 2.2rem;
+}
+.cremisi-plate .label { color: var(--accent-bright); white-space: nowrap; }
+.cremisi-plate-sub { max-width: 34ch; }
+.cremisi-plate-title {
+  font-family: 'Cinzel', serif;
+  font-size: var(--step-4);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+}
+[data-theme="ivory"] .cremisi-plate-title { color: var(--accent); }
+.cremisi-plate-sub {
+  font-size: var(--step--1);
+  font-weight: 300;
+  line-height: 1.66;
+  color: var(--subtext0);
+}
+
+.cremisi-plate-spires {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 168px;
+}
+.cremisi-plate-spires i {
+  --d: max(var(--n) - 8, 8 - var(--n));
+  width: clamp(11px, 2vw, 21px);
+  height: calc(100% - var(--d) * 6.4%);
+  background: var(--c);
+  clip-path: polygon(0 100%, 0 30%, 6% 20%, 16% 11%, 30% 4.5%, 50% 0, 70% 4.5%, 84% 11%, 94% 20%, 100% 30%, 100% 100%);
+  transform-origin: 50% 100%;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.1, 1);
+  transition-delay: calc(var(--d) * 26ms);
+}
+[data-theme="ivory"] .cremisi-plate-spires i { background: var(--ci); }
+.cremisi-plate:hover .cremisi-plate-spires i { transform: scaleY(1.09); }
+.reveal-ready .cremisi-plate[data-reveal] .cremisi-plate-spires i { transform: scaleY(0); }
+.reveal-ready .cremisi-plate[data-reveal].is-visible .cremisi-plate-spires i { transform: scaleY(1); transition-duration: 1.2s; transition-delay: calc(0.25s + var(--d) * 60ms); }
+.reveal-ready .cremisi-plate[data-reveal].is-visible:hover .cremisi-plate-spires i { transform: scaleY(1.09); transition-duration: 0.6s; transition-delay: calc(var(--d) * 26ms); }
+
+@media (max-width: 768px) {
+  .hero--home { min-height: 0; }
+  .hero-descend { display: none; }
+  .cremisi-plate { grid-template-columns: 1fr; gap: 0.4rem; padding: 1.8rem 1.6rem 0; }
+  .cremisi-plate-text { padding-bottom: 1.2rem; }
+  .cremisi-plate-spires { height: 104px; justify-content: center; }
+}
+
 /* ═══ MOTION ═══ */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(18px); }
@@ -1679,6 +1850,16 @@ pre code {
 
 .reveal-ready [data-reveal].is-visible { opacity: 1; transform: none; }
 
+.reveal-ready [data-reveal][data-tilt] {
+  transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  translate: 0 22px;
+  transition: opacity 0.7s ease, translate 0.7s cubic-bezier(0.22, 0.61, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.reveal-ready [data-reveal][data-tilt].is-visible {
+  transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  translate: 0 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -1688,6 +1869,9 @@ pre code {
   }
   .reveal-ready [data-reveal] { opacity: 1; transform: none; }
   .hero-embers { display: none; }
+  .sigil-a { transform: rotateX(63deg); }
+  .sigil-b { transform: rotateZ(40deg) rotateY(56deg); }
+  [data-tilt] { transform: none; }
 }
 
 /* ═══ MOBILE MENU ═══ */
