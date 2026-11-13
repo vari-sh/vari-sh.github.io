@@ -326,7 +326,8 @@ main { position: relative; isolation: isolate; }
 
 /* ── NICHES & RELICS ─────────────────────────────── */
 .niche, .pillar-niche { position: relative; display: block; }
-.niche-frame { position: absolute; left: -7px; top: -7px; width: calc(100% + 14px); height: calc(100% + 7px); overflow: visible; pointer-events: none; }
+/* max-width: none lifts the global svg cap, which would clamp the frame to the niche's width and leave it 7px off-centre. */
+.niche-frame { position: absolute; left: -7px; top: -7px; width: calc(100% + 14px); max-width: none; height: calc(100% + 7px); overflow: visible; pointer-events: none; }
 .niche-frame path { fill: none; vector-effect: non-scaling-stroke; stroke: color-mix(in srgb, var(--c) 42%, var(--line-2)); stroke-width: 1px; transition: stroke .5s var(--ease); }
 .niche-back {
   position: absolute; inset: 0; clip-path: url(#arch);
