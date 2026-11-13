@@ -2,7 +2,11 @@
 
 {{/* ── HERO ── */}}
 <section class="hero hero--home" data-hero>
-  {{ partial "sigil.html" . }}
+  {{/* The rose window, turning. A second copy sits on top and shows only inside the disc of light that trails the pointer. */}}
+  <div class="hero-rose" aria-hidden="true" data-rose>
+    {{ partial "rose.html" (dict "id" "hero" "text" true) }}
+    <div class="hero-rose-lit">{{ partial "rose.html" (dict "id" "hero-lit" "text" true) }}</div>
+  </div>
   <div class="hero-embers" aria-hidden="true">
     {{- range seq 1 22 }}
     <span style="{{ printf "--x:%d%%;--d:%ds;--delay:-%ds;--s:%dpx" (mod (mul . 37) 100) (add 9 (mod (mul . 7) 11)) (mod (mul . 13) 17) (add 2 (mod . 3)) | safeCSS }}"></span>

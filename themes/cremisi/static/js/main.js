@@ -152,7 +152,7 @@
     });
   });
 
-  /* ── Tilt & sigil: plates lean towards the pointer, the armillary answers it ── */
+  /* ── Tilt & rose: plates lean towards the pointer, the rose window lights up under it ── */
   const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
     && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (motionOK) {
@@ -190,19 +190,26 @@
     });
 
     const hero = document.querySelector('[data-hero]');
-    const sigil = document.querySelector('[data-sigil]');
-    if (hero && sigil) {
+    const rose = document.querySelector('[data-rose]');
+    if (hero && rose) {
+      // The lit copy has to turn in step with the rose under it: give both the same start time,
+      // once they have one (it is null until the first frame, and setting null would pause the copy).
+      const [base, lit] = [...rose.querySelectorAll('.rose')].map((el) => el.getAnimations?.()[0]);
+      if (base && lit) Promise.all([base.ready, lit.ready]).then(() => { lit.startTime = base.startTime; });
+
       const t = { x: 0, y: 0, tx: 0, ty: 0, paint: (x, y) => {
-        sigil.style.setProperty('--sx', x.toFixed(2));
-        sigil.style.setProperty('--sy', y.toFixed(2));
+        rose.style.setProperty('--mx', `${Math.round(x)}px`);
+        rose.style.setProperty('--my', `${Math.round(y)}px`);
       } };
+      let on = false;
       hero.addEventListener('pointermove', (e) => {
-        const r = hero.getBoundingClientRect();
-        t.tx = ((e.clientY - r.top) / r.height - 0.5) * 70;
-        t.ty = ((e.clientX - r.left) / r.width - 0.5) * 70;
+        const r = rose.getBoundingClientRect();
+        t.tx = e.clientX - r.left;
+        t.ty = e.clientY - r.top;
+        if (!on) { on = true; t.x = t.tx; t.y = t.ty; rose.classList.add('is-lit'); }
         follow(t);
       });
-      hero.addEventListener('pointerleave', () => { t.tx = t.ty = 0; follow(t); });
+      hero.addEventListener('pointerleave', () => { on = false; rose.classList.remove('is-lit'); });
     }
   }
 
