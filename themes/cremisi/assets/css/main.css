@@ -1835,7 +1835,6 @@ pre code {
 .reveal-ready .cremisi-plate[data-reveal].is-visible:hover .cremisi-plate-spires i { transform: scaleY(1.09); transition-duration: 0.6s; transition-delay: calc(var(--d) * 26ms); }
 
 @media (max-width: 768px) {
-  .hero--home { min-height: 0; }
   .hero-descend { display: none; }
   .cremisi-plate { grid-template-columns: 1fr; gap: 0.4rem; padding: 1.8rem 1.6rem 0; }
   .cremisi-plate-text { padding-bottom: 1.2rem; }
