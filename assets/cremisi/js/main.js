@@ -46,9 +46,16 @@ $$(".reveal, [data-head], [data-chart], [data-ramp], [data-facade]").forEach((el
 
 // ── The nave and the relics
 const naveCanvas = $("[data-nave]");
-const nave = naveCanvas ? createNave(naveCanvas, naveCanvas.dataset.palette.split(","), { still: reduced }) : null;
+// The nave is built in the background: the drawn rose stays until its first frame is on the canvas,
+// and comes back if it cannot be built after all.
+const nave = naveCanvas
+  ? createNave(naveCanvas, naveCanvas.dataset.palette.split(","), {
+      still: reduced,
+      onReady: () => root.classList.add("has-gl"),
+      onLost: () => { root.classList.remove("has-gl", "fly"); measure(); },
+    })
+  : null;
 const relics = createRelics($$("canvas[data-relic]"), { still: reduced });
-if (nave) root.classList.add("has-gl");
 if (nave && !reduced) root.classList.add("fly");
 
 // ── Nav, rail and the current chapter
