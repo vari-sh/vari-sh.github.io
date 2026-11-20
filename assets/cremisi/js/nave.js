@@ -1136,10 +1136,16 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
   // are built at once, and the full one takes over once ready. Where it does not (Firefox), all WebGL
   // on the page runs on one thread: while a shader compiles, anything drawn with it, by the nave or
   // by the relics, holds back every frame of the page until the compile is done, and a fence is the
-  // only thing that may be asked meanwhile. There the plain nave alone is built, behind the veil, and
-  // the relics wait for it (see busy below): the full one would take the page's WebGL away for
-  // several seconds more, and no moment is safe to spend them on.
-  const canFull = !software && floatTargets && !!parallel;
+  // only thing that may be asked meanwhile. There the plain nave is built first, behind the veil, and
+  // the relics wait for it (see busy below); the time it took tells what the full one would cost.
+  // Through Direct3D (Firefox on Windows) that is seconds more, which no moment of the page can
+  // spare: the plain nave stays. Through OpenGL ES (a phone) it is a fraction of a second: the full
+  // nave is built at once, still behind the veil, before the plain one draws its first frame.
+  const canFull = !software && floatTargets;
+  const QUICK_BUILD = 500; // ms: a plain nave built faster than this lets the full one follow
+  // On a phone the full nave already draws at twice the page's pixels, finer than the eye can tell:
+  // supersampling on top would only spend battery and heat. Its best level there has one sample.
+  const TOP = matchMedia("(pointer: coarse)").matches ? 2 : LEVELS.length - 1;
   const begin = (vs, fs) => {
     const pr = gl.createProgram();
     const shaders = [[gl.VERTEX_SHADER, vs], [gl.FRAGMENT_SHADER, fs]].map(([type, src]) => {
@@ -1166,7 +1172,7 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
     return false;
   };
   const uniforms = (pr, names) => Object.fromEntries(names.map((n) => [n, gl.getUniformLocation(pr, n)]));
-  const plain = { jobs: null, fence: null, ready: false, lost: false };
+  const plain = { jobs: null, fence: null, at: 0, ready: false, lost: false };
   let prog = null, dust = null, U = null, D = null;
 
   const quad = gl.createVertexArray();
@@ -1229,31 +1235,37 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
     gl.useProgram(prog);
     gl.uniform3fv(U.uPal, pal);
     plain.ready = true;
+    // Without background compilation, the full nave follows at once if the plain one built quickly.
+    if (hq.phase === "waiting") {
+      if (performance.now() - plain.at < QUICK_BUILD) { hq.jobs = fullJobs(); hq.fence = fenceAfter(); hq.phase = "compiling"; }
+      else hq.phase = "off";
+    }
     return true;
   };
 
   // ── The full nave. Where the plain nave is built too, the full one takes over once the plain one
   // has shown that the GPU is a real one.
-  const hq = { phase: "off", level: 2, ceiling: LEVELS.length - 1, jobs: null, P: null, U: null, rt: null, samples: [], dts: [], calm: 0, capUntil: 0, capMs: 15000, fade: 1, base: 1000 / 60, retryAt: 0, left: 0 };
-  if (canFull) hq.phase = "compiling";
+  const hq = { phase: "off", level: 2, ceiling: LEVELS.length - 1, jobs: null, P: null, U: null, rt: null, samples: [], dts: [], calm: 0, capUntil: 0, capMs: 15000, fade: 1, base: 1000 / 60, retryAt: 0, left: 0, fence: null };
+  if (canFull) hq.phase = parallel ? "compiling" : "waiting";
 
   // The builds start at once where the browser compiles in the background. Where it does not, the
   // plain nave's waits until the page has started (the nave is started once the type is in) and a
   // couple of frames more: begun before the page has painted, Firefox holds back every frame of it
   // until the build is done.
+  const fullJobs = () => ({
+    scene: begin(VERT, HQ_FRAG),
+    shaft: begin(VERT, SHAFT_FRAG),
+    down: begin(VERT, DOWN_FRAG),
+    up: begin(VERT, UP_FRAG),
+    comp: begin(VERT, COMP_FRAG),
+  });
   let built = false;
   const build = () => {
     if (built) return;
     built = true;
     plain.jobs = [begin(VERT, FRAG), begin(DUST_VERT, DUST_FRAG)];
-    if (canFull) hq.jobs = {
-      scene: begin(VERT, HQ_FRAG),
-      shaft: begin(VERT, SHAFT_FRAG),
-      down: begin(VERT, DOWN_FRAG),
-      up: begin(VERT, UP_FRAG),
-      comp: begin(VERT, COMP_FRAG),
-    };
-    if (!parallel) plain.fence = fenceAfter();
+    if (parallel) { if (canFull) hq.jobs = fullJobs(); }
+    else { plain.fence = fenceAfter(); plain.at = performance.now(); }
   };
   if (parallel) build();
   canvas.dataset.tier = "lq";
@@ -1330,7 +1342,7 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
   };
   const pollHQ = () => {
     const jobs = Object.values(hq.jobs);
-    if (!done(jobs)) return;
+    if (!done(jobs, hq.fence)) return;
     hq.phase = jobs.every(linked) ? "ready" : "off";
   };
   // The first level to try: where the plain nave's own cost says the full one should fit, from the
@@ -1589,9 +1601,8 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
   // and the next level should still fit. A level given up is not tried again for a while, and for
   // longer each time.
   const watch = (dt) => {
-    // The shortest interval seen is the display's refresh; anything faster than 60 Hz is a bonus.
-    state.refresh = Math.min(state.refresh || 1e3, Math.max(dt, 4));
-    const frame = Math.max(state.refresh, 1000 / 60);
+    // The display's refresh (see tick); anything faster than 60 Hz is a bonus.
+    const frame = Math.max(state.refresh || 1000 / 60, 1000 / 60);
     push(hq.dts, dt);
     if (timer) { const ms = clockRead(); if (ms != null) push(hq.samples, ms); }
     if (hq.dts.length < 24 || (timer && hq.samples.length < 10)) return;
@@ -1601,7 +1612,7 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
     // GPU time alone brings the nave down only when it fills the frame; slow frames do, when the
     // nave's share of the frame is large enough to be their cause.
     if (g > frame || (slow && (!timer || g > frame * 0.25))) return stepDown();
-    if (hq.level >= LEVELS.length - 1 || (hq.level >= hq.ceiling && performance.now() < hq.capUntil)) return;
+    if (hq.level >= TOP || (hq.level >= hq.ceiling && performance.now() < hq.capUntil)) return;
     // The next level costs up to 1.8 times this one; without a timer it can only be tried.
     const room = timer ? g * 1.8 < BUDGET : ++hq.calm > 120;
     if (room && f < Math.max(frame, hq.base) * 1.06) setLevel(hq.level + 1);
@@ -1619,23 +1630,33 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
     if (!plain.ready && !plainReady()) return;
     const dt = state.last ? now - state.last : 16;
     state.last = now;
+    // The display's refresh is the shortest interval between the nave's frames, the plain one's too:
+    // seen only while the full nave draws, every interval could be slow, and slow would pass for normal.
+    if (state.shown && dt < 250) state.refresh = Math.min(state.refresh || 1e3, Math.max(dt, 4));
     const step = Math.min(dt, 80) / 1000;
     state.birth += step;
     state.ignite = Math.min(1, state.ignite + step / 3.4);
     state.px += (state.tx - state.px) * Math.min(1, step * 3);
     state.py += (state.ty - state.py) * Math.min(1, step * 3);
     const time = (now - state.t0) / 1000;
-    if (hq.phase === "compiling") pollHQ();
+    if (hq.phase === "compiling") {
+      pollHQ();
+      // Without background compilation the full nave is being built behind the veil: nothing is drawn
+      // until it is, as a draw would wait for it.
+      if (!parallel && hq.phase === "compiling") return;
+    }
     // A still frame (reduced motion): the plain nave as soon as it is built, the full one at its
     // best once that is built too, and nothing more.
     if (still) {
-      if (hq.phase === "ready") enterHQ(4);
+      if (hq.phase === "ready") enterHQ(Math.min(4, TOP));
       if (!state.shown || state.hq) draw(30);
       if (!state.shown) { state.shown = true; onReady(); }
       if (hq.phase !== "compiling") state.running = false;
       return;
     }
-    if (hq.phase === "ready" && state.fast && performance.now() >= hq.retryAt) enterHQ(firstLevel());
+    // The full nave takes over once the plain one has lit its windows: by then the page's own opening
+    // is over, and the frames it will be held against (hq.base) are the plain nave's alone.
+    if (hq.phase === "ready" && state.fast && state.ignite >= 1 && performance.now() >= hq.retryAt) enterHQ(firstLevel());
     if (state.hq) {
       // A hidden tab or a long task says nothing about the GPU.
       if (hq.fade < 1) hq.fade = Math.min(1, hq.fade + step / 1.4);
@@ -1665,10 +1686,13 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
       if (!state.running) { state.running = true; state.last = 0; state.frames = 0; }
     },
     stop() { state.running = false; },
-    // Without background compilation: whether the build is under way, during which nothing else on the
+    // Without background compilation: whether a build is under way, during which nothing else on the
     // page may draw with WebGL (it would hold the page until the build is done).
     busy() {
-      return !parallel && !!plain.jobs && !plain.ready && !plain.lost && !done(plain.jobs, plain.fence);
+      if (parallel) return false;
+      if (plain.jobs && !plain.ready && !plain.lost && !done(plain.jobs, plain.fence)) return true;
+      if (hq.phase === "compiling") pollHQ();
+      return hq.phase === "compiling";
     },
     render() { draw(still ? 30 : (performance.now() - state.t0) / 1000); },
   };
