@@ -156,10 +156,15 @@ main { position: relative; isolation: isolate; }
 .fly .hero { height: 250svh; }
 /* The first chapter rises while the last of the glass goes dark, instead of after a screen of nothing. */
 .fly .hero + .section { margin-top: -36svh; }
+/* The text stands a little below the middle, clear of the rose, with the scroll cue at the foot of the
+   stage. The space above the text gives way first where the screen is short: the text rises, though not
+   under the nav, instead of running into the cue. --cue is the cue's height with its margins. */
 .hero-stage {
   position: sticky; top: 0; height: 100svh; min-height: 560px; overflow: hidden; isolation: isolate;
-  display: grid; place-items: center; background: #050506;
+  display: flex; flex-direction: column; align-items: center; background: #050506;
+  --cue: 115px;
 }
+.hero-stage::before { content: ""; flex: 0 1 calc(clamp(60px, 21svh, 210px) + var(--cue)); min-height: 84px; }
 .hero-nave { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; opacity: 0; transition: opacity 1.6s ease; }
 .has-gl .hero-nave { opacity: 1; }
 .hero-fallback {
@@ -181,7 +186,7 @@ main { position: relative; isolation: isolate; }
 }
 .hero-flash { position: absolute; inset: 0; z-index: 5; pointer-events: none; background: var(--void); opacity: var(--flash, 0); }
 
-.hero-inner { text-align: center; max-width: 980px; padding: 0 var(--gutter); margin-top: clamp(60px, 21svh, 210px); will-change: transform, opacity; }
+.hero-inner { flex: none; margin-block: auto; text-align: center; max-width: 980px; padding: 0 var(--gutter); will-change: transform, opacity; }
 .kicker {
   font-family: var(--f-title); font-size: .78rem; letter-spacing: .38em; text-transform: uppercase;
   color: var(--tallow); margin: 0 0 18px; font-weight: 500;
@@ -195,9 +200,11 @@ main { position: relative; isolation: isolate; }
   font-size: clamp(3.6rem, 17.5vw, 10rem); font-weight: 600; letter-spacing: .035em; line-height: 1; padding-left: .035em; margin: 0 0 20px;
   --mx: -999px; --my: 0px; --la: 0; transition: --la .7s var(--ease);
 }
+/* The glow is an ellipse filling its box. It is drawn as a circle in an image stretched to the box, not as
+   an elliptical radial-gradient: Safari on iOS painted that one as a band, cut flat at the top and bottom. */
 .hero-title::before {
   content: ""; position: absolute; inset: 6% -3% 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(ellipse closest-side, rgba(217, 72, 93, .34), rgba(196, 39, 64, .12) 55%, transparent);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2' preserveAspectRatio='none'%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23d9485d' stop-opacity='.34'/%3E%3Cstop offset='.55' stop-color='%23c42740' stop-opacity='.12'/%3E%3Cstop offset='1' stop-color='%23c42740' stop-opacity='0'/%3E%3C/radialGradient%3E%3Crect width='2' height='2' fill='url(%23g)'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
   animation: breathe 4.5s ease-in-out infinite;
 }
 @keyframes breathe { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
@@ -237,7 +244,7 @@ main { position: relative; isolation: isolate; }
 .hero-corner-l { left: var(--gutter); }
 .hero-corner-r { right: var(--gutter); text-align: right; }
 .scroll-cue {
-  position: absolute; bottom: 22px; left: 50%; translate: -50% 0; display: grid; justify-items: center; gap: 10px;
+  flex: none; margin: 20px 0 22px; display: grid; justify-items: center; gap: 10px;
   color: var(--bone-dim); opacity: calc(1 - var(--hp, 0) * 5);
 }
 .scroll-label { font-family: var(--f-title); font-size: .62rem; letter-spacing: .4em; text-transform: uppercase; padding-left: .4em; }
@@ -347,9 +354,11 @@ main { position: relative; isolation: isolate; }
 .relic { position: absolute; left: 50%; top: 5%; width: 80%; aspect-ratio: 1; translate: -50% 0; }
 /* The plinth is the swatch: the material's flat, exact colour. */
 .niche-plinth { position: absolute; left: 13%; right: 13%; bottom: 0; height: 15%; background: var(--c); transition: background .5s var(--ease); }
+/* The stone's shadow: an ellipse stretched from a circle, as the hero title's glow is (see there). */
 .niche-plinth::before {
   content: ""; position: absolute; left: 8%; right: 8%; bottom: 100%; height: 16px; translate: 0 50%;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, .6), transparent); pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2' preserveAspectRatio='none'%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-opacity='.6'/%3E%3Cstop offset='1' stop-opacity='0'/%3E%3C/radialGradient%3E%3Crect width='2' height='2' fill='url(%23g)'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  pointer-events: none;
 }
 .niche-plinth::after { content: ""; position: absolute; inset: auto -5% 100% -5%; height: 4px; background: color-mix(in srgb, var(--c) 82%, #000); transition: background .5s var(--ease); }
 
@@ -449,7 +458,9 @@ main { position: relative; isolation: isolate; }
     radial-gradient(circle at 50% 44%, color-mix(in srgb, var(--c) 16%, transparent), transparent 60%),
     linear-gradient(180deg, rgba(110, 90, 60, .2), rgba(110, 90, 60, .04) 55%, rgba(110, 90, 60, .18));
 }
-[data-variant="ivory"] .niche-plinth::before { background: radial-gradient(closest-side, rgba(60, 40, 20, .34), transparent); }
+[data-variant="ivory"] .niche-plinth::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2' preserveAspectRatio='none'%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%233c2814' stop-opacity='.34'/%3E%3Cstop offset='1' stop-color='%233c2814' stop-opacity='0'/%3E%3C/radialGradient%3E%3Crect width='2' height='2' fill='url(%23g)'/%3E%3C/svg%3E");
+}
 .swatch-index { position: absolute; left: 12px; top: 9px; font-family: var(--f-code); font-size: .64rem; letter-spacing: .1em; color: color-mix(in srgb, var(--c) 50%, #8a8580); opacity: .7; }
 .swatch-body { padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .swatch h3 { font-size: 1.02rem; letter-spacing: .08em; }
@@ -850,6 +861,7 @@ main { position: relative; isolation: isolate; }
   .chart-foot .th-label { translate: -20px 0; font-size: .62rem; }
   .status-right span:not(:last-child) { display: none; }
   .scroll-label { display: none; }
+  .hero-stage { --cue: 88px; }
   .facade { gap: 2px; }
   .codex li { grid-template-columns: 40px 1fr; }
   .editor-pane .ln { width: 3em; padding-right: 1em; }
