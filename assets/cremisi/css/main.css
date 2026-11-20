@@ -249,8 +249,10 @@ main { position: relative; isolation: isolate; }
 }
 .scroll-label { font-family: var(--f-title); font-size: .62rem; letter-spacing: .4em; text-transform: uppercase; padding-left: .4em; }
 .scroll-line { position: relative; width: 1px; height: 46px; background: linear-gradient(rgba(220, 203, 154, .5), transparent); }
+/* The drop sits 3px left of its 1px line, set as an offset rather than a -50% shift: half of its 7px
+   would be applied after the drop is snapped to the pixel grid, and leave it half a pixel off. */
 .drop {
-  position: absolute; left: 50%; top: 0; width: 7px; height: 10px; translate: -50% 0;
+  position: absolute; left: calc(50% - 3.5px); top: 0; width: 7px; height: 10px;
   background: var(--crimson); border-radius: 50% 50% 50% 50% / 62% 62% 40% 40%; box-shadow: 0 0 10px rgba(226, 88, 106, .8);
   animation: drip 2.6s cubic-bezier(.6, 0, .8, .6) infinite;
 }
