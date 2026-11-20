@@ -113,11 +113,10 @@ float roseShape(vec2 q, out vec3 tint, out float lid) {
 float roseSd(vec2 q) { vec3 t; float l; return roseShape(q, t, l); }
 
 // The embrasure and the tracery are lit by the rose itself, from behind: the stone is dark, and
-// bright where it faces the glass, the more so the nearer it is to it.
-vec3 roseStone(vec3 p, vec3 n, int id) {
+// bright where it faces the glass, the more so the nearer it is to it. d and tint: roseShape at p.
+vec3 roseStone(vec3 p, vec3 n, int id, float d, vec3 tint) {
   vec2 c = p.xy - vec2(0., HROSE);
-  vec3 tint; float lid;
-  float d = roseShape(c / RROSE, tint, lid) * RROSE;
+  d *= RROSE;
   float on = roseIgn();
   if (id == 10) {
     // The embrasure: voussoirs round a cylinder, warmer towards the glass.
@@ -177,6 +176,10 @@ vec3 roseGlow(vec2 uv) {
 //     7 reveal of an opening · 8 clerestory glass · 9 triforium passage
 //     10 the rose's embrasure · 11 its tracery · 12 its glass
 const TRACE = `
+// A zero the compiler cannot see through. Direct3D unrolls a loop with a constant count and compiles
+// every copy of what it calls, which takes it seconds on a shader this size; counted from ZERO, a loop
+// stays a loop. A normal is taken the same way, by four samples in a loop instead of six calls.
+#define ZERO min(uMarch, 0)
 // A clustered pier in plan: a core with four main shafts and four lesser ones between them, each a
 // circle (centre, radius). As the pier is their union, the first circle a ray enters is where it hits.
 const vec3 PIER[9] = vec3[9](vec3(0., 0., .31), vec3(.33, 0., .11), vec3(-.33, 0., .11), vec3(0., .33, .11), vec3(0., -.33, .11),
@@ -267,7 +270,7 @@ float trace(vec3 ro, vec3 rd, out int idOut, out vec3 nOut) {
     // are solids of revolution), and the vault shaft that rises from the capital as a cylinder.
     float zIn = ro.z + rd.z * (WN - .7 - sx * ro.x) * irx;
     float k = ceil((zIn - .7) / BAY), a2 = dot(rd.xz, rd.xz);
-    for (int i = 0; i < 3; i++) {
+    for (int i = ZERO; i < 3; i++) {
       float zk = (k + float(i)) * BAY;
       if (zk > ZEND + 1.) break;
       vec2 o = vec2(ro.x - sx * WN, ro.z - zk);
@@ -281,7 +284,7 @@ float trace(vec3 ro, vec3 rd, out int idOut, out vec3 nOut) {
       float tp = pierHit(o, rd.xz, a2, pn), y = ro.y + rd.y * tp;
       if (tp < 1e8 && y > .3 && y < 4.5) { best = tp; bn = vec3(pn.x, 0., pn.y); }
       vec3 o3 = vec3(o.x, ro.y, o.y);
-      for (int band = 0; band < 2; band++) {
+      for (int band = ZERO; band < 2; band++) {
         // The base, then the capital (or the other way round for a ray going down).
         bool cap = (band == 0) == (rd.y < 0.);
         float lo = cap ? 4.42 : 0., hi = cap ? 5.16 : .34;
@@ -302,8 +305,10 @@ float trace(vec3 ro, vec3 rd, out int idOut, out vec3 nOut) {
         if (tm <= tb && d < .01) { best = tm; solid = true; break; }
       }
       if (solid) {
-        vec3 q = o3 + rd * best, e = vec3(1e-3, 0., 0.);
-        bn = normalize(vec3(colSd(q + e.xyy) - colSd(q - e.xyy), colSd(q + e.yxy) - colSd(q - e.yxy), colSd(q + e.yyx) - colSd(q - e.yyx)));
+        vec3 q = o3 + rd * best;
+        bn = vec3(0.);
+        for (int j = ZERO; j < 4; j++) { vec3 e = vec3(((j + 3) >> 1) & 1, (j >> 1) & 1, j & 1) * 2e-3 - 1e-3; bn += e * colSd(q + e); }
+        bn = normalize(bn);
       }
       // The vault shafts stand proud of the wall, on the nave side, from the abacus up; against the end
       // wall they keep to the corner, clear of the rose.
@@ -340,8 +345,9 @@ float trace(vec3 ro, vec3 rd, out int idOut, out vec3 nOut) {
         if (rev && tm < tO) {
           if (tm < t) {
             t = tm; id = 7;
-            vec2 q = (ro + rd * tm).zy, e = vec2(2e-3, 0.);
-            n = normalize(vec3(0., hole(q - e.yx) - hole(q + e.yx), hole(q - e.xy) - hole(q + e.xy)));
+            vec2 q = (ro + rd * tm).zy, g = vec2(0.);
+            for (int j = ZERO; j < 4; j++) { vec2 e = vec2(j == 0 ? 2e-3 : j == 1 ? -2e-3 : 0., j == 2 ? 2e-3 : j == 3 ? -2e-3 : 0.); g += e * hole(q + e); }
+            n = normalize(vec3(0., -g.y, -g.x));
           }
         } else if (clerHole(po) < 0.) {
           if (tO < t) { t = tO; id = 8; n = vec3(-sx, 0., 0.); }
@@ -385,8 +391,9 @@ float trace(vec3 ro, vec3 rd, out int idOut, out vec3 nOut) {
         side = side || (tm < tg && d > -.02);
         if (side && tm < tg) {
           t = tm; id = 11;
-          vec2 q = (o + rd.xy * tm) / RROSE, e = vec2(1e-3, 0.);
-          n = normalize(vec3(roseSd(q - e.xy) - roseSd(q + e.xy), roseSd(q - e.yx) - roseSd(q + e.yx), 0.));
+          vec2 q = (o + rd.xy * tm) / RROSE, g = vec2(0.);
+          for (int j = ZERO; j < 4; j++) { vec2 e = vec2(j == 0 ? 1e-3 : j == 1 ? -1e-3 : 0., j == 2 ? 1e-3 : j == 3 ? -1e-3 : 0.); g += e * roseSd(q + e); }
+          n = normalize(vec3(-g, 0.));
         } else { t = tg; id = 12; n = vec3(0., 0., -1.); }
       }
     }
@@ -439,8 +446,8 @@ vec3 stone(vec3 p, vec3 n, vec3 alb) {
   return alb * (amb + key + side + lancetLight(p, n));
 }
 
-// Every branch gathers what the surface is made of; glass, light and self-lit surfaces are then
-// evaluated once each, which keeps the compiled shader small.
+// Every branch gathers what the surface is made of; the masonry before them, and glass, light and
+// self-lit surfaces after them, are evaluated once each, which keeps the compiled shader small.
 vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl) {
   float aa = t * uPix;
   float zl = mod(p.z, BAY) - BAY * .5, kb = floor(p.z / BAY);
@@ -450,6 +457,7 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl
   vec3 alb = vec3(0.), nn = n, em = vec3(0.), own = vec3(0.);
   float mul = 1.;
   bool unlit = false;
+  vec3 ash = id == 1 || id == 4 || id == 5 || id == 9 ? masonry(id == 1 ? p.xy : p.zy, aa) : vec3(1., 0., 0.);
 
   if (id == 0) {
     vec2 g = vec2(p.x + p.z, p.x - p.z) * .64;
@@ -466,7 +474,6 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl
     refl = (.045 + .955 * pow(1. - max(dot(-rd, nr), 0.), 5.)) * .72 * mix(1., smoothstep(.5, .47, edge), far);
   } else if (id == 1) {
     vec2 q = p.xy, lc = vec2(0., HROSE);
-    vec3 ash = masonry(q, aa);
     alb = vec3(.3, .29, .33) * ash.x;
     if (abs(q.x) < WN) {
       vec2 rq = (q - lc) / RROSE;
@@ -475,7 +482,7 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl
       float sdL = max(sdArch(vec2(q.x - li * 1.22, q.y - 6.1), .42, 1.), 2.4 - q.y);
       vec3 tint = uPal[ENDL[int(li) + 2]] * ign(8.5);
       gq = q * 1.4; gt = tint; gsd = sdL; gseed = li * 3.; gk = .62;
-      em = lancetGlow(q) + ROSECOL * exp(-max(rr - 1., 0.) * 1.5) * .22 * roseIgn();
+      em = ROSECOL * exp(-max(rr - 1., 0.) * 1.5) * .22 * roseIgn();
       alb = mix(alb, vec3(.46, .44, .47), smoothstep(.09, .04, abs(rr - 1.07)) + smoothstep(.07, .03, abs(sdL - .07)) * .7);
       alb *= .55 + .45 * smoothstep(1., 1.2, rr);
       if (rr > 1.07) lc = vec2(li * 1.22, 6.8);
@@ -484,9 +491,10 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl
       float sdL = max(sdArch(vec2(abs(q.x) - 5., q.y - 5.4), .72, 1.6), 2.2 - q.y);
       vec3 tint = bayTint(8., q.x);
       if (q.y < HAISLE) { gq = q; gt = tint; gsd = sdL; gseed = 5.; gk = 1.; }
-      em = tint * exp(-max(sdL, 0.) * 2.4) * .12 + lancetGlow(q) * .5;
+      em = tint * exp(-max(sdL, 0.) * 2.4) * .12;
       alb *= step(q.y, HAISLE) * .8 + .2;
     }
+    em += lancetGlow(q) * (abs(q.x) < WN ? 1. : .5);
     // The joints catch the glow of the glass beside them.
     float rel = max(1. + dot(ash.yz, normalize(lc - q + 1e-4)) * .9, 0.);
     own = alb * (vec3(.011, .011, .017) + em * 2.4 * rel) + em * .4;
@@ -514,7 +522,6 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl
     }
     mul *= .45 + .55 * smoothstep(0., .9, p.y);
   } else if (id == 4) {
-    vec3 ash = masonry(p.zy, aa);
     alb = vec3(.3, .29, .33) * ash.x;
     vec2 tilt = ash.yz;
     if (p.y < HAISLE) {
@@ -550,23 +557,22 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl
     gq = vec2(zc, p.y); gt = bayTint(kb, sx); gseed = kb * 7. + sx;
     gsd = min(clerHole(p.zy), -1e-4);
   } else if (id >= 10) {
+    vec3 tint; float lid;
+    vec2 q = (p.xy - vec2(0., HROSE)) / RROSE;
+    float d = roseShape(q, tint, lid);
     if (id == 12) {
-      vec3 tint; float lid;
-      vec2 q = (p.xy - vec2(0., HROSE)) / RROSE;
-      float d = roseShape(q, tint, lid);
       gq = q * RROSE * 1.25; gseed = lid; gk = 1.15;
       gt = tint * roseIgn() * (.86 + .14 * vnoise(vec2(uTime * .22 + lid * 1.7, lid)));
       gsd = min(d * RROSE, -1e-4);
-    } else { own = roseStone(p, n, id); unlit = true; }
+    } else { own = roseStone(p, n, id, d, tint); unlit = true; }
   } else if (id == 9) {
     // The passage behind the triforium: dark, lit only by what comes through its arches.
-    alb = vec3(.2, .19, .22) * (n.x != 0. ? masonry(p.zy, aa).x : 1.);
+    alb = vec3(.2, .19, .22) * (n.x != 0. ? ash.x : 1.);
     mul = .35;
   } else if (id == 5) {
     float sdL = max(sdArch(vec2(zl, p.y - 5.5), .9, 2.), 2. - p.y);
     vec3 tint = bayTint(kb, sx);
     gq = vec2(zl, p.y); gt = tint; gsd = sdL; gseed = kb * 3. + sx; gk = mix(.42, 1., smoothstep(4., 16., t));
-    vec3 ash = masonry(p.zy, aa);
     alb = vec3(.28, .27, .31) * ash.x;
     alb = mix(alb, vec3(.44, .42, .46), smoothstep(.1, .05, abs(sdL - .09)) * .6);
     own = alb * (vec3(.012, .012, .018) + tint * exp(-sdL * 1.7) * .5 + bayTint(kb, -sx) * .03) * (1. - ash.z * .5);
@@ -725,8 +731,9 @@ vec3 lit(vec3 p, vec3 n, vec3 alb, float ao, float aa) {
   return alb * ((amb + side + lancetLight(p, n)) * ao + key * (.5 + .5 * ao) + sun);
 }
 
-// Every branch only gathers what the surface is made of; the glass, the lighting and the self-lit
-// surfaces are then evaluated in one place each, which keeps the compiled shader small.
+// Every branch only gathers what the surface is made of; the masonry before them, and the glass, the
+// lighting and the self-lit surfaces after them, are evaluated in one place each, which keeps the
+// compiled shader small.
 vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out float refl) {
   float aa = t * uPix * uAAk;
   float zl = mod(p.z, BAY) - BAY * .5, kb = floor(p.z / BAY);
@@ -736,6 +743,7 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out 
   vec3 alb = vec3(0.), nn = n, em = vec3(0.), own = vec3(0.);
   float ao = 1., mul = 1.;
   bool unlit = false;
+  vec3 ash = id == 1 || id == 4 || id == 5 || id == 9 ? ashlar(id == 1 ? p.xy : p.zy, aa) : vec3(1., 0., 0.);
 
   if (id == 0) {
     vec2 g = vec2(p.x + p.z, p.x - p.z) * .64;
@@ -763,7 +771,6 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out 
     refl = (.045 + .955 * pow(1. - max(dot(-rd, nr), 0.), 5.)) * .72 * mix(1., joint, far);
   } else if (id == 1) {
     vec2 q = p.xy, lc = vec2(0., HROSE);
-    vec3 ash = ashlar(q, aa);
     alb = vec3(.3, .29, .33) * ash.x;
     if (abs(q.x) < WN) {
       vec2 rq = (q - lc) / RROSE;
@@ -772,7 +779,7 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out 
       float sdL = max(sdArch(vec2(q.x - li * 1.22, q.y - 6.1), .42, 1.), 2.4 - q.y);
       vec3 tint = uPal[ENDL[int(li) + 2]] * ign(8.5);
       gq = q * 1.4; gt = tint; gsd = sdL; gseed = li * 3.; gk = .62;
-      em = lancetGlow(q) + ROSECOL * exp(-max(rr - 1., 0.) * 1.5) * .22 * roseIgn();
+      em = ROSECOL * exp(-max(rr - 1., 0.) * 1.5) * .22 * roseIgn();
       alb = mix(alb, vec3(.46, .44, .47), smoothstep(.09, .04, abs(rr - 1.07)) + smoothstep(.07, .03, abs(sdL - .07)) * .7);
       alb *= .55 + .45 * smoothstep(1., 1.2, rr);
       if (rr > 1.07) lc = vec2(li * 1.22, 6.8);
@@ -781,9 +788,10 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out 
       float sdL = max(sdArch(vec2(abs(q.x) - 5., q.y - 5.4), .72, 1.6), 2.2 - q.y);
       vec3 tint = bayTint(8., q.x);
       if (q.y < HAISLE) { gq = q; gt = tint; gsd = sdL; gseed = 5.; }
-      em = tint * exp(-max(sdL, 0.) * 2.4) * .12 + lancetGlow(q) * .5;
+      em = tint * exp(-max(sdL, 0.) * 2.4) * .12;
       alb *= step(q.y, HAISLE) * .8 + .2;
     }
+    em += lancetGlow(q) * (abs(q.x) < WN ? 1. : .5);
     // The joints catch the glow of the glass beside them.
     float rel = max(1. + dot(ash.yz, normalize(lc - q + 1e-4)) * .9, 0.);
     float a1 = mix(.5, 1., smoothstep(0., 1.4, q.y)) * mix(.6, 1., smoothstep(0., 1., WA - abs(q.x)))
@@ -833,7 +841,6 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out 
     }
     mul *= .45 + .55 * smoothstep(0., .9, p.y);
   } else if (id == 4) {
-    vec3 ash = ashlar(p.zy, aa);
     alb = vec3(.3, .29, .33) * ash.x;
     vec2 tilt = ash.yz;
     ao = mix(.55, 1., smoothstep(0., 1.4, p.y));
@@ -870,23 +877,22 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out 
     gq = vec2(zc, p.y); gt = bayTint(kb, sx); gseed = kb * 7. + sx;
     gsd = min(clerHole(p.zy), -1e-4);
   } else if (id >= 10) {
+    vec3 tint; float lid;
+    vec2 q = (p.xy - vec2(0., HROSE)) / RROSE;
+    float d = roseShape(q, tint, lid);
     if (id == 12) {
-      vec3 tint; float lid;
-      vec2 q = (p.xy - vec2(0., HROSE)) / RROSE;
-      float d = roseShape(q, tint, lid);
       gq = q * RROSE * 1.25; gseed = lid; gk = 1.05;
       gt = tint * roseIgn() * (.86 + .14 * vnoise(vec2(uTime * .22 + lid * 1.7, lid)));
       gsd = min(d * RROSE, -1e-4);
-    } else { own = roseStone(p, n, id); unlit = true; }
+    } else { own = roseStone(p, n, id, d, tint); unlit = true; }
   } else if (id == 9) {
     // The passage behind the triforium: dark, lit only by what comes through its arches.
-    alb = vec3(.2, .19, .22) * (n.x != 0. ? ashlar(p.zy, aa).x : 1.);
+    alb = vec3(.2, .19, .22) * (n.x != 0. ? ash.x : 1.);
     ao = .3;
   } else if (id == 5) {
     float sdL = max(sdArch(vec2(zl, p.y - 5.5), .9, 2.), 2. - p.y);
     vec3 tint = bayTint(kb, sx);
     gq = vec2(zl, p.y); gt = tint; gsd = sdL; gseed = kb * 3. + sx; gk = mix(.42, 1., smoothstep(4., 16., t));
-    vec3 ash = ashlar(p.zy, aa);
     alb = vec3(.28, .27, .31) * ash.x;
     alb = mix(alb, vec3(.44, .42, .46), smoothstep(.1, .05, abs(sdL - .09)) * .6);
     float a5 = mix(.5, 1., smoothstep(0., 1.2, p.y)) * mix(.55, 1., smoothstep(0., 1., HAISLE - p.y));
@@ -1113,10 +1119,27 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
   const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, depth: false, stencil: false, powerPreference: "high-performance" });
   if (!gl) return null;
 
-  // Every program is compiled in the background: through Direct3D a shader of this size takes
-  // seconds, and the page must not wait for it. Until the plain nave is ready, the page keeps its
-  // drawn rose.
+  // What the context can do is asked before anything is compiled: where WebGL runs on a single
+  // thread (Firefox), every question put to a context waits for the compiler to finish.
   const parallel = gl.getExtension("KHR_parallel_shader_compile");
+  const timer = gl.getExtension("EXT_disjoint_timer_query_webgl2");
+  const floatTargets = !!gl.getExtension("EXT_color_buffer_float");
+  const renderer = (() => {
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    return String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || "");
+  })();
+  const software = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
+
+  // Every program is compiled in the background: through Direct3D a shader of this size takes
+  // seconds, and the page must not wait for it (it keeps its veil up until the nave's first frame).
+  // Where the browser compiles in the background on its own (Chrome), the plain nave and the full one
+  // are built at once, and the full one takes over once ready. Where it does not (Firefox), all WebGL
+  // on the page runs on one thread: while a shader compiles, anything drawn with it, by the nave or
+  // by the relics, holds back every frame of the page until the compile is done, and a fence is the
+  // only thing that may be asked meanwhile. There the plain nave alone is built, behind the veil, and
+  // the relics wait for it (see busy below): the full one would take the page's WebGL away for
+  // several seconds more, and no moment is safe to spend them on.
+  const canFull = !software && floatTargets && !!parallel;
   const begin = (vs, fs) => {
     const pr = gl.createProgram();
     const shaders = [[gl.VERTEX_SHADER, vs], [gl.FRAGMENT_SHADER, fs]].map(([type, src]) => {
@@ -1131,14 +1154,19 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
     gl.linkProgram(pr);
     return { pr, shaders };
   };
-  const done = (jobs) => !parallel || jobs.every((j) => gl.getProgramParameter(j.pr, parallel.COMPLETION_STATUS_KHR));
+  const fenceAfter = () => { const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0); gl.flush(); return { sync, ok: false, at: 0 }; };
+  const done = (jobs, fence) => {
+    if (parallel) return jobs.every((j) => gl.getProgramParameter(j.pr, parallel.COMPLETION_STATUS_KHR));
+    if (fence && !fence.ok && performance.now() - fence.at > 100) { fence.at = performance.now(); fence.ok = gl.getSyncParameter(fence.sync, gl.SYNC_STATUS) === gl.SIGNALED; }
+    return !!fence && fence.ok;
+  };
   const linked = (job) => {
     if (gl.getProgramParameter(job.pr, gl.LINK_STATUS)) return true;
     console.warn("Cremisi nave: a shader failed to build", job.shaders.map((sh) => gl.getShaderInfoLog(sh)).join("\n"), gl.getProgramInfoLog(job.pr));
     return false;
   };
   const uniforms = (pr, names) => Object.fromEntries(names.map((n) => [n, gl.getUniformLocation(pr, n)]));
-  const plain = { jobs: [begin(VERT, FRAG), begin(DUST_VERT, DUST_FRAG)], ready: false, lost: false };
+  const plain = { jobs: null, fence: null, ready: false, lost: false };
   let prog = null, dust = null, U = null, D = null;
 
   const quad = gl.createVertexArray();
@@ -1193,7 +1221,7 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
   const push = (xs, x) => { xs.push(x); if (xs.length > 30) xs.shift(); };
 
   const plainReady = () => {
-    if (plain.lost || !done(plain.jobs)) return false;
+    if (plain.lost || !plain.jobs || !done(plain.jobs, plain.fence)) return false;
     if (!plain.jobs.every(linked)) { plain.lost = true; state.running = false; onLost(); return false; }
     [prog, dust] = plain.jobs.map((j) => j.pr);
     U = uniforms(prog, ["uRes", "uTime", "uFocal", "uIgnite", "uExpo", "uPix", "uCam", "uBasis", "uPal", "uBay", "uRose", "uMarch", "uBounces"]);
@@ -1204,26 +1232,30 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
     return true;
   };
 
-  // ── The full nave. Its programs are compiled in the background from the start too, unless the
-  // context is a software rasteriser, cannot render to half-float targets, or cannot compile in the
-  // background at all (checking a shader that size would then stall the page); it takes over once
-  // the plain nave has shown that the GPU is a real one.
-  const renderer = (() => {
-    const info = gl.getExtension("WEBGL_debug_renderer_info");
-    return String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER) || "");
-  })();
-  const software = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
+  // ── The full nave. Where the plain nave is built too, the full one takes over once the plain one
+  // has shown that the GPU is a real one.
   const hq = { phase: "off", level: 2, ceiling: LEVELS.length - 1, jobs: null, P: null, U: null, rt: null, samples: [], dts: [], calm: 0, capUntil: 0, capMs: 15000, fade: 1, base: 1000 / 60, retryAt: 0, left: 0 };
-  if (!software && parallel && gl.getExtension("EXT_color_buffer_float")) {
-    hq.phase = "compiling";
-    hq.jobs = {
+  if (canFull) hq.phase = "compiling";
+
+  // The builds start at once where the browser compiles in the background. Where it does not, the
+  // plain nave's waits until the page has started (the nave is started once the type is in) and a
+  // couple of frames more: begun before the page has painted, Firefox holds back every frame of it
+  // until the build is done.
+  let built = false;
+  const build = () => {
+    if (built) return;
+    built = true;
+    plain.jobs = [begin(VERT, FRAG), begin(DUST_VERT, DUST_FRAG)];
+    if (canFull) hq.jobs = {
       scene: begin(VERT, HQ_FRAG),
       shaft: begin(VERT, SHAFT_FRAG),
       down: begin(VERT, DOWN_FRAG),
       up: begin(VERT, UP_FRAG),
       comp: begin(VERT, COMP_FRAG),
     };
-  }
+    if (!parallel) plain.fence = fenceAfter();
+  };
+  if (parallel) build();
   canvas.dataset.tier = "lq";
 
   const target = (w, h) => {
@@ -1494,7 +1526,6 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
   // Timing. Where the browser has GPU timer queries, a frame is timed on the GPU itself and read back
   // a few frames later, without stalling anything. One query is in flight at a time, tagged with
   // what it measured, so that a result arriving after a change is dropped.
-  const timer = gl.getExtension("EXT_disjoint_timer_query_webgl2");
   const clock = { q: null, tag: "" };
   const config = () => (state.hq ? `hq${hq.level}` : `lq${state.w}x${state.h}`);
   const clockRead = () => {
@@ -1629,8 +1660,16 @@ export function createNave(canvas, palette, { still = false, onReady = () => {},
     tick,
     setProgress(p) { state.progress = clamp01(p); },
     setPointer(x, y) { state.tx = x; state.ty = y; },
-    start() { if (!state.running) { state.running = true; state.last = 0; state.frames = 0; } },
+    start() {
+      if (!built && !state.buildAt) state.buildAt = requestAnimationFrame(() => requestAnimationFrame(build));
+      if (!state.running) { state.running = true; state.last = 0; state.frames = 0; }
+    },
     stop() { state.running = false; },
+    // Without background compilation: whether the build is under way, during which nothing else on the
+    // page may draw with WebGL (it would hold the page until the build is done).
+    busy() {
+      return !parallel && !!plain.jobs && !plain.ready && !plain.lost && !done(plain.jobs, plain.fence);
+    },
     render() { draw(still ? 30 : (performance.now() - state.t0) / 1000); },
   };
 }

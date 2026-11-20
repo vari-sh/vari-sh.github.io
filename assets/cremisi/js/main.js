@@ -46,13 +46,13 @@ $$(".reveal, [data-head], [data-chart], [data-ramp], [data-facade]").forEach((el
 
 // ── The nave and the relics
 const naveCanvas = $("[data-nave]");
-// The nave is built in the background: the drawn rose stays until its first frame is on the canvas,
-// and comes back if it cannot be built after all.
+// The nave is built in the background: the veil stays up until its first frame is on the canvas (see
+// unveil below); the drawn rose takes its place if it cannot be built after all.
 const nave = naveCanvas
   ? createNave(naveCanvas, naveCanvas.dataset.palette.split(","), {
       still: reduced,
-      onReady: () => root.classList.add("has-gl"),
-      onLost: () => { root.classList.remove("has-gl", "fly"); measure(); },
+      onReady: () => { root.classList.add("has-gl"); naveIn(); },
+      onLost: () => { root.classList.remove("has-gl", "fly"); measure(); naveIn(); },
     })
   : null;
 const relics = createRelics($$("canvas[data-relic]"), { still: reduced });
@@ -99,7 +99,7 @@ if (stage && nave && fine) {
   stage.addEventListener("pointerleave", () => nave.setPointer(0, 0));
 }
 let heroSeen = true;
-if (hero) new IntersectionObserver(([e]) => { heroSeen = e.isIntersecting; if (nave) heroSeen && isReady ? nave.start() : nave.stop(); }).observe(hero);
+if (hero) new IntersectionObserver(([e]) => { heroSeen = e.isIntersecting; if (!heroSeen) naveIn(); if (nave) heroSeen && isReady ? nave.start() : nave.stop(); }).observe(hero);
 
 // ── Everything tied to the scroll position is computed in one place, once per frame.
 const parallax = $$("[data-parallax]");
@@ -237,7 +237,8 @@ const frame = (now) => {
   nave?.tick(now);
   // A nave that costs this much at full size means a software rasteriser: start the stones on the plainest tier.
   if (relics && !hinted && nave?.state.full) { hinted = true; if (nave.state.full > 20) relics.setTier(0); }
-  relics?.tick(now);
+  // Where WebGL runs on a single thread (Firefox), the stones wait while the nave is being built.
+  if (!nave?.busy()) relics?.tick(now);
 };
 let hinted = false;
 
@@ -416,16 +417,26 @@ for (const btn of $$("[data-copy-code]")) {
   });
 }
 
-// ── Raise the veil once the type is in, and light the windows.
+// ── Once the type is in, the windows are lit; the veil rises when the nave has drawn its first
+// frame too (or cannot, or is out of sight), so that the hero opens on the nave and not on the rose
+// that stands in for it. Not after more than twelve seconds, though.
 measure();
 requestAnimationFrame(frame);
+let veiled = true, naveShown = !nave;
+const unveil = () => {
+  if (!veiled || !isReady || !naveShown) return;
+  veiled = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add("is-ready")));
+};
+function naveIn() { naveShown = true; unveil(); }
 const lift = () => {
   if (isReady) return;
   isReady = true;
   measure();
   if (nave && heroSeen) nave.start();
-  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add("is-ready")));
+  unveil();
 };
 (document.fonts?.ready ?? Promise.resolve()).then(lift);
 setTimeout(lift, 900);
+setTimeout(naveIn, 12000);
 addEventListener("load", measure);

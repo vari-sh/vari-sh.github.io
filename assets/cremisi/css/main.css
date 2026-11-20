@@ -67,10 +67,13 @@ h1, h2, h3 { font-family: var(--f-title); font-weight: 600; letter-spacing: .04e
 .veil {
   position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: #050506;
   transition: opacity .8s ease .05s, visibility 0s .9s;
-  animation: veil-out .8s 4s forwards;
+  /* Should the script fail, the veil lifts by itself. Once the page is ready the animation goes: in
+     Firefox an animation of the opacity, even while it waits for its delay, keeps the transition from
+     running, and the veil would come back until the animation starts. */
+  animation: veil-out .8s 13s forwards;
 }
 .veil-cross { width: 30px; height: 38px; fill: var(--crimson); animation: veil-pulse 1.5s ease-in-out infinite; }
-.is-ready .veil { opacity: 0; visibility: hidden; }
+.is-ready .veil { opacity: 0; visibility: hidden; animation: none; }
 .no-js .veil { display: none; }
 @keyframes veil-out { to { opacity: 0; visibility: hidden; } }
 @keyframes veil-pulse { 0%, 100% { opacity: .25; scale: .92; } 50% { opacity: 1; scale: 1; } }
