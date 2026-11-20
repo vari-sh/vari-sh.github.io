@@ -98,6 +98,44 @@ if (stage && nave && fine) {
   stage.addEventListener("pointermove", (e) => nave.setPointer((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1));
   stage.addEventListener("pointerleave", () => nave.setPointer(0, 0));
 }
+// On a phone the nave follows the tilt of the screen instead: how far it has turned from where it was
+// held a moment ago, so that any way of holding it is the rest position, and a tilt that is held
+// eases back to it. iOS sends no reading until asked, and asking needs a tap: the first one on the
+// hero that is not on a link or a button.
+if (stage && nave && !fine && !reduced && "DeviceOrientationEvent" in window) {
+  const RANGE = 15; // degrees of tilt for the swing the mouse gets from edge to centre
+  let rest = null, prev = null, last = 0, still = 0;
+  const onTilt = (e) => {
+    if (e.beta == null || e.gamma == null) return;
+    // The screen's own axes: in landscape they are the device's, turned a quarter.
+    const turn = (((screen.orientation?.angle ?? window.orientation ?? 0) % 360) + 360) % 360;
+    const [x, y] = turn === 90 ? [e.beta, -e.gamma] : turn === 270 ? [-e.beta, e.gamma] : turn === 180 ? [-e.gamma, -e.beta] : [e.gamma, e.beta];
+    // The rest has been following where the screen was since the last reading (no reading comes while
+    // it is still); after a jump (held upright, the angles can flip over) it starts again here.
+    if (!rest || Math.abs(x - prev[0]) > 30 || Math.abs(y - prev[1]) > 30) rest = [x, y];
+    else {
+      const k = 1 - Math.exp(-(e.timeStamp - last) / 3000);
+      rest[0] += (prev[0] - rest[0]) * k;
+      rest[1] += (prev[1] - rest[1]) * k;
+    }
+    prev = [x, y];
+    last = e.timeStamp;
+    nave.setPointer(clamp((x - rest[0]) / RANGE, -1, 1), clamp((rest[1] - y) / RANGE, -1, 1));
+    // A screen held still for a second sends no more readings: it is at rest where it is.
+    clearTimeout(still);
+    still = setTimeout(() => { rest = [...prev]; nave.setPointer(0, 0); }, 1000);
+  };
+  addEventListener("deviceorientation", onTilt);
+  // Chrome has the same way of asking but sends the readings anyway: ask only if none has come.
+  if (typeof DeviceOrientationEvent.requestPermission === "function") {
+    const ask = (e) => {
+      if (e.target.closest("a, button")) return;
+      stage.removeEventListener("click", ask);
+      if (!rest) DeviceOrientationEvent.requestPermission().then((s) => s === "granted" && addEventListener("deviceorientation", onTilt), () => {});
+    };
+    stage.addEventListener("click", ask);
+  }
+}
 let heroSeen = true;
 if (hero) new IntersectionObserver(([e]) => { heroSeen = e.isIntersecting; if (!heroSeen) naveIn(); if (nave) heroSeen && isReady ? nave.start() : nave.stop(); }).observe(hero);
 
