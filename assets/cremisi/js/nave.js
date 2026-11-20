@@ -59,10 +59,10 @@ vec3 bayTint(float k, float side) { return uBay[int(clamp(k, -1., 8.) + 1.) * 2 
 // The openings of the nave wall, in (z, y), negative inside: the arcades, the triforium above them
 // (four small arches a bay, opening on a passage), and the clerestory lancets, two a bay.
 // Below the springing the arcades open right up to the core of each pier, so that no jamb shows
-// between its shafts; the step where the arch begins is hidden in the capital.
+// between its shafts; the step where the arch begins is hidden in the abacus.
 float arcadeHole(vec2 q) {
   float zl = mod(q.x, BAY) - BAY * .5;
-  return q.y < HCAP - .3 ? abs(zl) - 2.05 : sdArch(vec2(zl, q.y - HCAP), HS, RAD);
+  return q.y < HCAP - .04 ? abs(zl) - 2.05 : sdArch(vec2(zl, q.y - HCAP), HS, RAD);
 }
 float trifHole(vec2 q) { return max(sdArch(vec2(mod(q.x, BAY * .25) - BAY * .125, q.y - HAISLE - .68), .34, .7), HAISLE + .2 - q.y); }
 float clerHole(vec2 q) { return max(sdArch(vec2(abs(mod(q.x, BAY) - BAY * .5) - .98, q.y - HCLS), .6, 1.3), HCL0 + .1 - q.y); }
@@ -191,6 +191,38 @@ float pierGroove(vec2 q) {
   }
   return d2;
 }
+// An octagon of inradius r, in plan.
+float sdOct(vec2 q, float r) { q = abs(q); return max(max(q.x, q.y), (q.x + q.y) * .70711) - r; }
+
+// The capital and the base of a pier, in its own frame (q.xz from its axis, q.y the height): above, an
+// astragal round the top of the shafts, a bell flaring to the abacus with a crocket under each of its
+// corners (a stalk rising along the bell, curling out at the top), and an octagonal abacus; below, a
+// torus on an octagonal plinth. All within radius .7.
+float sdSeg(vec3 p, vec3 a, vec3 b) { vec3 pa = p - a, ba = b - a; return length(pa - ba * clamp(dot(pa, ba) / dot(ba, ba), 0., 1.)); }
+float colSd(vec3 q) {
+  float r = length(q.xz);
+  if (q.y < 2.) return min(max(sdOct(q.xz, .6), abs(q.y - .09) - .09), length(vec2(r - .42, q.y - .25)) - .07);
+  float k = clamp((q.y - 4.5) / .47, 0., 1.);
+  float bell = max(max(r - .34 - .27 * k * sqrt(k), 4.5 - q.y), q.y - 4.97) * .72;
+  float ring = length(vec2(r - .4, q.y - 4.5)) - .06;
+  float abac = max(sdOct(q.xz, .64), abs(q.y - 5.055) - .085);
+  float s = TAU / 8., a = mod(atan(q.z, q.x) - s * .5, s) - s * .5;
+  vec3 c = vec3(r * cos(a), q.y, r * sin(a));
+  float crock = min(sdSeg(c, vec3(.4, 4.62, 0.), vec3(.55, 4.86, 0.)) - .035, length(c - vec3(.585, 4.88, 0.)) - .055);
+  return min(min(bell, ring), min(abac, crock));
+}
+
+// The stone of a capital or a base, by height. A little carving on the bell goes into nn.
+vec3 capStone(vec3 p, vec3 n, inout vec3 nn) {
+  if (p.y < 2.) return p.y < .19 ? vec3(.40, .38, .42) : vec3(.46, .44, .47);
+  if (p.y > HTOP + .02) return vec3(.37, .355, .395);
+  if (p.y > 4.965) return vec3(.47, .45, .48) * (.82 + .18 * smoothstep(0., .03, 5.14 - p.y));
+  if (p.y < 4.56) return vec3(.46, .44, .47);
+  float az = atan(n.z, n.x), leaf = sin(az * 24.) * smoothstep(4.56, 4.9, p.y);
+  nn = normalize(n + vec3(-sin(az), 0., cos(az)) * leaf * .18);
+  return vec3(.42, .40, .44) * (.78 + .22 * smoothstep(4.56, 4.95, p.y)) * (.92 + .08 * leaf);
+}
+
 float pierHit(vec2 o, vec2 d, float a, out vec2 nc) {
   float best = 1e9;
   nc = vec2(1., 0.);
@@ -230,47 +262,61 @@ float trace(vec3 ro, vec3 rd, out int idOut, out vec3 nOut) {
         }
       }
     }
-    float zIn = ro.z + rd.z * (WN - CAPR - sx * ro.x) * irx;
-    float k = ceil((zIn - CAPR) / BAY), a2 = dot(rd.xz, rd.xz);
+    // The piers, nearest first: each is bounded by a cylinder of radius .7 that holds its capital
+    // and base. Within it the pier is met exactly, the capital and the base by sphere tracing (they
+    // are solids of revolution), and the vault shaft that rises from the capital as a cylinder.
+    float zIn = ro.z + rd.z * (WN - .7 - sx * ro.x) * irx;
+    float k = ceil((zIn - .7) / BAY), a2 = dot(rd.xz, rd.xz);
     for (int i = 0; i < 3; i++) {
       float zk = (k + float(i)) * BAY;
       if (zk > ZEND + 1.) break;
       vec2 o = vec2(ro.x - sx * WN, ro.z - zk);
-      float b = dot(o, rd.xz), oo = dot(o, o);
-      float h = b * b - a2 * (oo - CAPR * CAPR);
+      float b = dot(o, rd.xz), h = b * b - a2 * (dot(o, o) - .49);
       if (h <= 0.) continue;
-      float r = CAPR, tt = (-b - sqrt(h)) / a2, y = ro.y + rd.y * tt;
-      vec2 oc = o, pn = vec2(1., 0.);
-      bool ok = tt > 0. && ((y > HCAP - .5 && y < HTOP) || y < .34);
-      if (!ok) {
-        h = b * b - a2 * (oo - CR * CR);
-        if (h > 0.) {
-          float tp = pierHit(o, rd.xz, a2, pn);
-          if (tp < 1e8) { y = ro.y + rd.y * tp; ok = y < HCAP - .4; r = 0.; tt = tp; }
+      float sq = sqrt(h), c0 = max((-b - sq) / a2, 0.), c1 = (-b + sq) / a2;
+      float best = 1e9;
+      vec3 bn = vec3(0.);
+      bool solid = false;
+      vec2 pn;
+      float tp = pierHit(o, rd.xz, a2, pn), y = ro.y + rd.y * tp;
+      if (tp < 1e8 && y > .3 && y < 4.5) { best = tp; bn = vec3(pn.x, 0., pn.y); }
+      vec3 o3 = vec3(o.x, ro.y, o.y);
+      for (int band = 0; band < 2; band++) {
+        // The base, then the capital (or the other way round for a ray going down).
+        bool cap = (band == 0) == (rd.y < 0.);
+        float lo = cap ? 4.42 : 0., hi = cap ? 5.16 : .34;
+        float ta = c0, tb = min(c1, best);
+        if (abs(rd.y) > 1e-6) {
+          float y0 = (lo - ro.y) / rd.y, y1 = (hi - ro.y) / rd.y;
+          ta = max(ta, min(y0, y1)); tb = min(tb, max(y0, y1));
+        } else if (ro.y < lo || ro.y > hi) continue;
+        if (tb <= ta) continue;
+        float tm = ta, d = 1.;
+        for (int j = 0; j < uMarch; j++) {
+          d = colSd(o3 + rd * tm);
+          if (d < 1e-3) break;
+          tm += d;
+          if (tm > tb) break;
         }
+        // A ray still in the band when the steps run out is grazing the stone: it hits.
+        if (tm <= tb && d < .01) { best = tm; solid = true; break; }
       }
-      if (!ok) {
-        // The vault shafts stand proud of the wall, on the nave side; against the end wall they keep
-        // to the corner, clear of the rose.
-        oc = vec2(ro.x - sx * (zk > ZEND - 1. ? WN : WN - WT - .06), ro.z - zk);
-        b = dot(oc, rd.xz);
-        h = b * b - a2 * (dot(oc, oc) - SHR * SHR);
-        if (h > 0.) { r = SHR; tt = (-b - sqrt(h)) / a2; y = ro.y + rd.y * tt; ok = tt > 0. && y >= HCAP && y < HV + .4; }
+      if (solid) {
+        vec3 q = o3 + rd * best, e = vec3(1e-3, 0., 0.);
+        bn = normalize(vec3(colSd(q + e.xyy) - colSd(q - e.xyy), colSd(q + e.yxy) - colSd(q - e.yxy), colSd(q + e.yyx) - colSd(q - e.yyx)));
       }
-      if (ok) {
-        if (tt < t) {
-          t = tt; id = 3;
-          vec2 q = oc + rd.xz * tt;
-          n = r > 0. ? vec3(q.x, 0., q.y) / r : vec3(pn.x, 0., pn.y);
-        }
+      // The vault shafts stand proud of the wall, on the nave side, from the abacus up; against the end
+      // wall they keep to the corner, clear of the rose.
+      vec2 os = vec2(ro.x - sx * (zk > ZEND - 1. ? WN : WN - WT - .06), ro.z - zk);
+      float bs = dot(os, rd.xz), hs = bs * bs - a2 * (dot(os, os) - SHR * SHR);
+      if (hs > 0.) {
+        float ts = (-bs - sqrt(hs)) / a2, ys = ro.y + rd.y * ts;
+        if (ts > 0. && ts < best && ys >= HTOP && ys < HV + .4) { best = ts; vec2 qs = os + rd.xz * ts; bn = vec3(qs.x, 0., qs.y) / SHR; }
+      }
+      if (best < 1e8) {
+        if (best < t) { t = best; id = 3; n = bn; }
         break;
       }
-    }
-    if (rd.y < 0. && ro.y > HTOP) {
-      float tt = (HTOP - ro.y) / rd.y;
-      vec3 pt = ro + rd * tt;
-      vec2 dq = vec2(abs(pt.x) - WN, pt.z - floor(pt.z / BAY + .5) * BAY);
-      if (tt < t && dot(dq, dq) < CAPR * CAPR && abs(pt.x) < WN) { t = tt; id = 3; n = vec3(0., 1., 0.); }
     }
     // The nave wall is a slab: the arcades open through it onto the aisle, the triforium onto a
     // passage behind it, and the clerestory glass is set in its outer face.
@@ -453,16 +499,11 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, out vec3 nr, out float refl
     alb = mix(vec3(.17, .165, .2) * (.86 + .14 * sin(p.z * 5.3 + th * 23.) * sin(th * 31. - p.z * 2.9)), vec3(.4, .38, .42), rib);
     mul = .5 + .5 * (1. - u);
   } else if (id == 3) {
-    float az = atan(n.z, n.x);
     alb = vec3(.33, .32, .36) * (.8 + .2 * smoothstep(.5, .47, abs(fract(p.y / 1.25) - .5)));
-    if (p.y > HCAP - .5) {
-      float cap = step(p.y, HTOP + .01);
-      // Crockets round the bell of the capital.
-      float leaf = sin(az * 16.) * smoothstep(HCAP - .5, HCAP - .1, p.y) * cap;
-      nn = normalize(n + vec3(-sin(az), 0., cos(az)) * leaf * .35 + vec3(0., .2 * cap, 0.));
-      alb = mix(vec3(.37, .355, .395), vec3(.47, .45, .48) * (.72 + .28 * smoothstep(0., .05, abs(p.y - HCAP + .2))), cap);
-    } else if (p.y < .34) {
-      alb = vec3(.44, .42, .45) * (.75 + .25 * smoothstep(0., .04, abs(p.y - .2)));
+    if (p.y > 4.5 || p.y < .3) {
+      alb = capStone(p, n, nn);
+      // The underside of the bell, where it leaves the pier, is in shadow.
+      mul = p.y > 4.5 && p.y < 4.97 ? mix(.55, 1., smoothstep(.0, .12, length(p.xz - vec2(sign(p.x) * WN, floor(p.z / BAY + .5) * BAY)) - .34)) : 1.;
     } else {
       // Far off, the shafts of the pier are narrower than a few pixels: their relief fades into the
       // round of the whole pier, instead of breaking into a dashed line of highlights.
@@ -776,15 +817,11 @@ vec3 shade(vec3 p, vec3 rd, float t, int id, vec3 n, vec2 jit, out vec3 nr, out 
     alb = vec3(.33, .32, .36) * (.88 + .24 * h21(vec2(drum, kb * 2. + side)));
     alb *= .82 + .18 * smoothstep(.5, .46 - aa, abs(fract(p.y / 1.25) - .5));
     alb *= .9 + .2 * vnoise(vec2(az * 3., p.y * 6.));
-    if (p.y > HCAP - .5) {
-      float cap = step(p.y, HTOP + .01);
-      // Crockets round the bell of the capital.
-      float leaf = sin(az * 16.) * smoothstep(HCAP - .5, HCAP - .1, p.y) * cap;
-      nn = normalize(n + vec3(-sin(az), 0., cos(az)) * leaf * .35 + vec3(0., .2 * cap, 0.));
-      alb = mix(vec3(.37, .355, .395), vec3(.47, .45, .48) * (.72 + .28 * smoothstep(0., .05, abs(p.y - HCAP + .2))), cap);
-      alb *= .86 + .14 * cos(az * 16.) * cap;
-    } else if (p.y < .34) {
-      alb = vec3(.44, .42, .45) * (.75 + .25 * smoothstep(0., .04, abs(p.y - .2)));
+    if (p.y > 4.5 || p.y < .3) {
+      alb = capStone(p, n, nn) * (.9 + .2 * vnoise(p.xz * 9. + p.y * 3.));
+      // The underside of the bell, where it leaves the pier, is in shadow; so is the foot of the base.
+      vec2 cc = vec2(sign(p.x) * WN, floor(p.z / BAY + .5) * BAY);
+      ao = p.y > 4.5 && p.y < 4.97 ? mix(.45, 1., smoothstep(0., .12, length(p.xz - cc) - .34)) : p.y < .3 ? mix(.6, 1., smoothstep(0., .12, p.y)) : 1.;
     } else {
       ao = 1. - .45 * smoothstep(.4, 0., HCAP - .5 - p.y);
       // Far off, the shafts of the pier are narrower than a few pixels: their relief fades into the
